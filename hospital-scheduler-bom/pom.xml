@@ -8,7 +8,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.11.0</junit.version>
-    <log4j.version>2.13.0</log4j.version>
+    <log4j.version>2.26.1</log4j.version>
     <assertj.version>3.27.7</assertj.version>
     <assertj.swing.version>3.27.7</assertj.swing.version>
     <mockito.version>4.11.0</mockito.version>
