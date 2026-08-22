@@ -8,6 +8,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class IdTest {
 
+    
+    
     @Nested
     class ErrorCases {
         
@@ -33,6 +35,16 @@ class IdTest {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Id.createId(value))
                 .withMessage("Id value cannot be empty");
+        }
+        
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "id.", "id,", "id?", "id`", "id#", "id@", "id(", "i d", "i\td"
+        })
+        void testValueWithInvalidCharactersShouldThrow(String value) {
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> Id.createId(value))
+                .withMessage("Id value contains invalid characters");
         }
     }
 }
