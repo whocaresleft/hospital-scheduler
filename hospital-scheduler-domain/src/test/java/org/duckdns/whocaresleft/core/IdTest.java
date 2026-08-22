@@ -2,38 +2,41 @@ package org.duckdns.whocaresleft.core;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+@DisplayName("Unit tests for Id")
 class IdTest {
 
-    @Nested
+    @Nested @DisplayName("Happy cases")
     class HappyCases {
         
-        @Test
+        @Test @DisplayName("Valid Id value with leading and trailing spaces gets trimmed")
         void testValidIdWithBothLeadingAndTrailingWhitespacesGetTrimmed() {
             Id id = Id.createId(" valid_id ");
             assertThat(id.getValue())
                 .isEqualTo("valid_id"); 
         }
         
-        @Test
-        void testValidIdWithOnlyCorrectCharactersRemainsItself() {
+        @Test @DisplayName("Valid Id value with no leading or trailing spaces remains itself")
+        void testValidIdWithNoLeadingOrTrailingWhitespacesRemainsItself() {
             Id id = Id.createId("valid_id");
             assertThat(id.getValue())
                 .isEqualTo("valid_id"); 
         }
         
-        @Test
+        @Test @DisplayName("Id is equal to itself")
         void testIdIsEqualToItself() {
             Id id = Id.createId("valid_id");
             assertThat(id)
                 .isEqualTo(id);
         }
         
-        @Test
+        @Test @DisplayName("Id's created from the same value are equal")
         void testIdsWithSameValueAreEqual() {
             Id id1 = Id.createId("valid_id");
             Id id2 = Id.createId("valid_id");
@@ -42,7 +45,7 @@ class IdTest {
                 .isEqualTo(id2);
         }
         
-        @Test
+        @Test @DisplayName("Id's created with different values are not equal")
         void testIdsWithDifferentValuesAreNotEqual() {
             Id id1 = Id.createId("valid_id");
             Id id2 = Id.createId("another_valid_id");
@@ -51,7 +54,7 @@ class IdTest {
                 .isNotEqualTo(id2); 
         }
         
-        @Test
+        @Test @DisplayName("Id is not equal to null")
         void testValidIdIsNotEqualToNull() {
             Id id1 = Id.createId("valid_id");
             
@@ -59,7 +62,7 @@ class IdTest {
                 .isNotEqualTo(null); 
         }
         
-        @Test
+        @Test @DisplayName("Id is not equal to object of a different class")
         void testValidIdIsNotEqualToObjectOfDifferentClass() {
             Id id1 = Id.createId("valid_id");
             
@@ -67,7 +70,7 @@ class IdTest {
                 .isNotEqualTo("valid_id"); 
         }
         
-        @Test
+        @Test @DisplayName("Id's that are equal should also have the same hash code")
         void testEqualIdsShouldHaveSameHashCode() {
             Id id1 = Id.createId("valid_id");
             Id id2 = Id.createId("valid_id");
@@ -78,7 +81,7 @@ class IdTest {
                 .isEqualTo(id2.hashCode());
         }
         
-        @Test
+        @Test @DisplayName("The string representation of Id is just its value")
         void testIdToStringShouldJustBeTheValue() {
             Id id = Id.createId("valid_id");
             
@@ -87,24 +90,24 @@ class IdTest {
         }
     }
     
-    @Nested
-    class ErrorCases {
+    @Nested @DisplayName("ErrorCases")
+    class ExceptionCases {
         
-        @Test
+        @Test @DisplayName("Creating an Id with null value should result in an exception")
         void testNullValueShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Id.createId(null))
                 .withMessage("Id value cannot be null");
         }
         
-        @Test
+        @Test @DisplayName("Creating an Id with empty string should result in an exception")
         void testEmptyStringValueShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Id.createId(""))
                 .withMessage("Id value cannot be empty");
         }
         
-        @ParameterizedTest
+        @ParameterizedTest @DisplayName("Creating an Id with a string consisting only of whitespaces should result in an exception")
         @ValueSource(strings = {
             " ", "\t", "   ", "\t\t\t", "\t   \t  \t "
         })
@@ -114,7 +117,7 @@ class IdTest {
                 .withMessage("Id value cannot be empty");
         }
         
-        @ParameterizedTest
+        @ParameterizedTest @DisplayName("Creating an Id with a non-permitted character should result in an exception")
         @ValueSource(strings = {
             "id.", "id?", "i d", "id#", "id@"
         })
