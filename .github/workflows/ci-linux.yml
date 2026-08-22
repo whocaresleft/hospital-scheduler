@@ -38,18 +38,14 @@ jobs:
 
       - name: Set Maven additional options
         run: |
-          if [[ -n "$COVERALLS_REPO_TOKEN" && "${{ matrix.java }}" == "17" ]]; then
-            echo "CODE_COVERAGE_OPTIONS=-Pcoveralls" >> $GITHUB_ENV
-          else
-            echo "CODE_COVERAGE_OPTIONS=-Pjacoco" >> $GITHUB_ENV
-          fi
-          if [[ -n "$SONAR_TOKEN " && "${{ matrix.java }}" == "17" ]]; then
-            echo "SONAR_GOAL=org.sonarsource.scanner.maven:sonar-maven-plugin:sonar"
+          echo "CODE_COVERAGE_ADDITIONAL_OPTIONS=-Pcoveralls" >> $GITHUB_ENV
+        if: ${{ env.COVERALLS_REPO_TOKEN && matrix.java == 17 }}
 
-      - name: Build with Maven
+      - name: Setup sonarcloud eventual goal
         run: |
           echo "SONARGOAL=org.sonarsource.scanner.maven:sonar-maven-plugin:sonar" >> $GITHUB_ENV
-        if: ${{ env.SONAR_TOKEN }}
+        if: ${{ env.SONAR_TOKEN && matrix.java == 17 }}
+
       - name: Build with Maven and SonarCloud
         run: >
           xvfb-run mvn verify $ADDITIONAL_MAVEN_OPTIONS $SONARGOAL
