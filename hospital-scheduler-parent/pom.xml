@@ -23,23 +23,6 @@
     <maven.coveralls.version>5.0.0</maven.coveralls.version>
     <maven.failsafe.version>3.5.6</maven.failsafe.version>
     <maven.docker.version>0.49.0</maven.docker.version>
-    
-    <maven.sonar.version>5.6.0.6792</maven.sonar.version>
-    <sonar.host.url>http://localhost:9000</sonar.host.url>
-    <sonar.tests>
-      src/test/java,
-      <!--src/it/java, --> 
-      <!--src/e2e/java, these are not present yet  --> 
-    </sonar.tests>
-    <sonar.junit.reportPaths>
-      target/surefire-reports,
-      target/failsafe-reports
-    </sonar.junit.reportPaths>
-    <sonar.coverage.exclusions>
-    
-    </sonar.coverage.exclusions>
-    
-    <sonar.organization>whocaresleft</sonar.organization>
   </properties>
 
   <dependencies>
@@ -99,12 +82,6 @@
           <groupId>io.fabric8</groupId>
           <artifactId>docker-maven-plugin</artifactId>
           <version>${maven.docker.version}</version>
-        </plugin>
-        
-        <plugin>
-          <groupId>org.sonarsource.scanner.maven</groupId>
-          <artifactId>sonar-maven-plugin</artifactId>
-          <version>${maven.sonar.version}</version>
         </plugin>
         
         <plugin>
