@@ -61,6 +61,39 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>${maven.build-helper.version}</version> <!--TODO configuration-->
+          <executions>
+            <execution>
+              <id>add-test-source</id>
+              <phase>generate-test-sources</phase>
+              <goals>
+                <goal>add-test-source</goal>
+              </goals>
+              <configuration>
+                <sources>
+                  <source>src/it/java</source>
+                  <source>src/e2e/java</source>
+                </sources>
+              </configuration>
+            </execution>
+            
+            <execution>
+              <id>add-test-resource</id>
+              <phase>generate-test-resources</phase>
+              <goals>
+                <goal>add-test-resource</goal>
+              </goals>
+              <configuration>
+                <resources>
+                  <resource>
+                    <directory>src/it/resources</directory>
+                  </resource>
+                  <resource>
+                    <directory>src/e2e/resources</directory>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         
         <plugin>
@@ -130,7 +163,7 @@
             </dependency>
           </dependencies>
           <configuration>
-          <!--Requires to add configuration. TODO-->
+          <!--TODO-->
           </configuration>
         </plugin>
       </plugins>
