@@ -15,8 +15,12 @@ class IdTest {
     @Nested @DisplayName("Happy cases")
     class HappyCases {
         
+        private static final String VALID_ID = "valid_id";
+        private static final String ANOTHER_VALID_ID = "another_valid_id";
+
         @Test @DisplayName("Valid Id value with leading and trailing spaces gets trimmed")
         void testValidIdWithBothLeadingAndTrailingWhitespacesGetTrimmed() {
+            
             Id id = Id.createId(" valid_id ");
             assertThat(id.getValue())
                 .isEqualTo("valid_id"); 
@@ -24,22 +28,22 @@ class IdTest {
         
         @Test @DisplayName("Valid Id value with no leading or trailing spaces remains itself")
         void testValidIdWithNoLeadingOrTrailingWhitespacesRemainsItself() {
-            Id id = Id.createId("valid_id");
+            Id id = Id.createId(VALID_ID);
             assertThat(id.getValue())
-                .isEqualTo("valid_id"); 
+                .isEqualTo(VALID_ID); 
         }
         
         @Test @DisplayName("Id is equal to itself")
         void testIdIsEqualToItself() {
-            Id id = Id.createId("valid_id");
+            Id id = Id.createId(VALID_ID);
             assertThat(id)
                 .isEqualTo(id);
         }
         
         @Test @DisplayName("Id's created from the same value are equal")
         void testIdsWithSameValueAreEqual() {
-            Id id1 = Id.createId("valid_id");
-            Id id2 = Id.createId("valid_id");
+            Id id1 = Id.createId(VALID_ID);
+            Id id2 = Id.createId(VALID_ID);
             
             assertThat(id1)
                 .isEqualTo(id2);
@@ -47,8 +51,8 @@ class IdTest {
         
         @Test @DisplayName("Id's created with different values are not equal")
         void testIdsWithDifferentValuesAreNotEqual() {
-            Id id1 = Id.createId("valid_id");
-            Id id2 = Id.createId("another_valid_id");
+            Id id1 = Id.createId(VALID_ID);
+            Id id2 = Id.createId(ANOTHER_VALID_ID);
             
             assertThat(id1)
                 .isNotEqualTo(id2); 
@@ -56,7 +60,7 @@ class IdTest {
         
         @Test @DisplayName("Id is not equal to null")
         void testValidIdIsNotEqualToNull() {
-            Id id1 = Id.createId("valid_id");
+            Id id1 = Id.createId(VALID_ID);
             
             assertThat(id1)
                 .isNotEqualTo(null); 
@@ -64,29 +68,29 @@ class IdTest {
         
         @Test @DisplayName("Id is not equal to object of a different class")
         void testValidIdIsNotEqualToObjectOfDifferentClass() {
-            Id id1 = Id.createId("valid_id");
+            Id id1 = Id.createId(VALID_ID);
             
             assertThat(id1)
-                .isNotEqualTo("valid_id"); 
+                .isNotEqualTo(VALID_ID); 
         }
         
         @Test @DisplayName("Id's that are equal should also have the same hash code")
         void testEqualIdsShouldHaveSameHashCode() {
-            Id id1 = Id.createId("valid_id");
-            Id id2 = Id.createId("valid_id");
+            Id id1 = Id.createId(VALID_ID);
+            Id id2 = Id.createId(VALID_ID);
             
             assertThat(id1)
                 .isEqualTo(id2);
-            assertThat(id1.hashCode())
-                .isEqualTo(id2.hashCode());
+            assertThat(id1)
+                .hasSameHashCodeAs(id2);
         }
         
         @Test @DisplayName("The string representation of Id is just its value")
         void testIdToStringShouldJustBeTheValue() {
-            Id id = Id.createId("valid_id");
+            Id id = Id.createId(VALID_ID);
             
-            assertThat(id.toString())
-                .isEqualTo("valid_id");
+            assertThat(id)
+                .hasToString(VALID_ID);
         }
     }
     
