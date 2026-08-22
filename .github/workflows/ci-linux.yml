@@ -54,7 +54,7 @@ jobs:
           -Dsonar.projectKey=whocaresleft_hospital-scheduler
         working-directory: ${{ env.workdir }}
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKE }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       
       - name: Generate JUnit report
         run: >
