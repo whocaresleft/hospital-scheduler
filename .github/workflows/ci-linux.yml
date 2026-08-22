@@ -31,7 +31,7 @@ jobs:
          restore-keys: ${{ runner.os }}-m2-
      - name: Build with Maven
        run: |
-         echo "SONARGOAL=sonar:sonar" >> $GITHUB_ENV
+         echo "SONARGOAL=org.sonarsource.scanner.maven:sonar-maven-plugin:sonar" >> $GITHUB_ENV
        if: ${{ env.SONAR_TOKEN }}
      - name: Build with Maven and SonarCloud
        run: >
