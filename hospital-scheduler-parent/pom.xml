@@ -1,0 +1,219 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.duckdns.whocaresleft</groupId>
+    <artifactId>hospital-scheduler-bom</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../hospital-scheduler-bom</relativePath>
+  </parent>
+  <artifactId>hospital-scheduler-parent</artifactId>
+  <packaging>pom</packaging>
+  
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    
+    <maven.compiler.version>3.8.0</maven.compiler.version>
+    <maven.surefire.version>2.22.1</maven.surefire.version>
+    <maven.site.version>3.7.1</maven.site.version>
+    <maven.build-helper.version>3.6.1</maven.build-helper.version>
+    <maven.jacoco.version>0.8.5</maven.jacoco.version>
+    <maven.pitest.version>1.5.2</maven.pitest.version>
+    <maven.pitest.junit5-plugin.version>0.12</maven.pitest.junit5-plugin.version> 
+    <maven.coveralls.version>5.0.0</maven.coveralls.version>
+    <maven.failsafe.version>3.5.6</maven.failsafe.version>
+    <maven.docker.version>0.49.0</maven.docker.version>
+    
+    <maven.sonar.version>5.6.0.6792</maven.sonar.version>
+    <sonar.host.url>http://localhost:9000</sonar.host.url>
+    <sonar.tets>
+      src/test/java,
+      src/it/java,
+      /src/e2e/java,
+    </sonar.tets>
+    <sonar.junit.reportPaths>
+      target/surefire-reports,
+      target/failsafe-reports
+    </sonar.junit.reportPaths>
+    <sonar.coverage.exclusions>
+    
+    </sonar.coverage.exclusions>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven.compiler.version}</version>
+        </plugin>
+        
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven.surefire.version}</version>
+        </plugin>
+        
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${maven.site.version}</version>
+        </plugin>
+        
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${maven.build-helper.version}</version> <!--TODO configuration-->
+        </plugin>
+        
+        <plugin>
+          <groupId>com.github.hazendaz.maven</groupId>
+          <artifactId>coveralls-maven-plugin</artifactId>
+          <version>${maven.coveralls.version}</version>
+          <configuration>
+            <repoToken>${env.COVERALLS_REPO_TOKEN}</repoToken>
+          </configuration>
+        </plugin>
+        
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven.failsafe.version}</version> <!--TODO configuration-->
+        </plugin>
+        
+        <plugin>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>${maven.docker.version}</version>
+        </plugin>
+        
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>${maven.sonar.version}</version>
+        </plugin>
+        
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${maven.jacoco.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+                <goal>report</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>jacoco-check</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <rule>
+                    <element>PACKAGE</element>
+                    <limits>
+                      <limit>
+                        <counter>LINE</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>0.50</minimum>
+                      </limit>
+                    </limits>
+                  </rule>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        
+        <plugin>
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <version>${maven.pitest.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.pitest</groupId>
+              <artifactId>pistest-junit5-plugin</artifactId>
+              <version>${maven.pitest.junit5-plugin.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+          <!--Requires to add configuration. TODO-->
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>jacoco</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>mutation-testing</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-maven</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>mutationCoverage</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>coveralls</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+          </plugin>
+          
+          <plugin>
+            <groupId>com.github.hazendaz.maven</groupId>
+            <artifactId>coveralls-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
