@@ -80,8 +80,7 @@ class IdTest {
             Id id2 = Id.createId(VALID_ID);
             
             assertThat(id1)
-                .isEqualTo(id2);
-            assertThat(id1)
+                .isEqualTo(id2)
                 .hasSameHashCodeAs(id2);
         }
         
