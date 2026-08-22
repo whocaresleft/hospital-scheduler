@@ -20,7 +20,7 @@
     <maven.jacoco.version>0.8.5</maven.jacoco.version>
     <maven.pitest.version>1.5.2</maven.pitest.version>
     <maven.pitest.junit5-plugin.version>0.12</maven.pitest.junit5-plugin.version> 
-    <maven.coveralls.version>5.0.0</maven.coveralls.version>
+    <maven.coveralls.version>5.1.0</maven.coveralls.version>
     <maven.failsafe.version>3.5.6</maven.failsafe.version>
     <maven.docker.version>0.49.0</maven.docker.version>
     
