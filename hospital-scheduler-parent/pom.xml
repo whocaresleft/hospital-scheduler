@@ -18,7 +18,7 @@
     <maven.site.version>3.7.1</maven.site.version>
     <maven.build-helper.version>3.6.1</maven.build-helper.version>
     <maven.jacoco.version>0.8.5</maven.jacoco.version>
-    <maven.pitest.version>1.5.2</maven.pitest.version>
+    <maven.pitest.version>1.25.9</maven.pitest.version>
     <maven.pitest.junit5-plugin.version>0.12</maven.pitest.junit5-plugin.version> 
     <maven.coveralls.version>5.0.0</maven.coveralls.version>
     <maven.failsafe.version>3.5.6</maven.failsafe.version>
