@@ -8,7 +8,7 @@ updates:
    ignore:
     # Any more recent version is incompatible with Java 8
     - dependency-name: "ch.qos.logback:logback-classic"
-    - depencency-name: "de.bwaldvogel:mongo-java-server"
+    - dependency-name: "de.bwaldvogel:mongo-java-server"
     
     # Same goes for mockito. Version 5 requires at least Java 11
     - dependency-name: "org.mockito:"
