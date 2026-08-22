@@ -6,21 +6,39 @@ on:
 
 jobs:
   build:
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     runs-on: ubuntu-latest
 
     steps:
      - uses: actions/checkout@v6
-     - name: Set up JDK 8
+       with:
+         fetch-depth: 0
+
+     - name: Set up JDK
        uses: actions/setup-java@v5
        with:
-         java-version: 8
+         java-version: 17
          distribution: 'temurin'
+
      - name: Cache Maven packages
        uses: actions/cache@v5
        with:
-         path: ~/.m2
+         path: |
+           ~/.m2
+           ~/.sonar/cache
          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
          restore-keys: ${{ runner.os }}-m2-
      - name: Build with Maven
-       run: xvfb-run mvn clean verify
+       run: |
+         echo "SONARGOAL=sonar:sonar" >> $GITHUB_ENV
+       if: ${{ env.SONAR_TOKEN }}
+     - name: Build with Maven and SonarCloud
+       run: >
+         xvfb-run mvn verify -Pjacoco $SONARGOAL
+         -Dsonar.organization=whocaresleft
+         -Dsonar.host.url=https://sonarcloud.io
+         -Dsonar.projectKey=whocaresleft_hospital-scheduler
        working-directory: hospital-scheduler-aggregator
+       env:
+         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

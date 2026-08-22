@@ -50,10 +50,29 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>report-aggregate</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report-aggregate</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
+          
           <plugin>
             <groupId>com.github.hazendaz.maven</groupId>
             <artifactId>coveralls-maven-plugin</artifactId>
+            <configuration>
+              <jacocoReports>
+                <param>${project.build.directory}/site/jacoco-aggregate/jacoco.xml</param>
+              </jacocoReports>
+              <sourceDirectories>
+                <param>${project.basedir}/../hospital-scheduler-domain/src/main/java</param>
+                <param>${project.basedir}/../hospital-scheduler-presentation/src/main/java</param>
+              </sourceDirectories>
+            </configuration>
             <executions>
               <execution>
                 <phase>verify</phase>
