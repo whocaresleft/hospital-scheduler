@@ -1,23 +1,23 @@
 version: 2
 updates:
-  - package-ecosystem: "maven"
-    directory: "/hospital-scheduler-aggregator"
-    schedule:
-      interval: "daily"
-    open-pull-request-limit: 10
-    ignore:
-      # Any more recent version is not compatible with Java 8
-      - dependency-name: "ch.qos.logback:logback-classic"
-      - dependency-name: "de.bwaldvogel:mongo-java-server"
-
-      # Same goes for mockito. Java 8 is supported up until 4.x.x
-      - dependency-name: "org.mockito"
-        versions: [">=5.0.0"]
-    groups:
-      maven-plugin-updates:
-        patterns:
-          - "org.apache.maven.plugins:*"
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+ - package-ecosystem: "maven"
+   directory: "/hospital-scheduler-aggregator"
+   schedule:
+     interval: "daily"
+   open-pull-requests-limit: 10
+   ignore:
+    # Any more recent version is incompatible with Java 8
+    - dependency-name: "ch.qos.logback:logback-classic"
+    - depencency-name: "de.bwaldvogel:mongo-java-server"
+    
+    # Same goes for mockito. Version 5 requires at least Java 11
+    - dependency-name: "org.mockito:"
+      versions: [">=5.0.0"]
+   groups:
+     maven-plugin-updates:
+       patterns:
+        - "org.apache.maven.plugins:*"
+ - package-ecosystem: "github-actions"
+   directory: "/"
+   schedule:
+     interval: "weekly"
