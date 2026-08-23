@@ -1,10 +1,12 @@
 package org.duckdns.whocaresleft.core;
 
-public class Id {
+import java.util.Objects;
 
-    private String value;
+public final class Id {
+
+    private final String value;
     
-    private Id(String value) { setValue(value); }
+    private Id(String value) { this.value = value; }
     
     public static Id createId(String value) {
         
@@ -20,8 +22,6 @@ public class Id {
 
     public String getValue() { return value; }
     
-    private void setValue(String value) { this.value = value; }
-    
     @Override
     public boolean equals(Object other) {
         
@@ -36,12 +36,11 @@ public class Id {
         
         Id otherId = (Id)other;
         
-        return value
-            .equals(otherId.value);
+        return Objects.equals(value, otherId.value);
     }
     
     @Override
-    public int hashCode() { return value.hashCode(); }
+    public int hashCode() { return Objects.hashCode(value); }
     
     @Override
     public String toString() { return value; }
