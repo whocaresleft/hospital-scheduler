@@ -3,7 +3,6 @@ package org.duckdns.whocaresleft.domain;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
-import java.util.function.IntPredicate;
 
 import org.duckdns.whocaresleft.core.Id;
 
@@ -82,6 +81,16 @@ public final class Shift {
     }
 
     public boolean overlaps(Shift second) {
+        
+        if (!date.equals(second.date))
+            return false;
+        
+        if (endTime.isBefore(second.startTime) || endTime.equals(second.startTime))
+            return false;
+        
+        if (startTime.isAfter(second.endTime) || startTime.equals(second.endTime))
+            return false;
+        
         return true;
     }
 }

@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
 import org.duckdns.whocaresleft.core.Id;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,6 +39,138 @@ class ShiftTest {
         @Test
         void testEqualsContractUsingEqualsVerifier() {
             EqualsVerifier.forClass(Shift.class).verify();
+        }
+        
+        @Test
+        void testShiftsWithDifferentDatesShouldNotOverlap() {
+            LocalDate date = LocalDate.of(2026, 6, 15);
+            LocalDate another_date = LocalDate.of(2026, 6, 16);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, date, START_TIME, END_TIME);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, another_date, START_TIME, END_TIME);
+            
+            assertThat(first.overlaps(second))
+                .isFalse();
+        }
+        
+        @Test
+        void testShiftsOnSameDateWhereTheFirstEndsBeforeTheSecondStartsShouldNotOverlap() {
+            LocalTime firstStart = LocalTime.of(8, 0);
+            LocalTime firstEnd = LocalTime.of(9, 0);
+            LocalTime secondStart = LocalTime.of(10, 0);
+            LocalTime secondEnd = LocalTime.of(11, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstStart, firstEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, secondStart, secondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isFalse();
+        }
+        
+        @Test
+        void testShiftsOnSameDateWhereTheFirstEndsWhenTheSecondStartsShouldNotOverlap() {
+            LocalTime firstStart = LocalTime.of(8, 0);
+            LocalTime firstEndAndSecondStart = LocalTime.of(9, 0);
+            LocalTime secondEnd = LocalTime.of(11, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstStart, firstEndAndSecondStart);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstEndAndSecondStart, secondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isFalse();
+        }
+        
+        @Test
+        void testShiftsOnSameDateWhereTheFirstStartsAfterTheSecondEndsShouldNotOverlap() {
+            LocalTime firstStart = LocalTime.of(10, 0);
+            LocalTime firstEnd = LocalTime.of(11, 0);
+            LocalTime secondStart = LocalTime.of(8, 0);
+            LocalTime secondEnd = LocalTime.of(9, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstStart, firstEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, secondStart, secondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isFalse();
+        }
+        
+        @Test
+        void testShiftsOnSameDateWhereTheFirstStartsWhenTheSecondEndsShouldNotOverlap() {
+            LocalTime firstStartAndSecondEnd = LocalTime.of(9, 0);
+            LocalTime firstEnd = LocalTime.of(10, 0);
+            LocalTime secondStart = LocalTime.of(8, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstStartAndSecondEnd, firstEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, secondStart, firstStartAndSecondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isFalse();
+        }
+        
+        @Test
+        void testShiftsOnSameDateThatStartAtTheSameTimeShouldOverlap() {
+            LocalTime firstAndSecondStart = LocalTime.of(9, 0);
+            LocalTime firstEnd = LocalTime.of(10, 0);
+            LocalTime secondEnd = LocalTime.of(11, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstAndSecondStart, firstEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstAndSecondStart, secondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isTrue();
+        }
+        
+        @Test
+        void testShiftsOnSameDateThatEndAtTheSameTimeShouldOverlap() {
+            LocalTime firstStart = LocalTime.of(10, 0);
+            LocalTime secondStart = LocalTime.of(11, 0);
+            LocalTime firstAndSecondEnd = LocalTime.of(12, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstStart, firstAndSecondEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, secondStart, firstAndSecondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isTrue();
+        }
+        
+        @Test
+        void testShiftsOnSameDateWhereFirstStartsBeforeAndEndsAfterTheSecondShouldOverlap() {
+            LocalTime firstStart = LocalTime.of(8, 0);
+            LocalTime firstEnd = LocalTime.of(11, 0);
+            LocalTime secondStart = LocalTime.of(9, 0);
+            LocalTime secondEnd = LocalTime.of(10, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstStart, firstEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, secondStart, secondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isTrue();
+        }
+        
+        @Test
+        void testShiftsOnSameDateWhereSecondStartsBeforeAndEndsAfterTheFirstShouldOverlap() {
+            LocalTime firstStart = LocalTime.of(9, 0);
+            LocalTime firstEnd = LocalTime.of(10, 0);
+            LocalTime secondStart = LocalTime.of(8, 0);
+            LocalTime secondEnd = LocalTime.of(11, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstStart, firstEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, secondStart, secondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isTrue();
+        }
+        
+        @Test
+        void testShiftsOnSameDateWhereTheyStartAndEndAtTheSameTimesShouldOverlap() {
+            LocalTime firstAndSecondStart = LocalTime.of(8, 0);
+            LocalTime firstAndSecondEnd = LocalTime.of(11, 0);
+            
+            Shift first = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstAndSecondStart, firstAndSecondEnd);
+            Shift second = Shift.createShift(WORKER_ID, DEPARTMENT_ID, DATE, firstAndSecondStart, firstAndSecondEnd);
+            
+            assertThat(first.overlaps(second))
+                .isTrue();
         }
     }
     
