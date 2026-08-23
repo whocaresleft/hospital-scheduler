@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 @DisplayName("Unit tests for Id")
 class IdTest {
 
@@ -16,7 +18,6 @@ class IdTest {
     class HappyCases {
         
         private static final String VALID_ID = "valid_id";
-        private static final String ANOTHER_VALID_ID = "another_valid_id";
 
         @Test @DisplayName("Valid Id value with leading and trailing spaces gets trimmed")
         void testValidIdWithBothLeadingAndTrailingWhitespacesGetTrimmed() {
@@ -32,56 +33,10 @@ class IdTest {
             assertThat(id.getValue())
                 .isEqualTo(VALID_ID); 
         }
-        
-        @Test @DisplayName("Id is equal to itself")
-        void testIdIsEqualToItself() {
-            Id id = Id.createId(VALID_ID);
-            assertThat(id)
-                .isEqualTo(id);
-        }
-        
-        @Test @DisplayName("Id's created from the same value are equal")
-        void testIdsWithSameValueAreEqual() {
-            Id id1 = Id.createId(VALID_ID);
-            Id id2 = Id.createId(VALID_ID);
-            
-            assertThat(id1)
-                .isEqualTo(id2);
-        }
-        
-        @Test @DisplayName("Id's created with different values are not equal")
-        void testIdsWithDifferentValuesAreNotEqual() {
-            Id id1 = Id.createId(VALID_ID);
-            Id id2 = Id.createId(ANOTHER_VALID_ID);
-            
-            assertThat(id1)
-                .isNotEqualTo(id2); 
-        }
-        
-        @Test @DisplayName("Id is not equal to null")
-        void testValidIdIsNotEqualToNull() {
-            Id id1 = Id.createId(VALID_ID);
-            
-            assertThat(id1)
-                .isNotEqualTo(null); 
-        }
-        
-        @Test @DisplayName("Id is not equal to object of a different class")
-        void testValidIdIsNotEqualToObjectOfDifferentClass() {
-            Id id1 = Id.createId(VALID_ID);
-            
-            assertThat(id1)
-                .isNotEqualTo(VALID_ID); 
-        }
-        
-        @Test @DisplayName("Id's that are equal should also have the same hash code")
-        void testEqualIdsShouldHaveSameHashCode() {
-            Id id1 = Id.createId(VALID_ID);
-            Id id2 = Id.createId(VALID_ID);
-            
-            assertThat(id1)
-                .isEqualTo(id2)
-                .hasSameHashCodeAs(id2);
+
+        @Test @DisplayName("Equals contract using EqualsVerifier")
+        void testEqualsContractUsingEqualsVerifier() {
+            EqualsVerifier.forClass(Id.class).verify();
         }
         
         @Test @DisplayName("The string representation of Id is just its value")
