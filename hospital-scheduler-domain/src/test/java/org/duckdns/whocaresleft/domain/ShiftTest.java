@@ -75,5 +75,30 @@ class ShiftTest {
                 .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, start, null))
                 .withMessage("Ending time cannot be null");
         }
+        
+        @Test
+        void testZeroDurationShiftShouldThrow() {
+            Id workerId = Id.createId("worker_id");
+            Id departmentId = Id.createId("department_id");
+            LocalDate date = LocalDate.of(2026, 6, 15);
+            LocalTime start = LocalTime.of(14, 00);
+            
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, start, start))
+                .withMessage("Shift has zero duration, starting time equals ending time");
+        }
+        
+        @Test
+        void testNegativeDurationShiftShouldThrow() {
+            Id workerId = Id.createId("worker_id");
+            Id departmentId = Id.createId("department_id");
+            LocalDate date = LocalDate.of(2026, 6, 15);
+            LocalTime start = LocalTime.of(14, 00);
+            LocalTime end = LocalTime.of(13, 30);
+            
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, start, end))
+                .withMessage("Shift has negative duration, starting time is after than ending time");
+        }
     }
 }
