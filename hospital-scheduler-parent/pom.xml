@@ -170,15 +170,23 @@
             <targetTests>
               <param>org.duckdns.whocaresleft.core.*</param>
             </targetTests>
-            <mutators>
-              <mutator>DEFAULTS</mutator>
-            </mutators>
             <mutationThreshold>80</mutationThreshold>
             <outputFormats>
               <outputFormat>HTML</outputFormat>
               <outputFormat>XML</outputFormat>
             </outputFormats>
             <exportLineCoverage>true</exportLineCoverage>
+            <excludedMethods>
+              <param>equals</param>
+              <param>hashCode</param>
+              <param>toString</param>
+              <param>get*</param>
+              <param>set*</param>
+            </excludedMethods>
+            <avoidCallsTo>
+              <param>org.apache.log4j</param>
+            </avoidCallsTo>
+            <threads>4</threads>
           </configuration>
         </plugin>
       </plugins>
@@ -205,6 +213,36 @@
           <plugin>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
+            <configuration>
+              <mutators>
+                <mutator>DEFAULTS</mutator>
+              </mutators>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>mutationCoverage</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>mutation-testing-full</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-maven</artifactId>
+            <configuration>
+              <mutators>
+                <mutator>STRONGER</mutator>
+              </mutators>
+            </configuration>
             <executions>
               <execution>
                 <goals>
