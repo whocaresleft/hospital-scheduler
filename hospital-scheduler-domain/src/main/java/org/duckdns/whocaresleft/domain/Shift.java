@@ -7,9 +7,18 @@ import org.duckdns.whocaresleft.core.Id;
 
 public class Shift {
 
-    private Shift() {
-        
-        
+    private Id workerId;
+    private Id departmentId;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    
+    private Shift(Id workerId, Id departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        setWorkerId(workerId);
+        setDepartmentId(departmentId);
+        setDate(date);
+        setStartTime(startTime);
+        setEndTime(endTime);
     }
     
     public static Shift createShift(Id workerId, Id departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
@@ -30,6 +39,18 @@ public class Shift {
         if (startTime.isAfter(endTime))
             throw new IllegalArgumentException("Shift has negative duration, starting time is after than ending time");
         
-        return null;
+        return new Shift(workerId, departmentId, date, startTime, endTime);
     }
+
+    private void setWorkerId(Id workerId) { this.workerId = workerId; }
+    private void setDepartmentId(Id departmentId) { this.departmentId = departmentId; }
+    private void setDate(LocalDate date) { this.date = date; }
+    private void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+    private void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+    
+    public Id getWorkerId() { return workerId; }
+    public Id getDepartmentId() { return departmentId; }
+    public LocalDate getDate() { return date; }
+    public LocalTime getStartTime() { return startTime; }
+    public LocalTime getEndTime() { return endTime; }
 }
