@@ -12,7 +12,7 @@ public class Shift {
         
     }
     
-    public static Shift createShift(Id workerId, Id departmentId, LocalDate date, LocalTime start, LocalTime end) {
+    public static Shift createShift(Id workerId, Id departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         
         if (workerId == null) 
             throw new IllegalArgumentException("Worker Id cannot be null");
@@ -20,14 +20,14 @@ public class Shift {
             throw new IllegalArgumentException("Department Id cannot be null");
         if (date == null) 
             throw new IllegalArgumentException("Date cannot be null");
-        if (start == null) 
+        if (startTime == null) 
             throw new IllegalArgumentException("Starting time cannot be null");
-        if (end == null) 
+        if (endTime == null) 
             throw new IllegalArgumentException("Ending time cannot be null");
         
-        if (start.equals(end)) 
+        if (startTime.equals(endTime)) 
             throw new IllegalArgumentException("Shift has zero duration, starting time equals ending time");
-        if (start.isAfter(end))
+        if (startTime.isAfter(endTime))
             throw new IllegalArgumentException("Shift has negative duration, starting time is after than ending time");
         
         return null;

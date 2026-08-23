@@ -16,88 +16,88 @@ class ShiftTest {
     @Nested @DisplayName("Error cases")
     class ExceptionalCases {
         
-        @Test
+        @Test @DisplayName("Null worker id during creation should result in exception")
         void testNullWorkerIdShouldThrow() {
             Id departmentId = Id.createId("department_id");
             LocalDate date = LocalDate.of(2026, 6, 15);
-            LocalTime start = LocalTime.of(14, 0);
-            LocalTime end = LocalTime.of(15, 0);
+            LocalTime startTime = LocalTime.of(14, 0);
+            LocalTime endTime = LocalTime.of(15, 0);
             
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Shift.createShift(null, departmentId, date, start, end))
+                .isThrownBy(() -> Shift.createShift(null, departmentId, date, startTime, endTime))
                 .withMessage("Worker Id cannot be null");
         }
         
-        @Test
+        @Test @DisplayName("Null department id during creation should result in exception")
         void testNullDepartmentIdShouldThrow() {
             Id workerId = Id.createId("worker_id");
             LocalDate date = LocalDate.of(2026, 6, 15);
-            LocalTime start = LocalTime.of(14, 0);
-            LocalTime end = LocalTime.of(15, 0);
+            LocalTime startTime = LocalTime.of(14, 0);
+            LocalTime endTime = LocalTime.of(15, 0);
             
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Shift.createShift(workerId, null, date, start, end))
+                .isThrownBy(() -> Shift.createShift(workerId, null, date, startTime, endTime))
                 .withMessage("Department Id cannot be null");
         }
         
-        @Test
+        @Test @DisplayName("Null date during creation should result in exception")
         void testNullDateShouldThrow() {
             Id workerId = Id.createId("worker_id");
             Id departmentId = Id.createId("department_id");
-            LocalTime start = LocalTime.of(14, 0);
-            LocalTime end = LocalTime.of(15, 0);
+            LocalTime startTime = LocalTime.of(14, 0);
+            LocalTime endTime = LocalTime.of(15, 0);
             
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Shift.createShift(workerId, departmentId, null, start, end))
+                .isThrownBy(() -> Shift.createShift(workerId, departmentId, null, startTime, endTime))
                 .withMessage("Date cannot be null");
         }
       
-        @Test
+        @Test @DisplayName("Null start time during creation should result in exception")
         void testNullStartTimeShouldThrow() {
             Id workerId = Id.createId("worker_id");
             Id departmentId = Id.createId("department_id");
             LocalDate date = LocalDate.of(2026, 6, 15);
-            LocalTime end = LocalTime.of(15, 0);
+            LocalTime endTime = LocalTime.of(15, 0);
             
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, null, end))
+                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, null, endTime))
                 .withMessage("Starting time cannot be null");
         }
         
-        @Test
+        @Test @DisplayName("Null end time during creation should result in exception")
         void testNullEndTimeShouldThrow() {
             Id workerId = Id.createId("worker_id");
             Id departmentId = Id.createId("department_id");
             LocalDate date = LocalDate.of(2026, 6, 15);
-            LocalTime start = LocalTime.of(14, 0);
+            LocalTime startTime = LocalTime.of(14, 0);
             
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, start, null))
+                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, startTime, null))
                 .withMessage("Ending time cannot be null");
         }
         
-        @Test
+        @Test @DisplayName("Zero shift duration (starting time = ending time) should result in exception")
         void testZeroDurationShiftShouldThrow() {
             Id workerId = Id.createId("worker_id");
             Id departmentId = Id.createId("department_id");
             LocalDate date = LocalDate.of(2026, 6, 15);
-            LocalTime start = LocalTime.of(14, 00);
+            LocalTime startTime = LocalTime.of(14, 00);
             
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, start, start))
+                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, startTime, startTime))
                 .withMessage("Shift has zero duration, starting time equals ending time");
         }
         
-        @Test
+        @Test @DisplayName("Negative shift duration (starting time > ending time) should result in exception")
         void testNegativeDurationShiftShouldThrow() {
             Id workerId = Id.createId("worker_id");
             Id departmentId = Id.createId("department_id");
             LocalDate date = LocalDate.of(2026, 6, 15);
-            LocalTime start = LocalTime.of(14, 00);
-            LocalTime end = LocalTime.of(13, 30);
+            LocalTime startTime = LocalTime.of(14, 00);
+            LocalTime endTime = LocalTime.of(13, 30);
             
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, start, end))
+                .isThrownBy(() -> Shift.createShift(workerId, departmentId, date, startTime, endTime))
                 .withMessage("Shift has negative duration, starting time is after than ending time");
         }
     }
