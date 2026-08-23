@@ -11,6 +11,8 @@ import org.duckdns.whocaresleft.core.Id;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 @DisplayName("Unit tests for Shift")
 class ShiftTest {
     
@@ -35,6 +37,10 @@ class ShiftTest {
             assertThat(shift.getEndTime()).isEqualTo(END_TIME);
         }
 
+        @Test
+        void testEqualsContractUsingEqualsVerifier() {
+            EqualsVerifier.forClass(Shift.class).verify();
+        }
     }
     
     @Nested @DisplayName("Error cases")

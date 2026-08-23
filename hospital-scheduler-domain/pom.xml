@@ -7,4 +7,11 @@
     <relativePath>../hospital-scheduler-parent</relativePath>
   </parent>
   <artifactId>hospital-scheduler-domain</artifactId>
+  
+  <dependencies>
+    <dependency>
+      <groupId>nl.jqno.equalsverifier</groupId>
+      <artifactId>equalsverifier</artifactId>
+    </dependency>
+  </dependencies>
 </project>
