@@ -179,6 +179,17 @@
               <outputFormat>XML</outputFormat>
             </outputFormats>
             <exportLineCoverage>true</exportLineCoverage>
+            <excludedMethods>
+              <param>equals</param>
+              <param>hashCode</param>
+              <param>toString</param>
+              <param>get*</param>
+              <param>set*</param>
+            </excludedMethods>
+            <avoidCallsTo>
+              <param>org.apache.log4j</param>
+            </avoidCallsTo>
+            <threads>4</threads>
           </configuration>
         </plugin>
       </plugins>
