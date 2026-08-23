@@ -37,6 +37,12 @@
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>nl.jqno.equalsverifier</groupId>
+      <artifactId>equalsverifier</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -166,9 +172,11 @@
             <failWhenNoMutations>false</failWhenNoMutations>
             <targetClasses>
               <param>org.duckdns.whocaresleft.core.*</param>
+              <param>org.duckdns.whocaresleft.model.*</param>
             </targetClasses>
             <targetTests>
               <param>org.duckdns.whocaresleft.core.*</param>
+              <param>org.duckdns.whocaresleft.model.*</param>
             </targetTests>
             <mutationThreshold>80</mutationThreshold>
             <outputFormats>

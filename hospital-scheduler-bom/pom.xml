@@ -7,6 +7,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     <junit.version>5.11.0</junit.version>
     <log4j.version>2.13.0</log4j.version>
     <assertj.version>3.27.7</assertj.version>
@@ -14,6 +15,7 @@
     <mockito.version>4.11.0</mockito.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <picocli.version>4.7.7</picocli.version>
+    <equalsverifier.version>3.19.4</equalsverifier.version>
   </properties>
 
   <dependencyManagement>
@@ -75,6 +77,13 @@
         <version>${picocli.version}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+      
+      <dependency>
+        <groupId>nl.jqno.equalsverifier</groupId>
+        <artifactId>equalsverifier</artifactId>
+        <version>${equalsverifier.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
