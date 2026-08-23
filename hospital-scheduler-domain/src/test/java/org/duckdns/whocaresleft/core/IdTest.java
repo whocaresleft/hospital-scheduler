@@ -84,6 +84,16 @@ class IdTest {
                 .hasSameHashCodeAs(id2);
         }
         
+        @Test @DisplayName("Id's that are not equal should also have different hash codes")
+        void testNonEqualIdsShouldHaveDifferentHashCodes() {
+            Id id1 = Id.createId(VALID_ID);
+            Id id2 = Id.createId(ANOTHER_VALID_ID);
+            
+            assertThat(id1)
+                .isNotEqualTo(id2)
+                .doesNotHaveSameHashCodeAs(id2);
+        }
+        
         @Test @DisplayName("The string representation of Id is just its value")
         void testIdToStringShouldJustBeTheValue() {
             Id id = Id.createId(VALID_ID);
