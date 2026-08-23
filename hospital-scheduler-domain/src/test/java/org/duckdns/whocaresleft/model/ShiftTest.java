@@ -65,10 +65,10 @@ class ShiftTest {
         @Test @DisplayName("Shifts on different dates should not overlap")
         void testShiftsWithDifferentDatesShouldNotOverlap() {
             LocalDate date = LocalDate.of(2026, 6, 15);
-            LocalDate another_date = LocalDate.of(2026, 6, 16);
+            LocalDate anotherDate = LocalDate.of(2026, 6, 16);
             
             Shift first = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, date, START_TIME, END_TIME);
-            Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, another_date, START_TIME, END_TIME);
+            Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, anotherDate, START_TIME, END_TIME);
             
             assertThat(first.overlaps(second))
                 .isFalse();
