@@ -1,4 +1,4 @@
-package org.duckdns.whocaresleft.domain;
+package org.duckdns.whocaresleft.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -8,24 +8,24 @@ import org.duckdns.whocaresleft.core.Id;
 
 public final class Shift {
 
-    private final Id workerId;
+    private final Id doctorId;
     private final Id departmentId;
     private final LocalDate date;
     private final LocalTime startTime;
     private final LocalTime endTime;
     
-    private Shift(Id workerId, Id departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        this.workerId = workerId;
+    private Shift(Id doctorId, Id departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        this.doctorId = doctorId;
         this.departmentId = departmentId;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
     }
     
-    public static Shift createShift(Id workerId, Id departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    public static Shift createShift(Id doctorId, Id departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         
-        if (workerId == null) 
-            throw new IllegalArgumentException("Worker Id cannot be null");
+        if (doctorId == null) 
+            throw new IllegalArgumentException("Doctor Id cannot be null");
         if (departmentId == null) 
             throw new IllegalArgumentException("Department Id cannot be null");
         if (date == null) 
@@ -40,10 +40,10 @@ public final class Shift {
         if (startTime.isAfter(endTime))
             throw new IllegalArgumentException("Shift has negative duration, starting time is after than ending time");
         
-        return new Shift(workerId, departmentId, date, startTime, endTime);
+        return new Shift(doctorId, departmentId, date, startTime, endTime);
     }
     
-    public Id getWorkerId() { return workerId; }
+    public Id getDoctorId() { return doctorId; }
     public Id getDepartmentId() { return departmentId; }
     public LocalDate getDate() { return date; }
     public LocalTime getStartTime() { return startTime; }
@@ -62,7 +62,7 @@ public final class Shift {
         
         Shift otherShift = (Shift)other;
         
-        return Objects.equals(workerId, otherShift.workerId)
+        return Objects.equals(doctorId, otherShift.doctorId)
             && Objects.equals(departmentId, otherShift.departmentId)
             && Objects.equals(date, otherShift.date)
             && Objects.equals(startTime, otherShift.startTime)
@@ -71,26 +71,17 @@ public final class Shift {
 
     @Override
     public int hashCode() {
-        return Objects.hash(workerId, departmentId, date, startTime, endTime);
+        return Objects.hash(doctorId, departmentId, date, startTime, endTime);
     }
     
     @Override
     public String toString() {
-        return "Shift [workerId=" + workerId + ", departmentId=" + departmentId + ", date=" + date + ", startTime="
-                + startTime + ", endTime=" + endTime + "]";
+        return "(" + doctorId + "-" + departmentId + "), " + date + ": (" + startTime + "-" + endTime +")";
     }
 
-    public boolean overlaps(Shift second) {
-        
-        if (!date.equals(second.date))
-            return false;
-        
-        if (endTime.isBefore(second.startTime) || endTime.equals(second.startTime))
-            return false;
-        
-        if (startTime.isAfter(second.endTime) || startTime.equals(second.endTime))
-            return false;
-        
-        return true;
+    public boolean overlaps(Shift other) {
+        return date.equals(other.date)
+            && endTime.isAfter(other.startTime) 
+            && startTime.isBefore(other.endTime);
     }
 }
