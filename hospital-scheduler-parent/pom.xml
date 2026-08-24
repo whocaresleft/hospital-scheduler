@@ -22,7 +22,6 @@
     <maven.pitest.junit5-plugin.version>1.2.3</maven.pitest.junit5-plugin.version> 
     <maven.coveralls.version>5.0.0</maven.coveralls.version>
     <maven.failsafe.version>3.5.6</maven.failsafe.version>
-    <maven.docker.version>0.49.0</maven.docker.version>
   </properties>
 
   <dependencies>
@@ -120,13 +119,15 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${maven.failsafe.version}</version> <!--TODO configuration-->
-        </plugin>
-        
-        <plugin>
-          <groupId>io.fabric8</groupId>
-          <artifactId>docker-maven-plugin</artifactId>
-          <version>${maven.docker.version}</version>
+          <version>${maven.failsafe.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         
         <plugin>
