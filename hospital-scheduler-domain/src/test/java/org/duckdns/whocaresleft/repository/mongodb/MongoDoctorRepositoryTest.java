@@ -97,7 +97,7 @@ class MongoDoctorRepositoryTest {
     @Nested
     class ExceptionalCases {
         
-        /*@Test
+        @Test
         void testSaveWhenDoctorIsAlreadyInDatabase() {
             addTestDoctorToDB("doctor_id", "Original", "Doctor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "A New", "Doctor");
@@ -107,13 +107,13 @@ class MongoDoctorRepositoryTest {
             });
             assertThat(readAllDoctorsFromDB())
                 .doesNotContain(newDoctorWithSameId);
-        }*/
+        }
     }
 
     
     private void addTestDoctorToDB(String id, String firstName, String lastName) {
         Document toInsert = new Document()
-            .append("id", id)
+            .append("_id", id)
             .append("firstName", firstName)
             .append("lastName", lastName);
         doctorCollection.insertOne(toInsert);
@@ -122,7 +122,7 @@ class MongoDoctorRepositoryTest {
     private List<Doctor> readAllDoctorsFromDB() {
         return StreamSupport.stream(
             doctorCollection.find().spliterator(), false)
-            .map(d -> Doctor.createDoctor(Id.createId(d.getString("id")), d.getString("firstName"), d.getString("lastName")))
+            .map(d -> Doctor.createDoctor(Id.createId(d.getString("_id")), d.getString("firstName"), d.getString("lastName")))
             .collect(Collectors.toList());
     }
 }
