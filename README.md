@@ -2,6 +2,7 @@
 Project for the AST exam at University of Florence, master's deegre in Software: Science and Technology. The application is a manager for doctor-department schedule.
 
 [![Java CI with Maven in Linux](https://github.com/whocaresleft/hospital-scheduler/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/whocaresleft/hospital-scheduler/actions/workflows/ci-linux.yml)
+[![Mutation Testing (Night + Manual)](https://github.com/whocaresleft/hospital-scheduler/actions/workflows/night-mutation-testing.yml/badge.svg)](https://github.com/whocaresleft/hospital-scheduler/actions/workflows/night-mutation-testing.yml)
 [![Coverage Status](https://coveralls.io/repos/github/whocaresleft/hospital-scheduler/badge.svg?branch=main)](https://coveralls.io/github/whocaresleft/hospital-scheduler?branch=main)
 [![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=whocaresleft_hospital-scheduler&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=whocaresleft_hospital-scheduler)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=whocaresleft_hospital-scheduler&metric=bugs)](https://sonarcloud.io/summary/new_code?id=whocaresleft_hospital-scheduler)

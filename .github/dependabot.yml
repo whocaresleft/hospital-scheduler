@@ -13,6 +13,8 @@ updates:
     # Same goes for mockito. Version 5 requires at least Java 11
     - dependency-name: "org.mockito:"
       versions: [">=5.0.0"]
+    - dependency-name: "nl.jqno.equalsverifier"
+      versions: [">=4.0"]
    groups:
      maven-plugin-updates:
        patterns:
