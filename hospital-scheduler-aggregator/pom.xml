@@ -22,7 +22,6 @@
     <sonar.coverage.exclusions>
       **/model/Doctor.*,
       **/exception/*.*,
-      **
     </sonar.coverage.exclusions>
     <sonar.organization>whocaresleft</sonar.organization>
   </properties>
