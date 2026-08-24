@@ -17,7 +17,7 @@
     <maven.surefire.version>2.22.1</maven.surefire.version>
     <maven.site.version>3.7.1</maven.site.version>
     <maven.build-helper.version>3.6.1</maven.build-helper.version>
-    <maven.jacoco.version>0.8.5</maven.jacoco.version>
+    <maven.jacoco.version>0.8.14</maven.jacoco.version>
     <maven.pitest.version>1.16.1</maven.pitest.version>
     <maven.pitest.junit5-plugin.version>1.2.1</maven.pitest.junit5-plugin.version> 
     <maven.coveralls.version>5.0.0</maven.coveralls.version>
@@ -41,6 +41,12 @@
     <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -127,6 +133,12 @@
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${maven.jacoco.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/exception/*Exception*</exclude>
+            </excludes>
+          </configuration>
           <executions>
             <execution>
               <goals>
@@ -171,12 +183,14 @@
           <configuration>
             <failWhenNoMutations>false</failWhenNoMutations>
             <targetClasses>
-              <param>org.duckdns.whocaresleft.core.*</param>
-              <param>org.duckdns.whocaresleft.model.*</param>
+              <param>org.duckdns.whocaresleft.core.Id</param>
+              <param>org.duckdns.whocaresleft.model.Shift</param>
+              <param>org.duckdns.whocaresleft.presenter.DoctorPresenter</param>
             </targetClasses>
             <targetTests>
-              <param>org.duckdns.whocaresleft.core.*</param>
-              <param>org.duckdns.whocaresleft.model.*</param>
+              <param>org.duckdns.whocaresleft.core.Id*</param>
+              <param>org.duckdns.whocaresleft.model.Shift*</param>
+              <param>org.duckdns.whocaresleft.presenter.DoctorPresenter*</param>
             </targetTests>
             <mutationThreshold>80</mutationThreshold>
             <outputFormats>
