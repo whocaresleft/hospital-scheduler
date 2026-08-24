@@ -3,14 +3,21 @@ package org.duckdns.whocaresleft.repository.mongodb;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.bson.Document;
 import org.duckdns.whocaresleft.core.Id;
+import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 
 import com.mongodb.MongoClient;
@@ -55,21 +62,49 @@ class MongoDoctorRepositoryTest {
         client.close();
     }
     
-    @Test
-    void testFindAllWhenDatabaseIsEmpty() {
-        assertThat(repository.findAll())
-            .isEmpty();
+    @Nested
+    class HappyCases {
+        @Test
+        void testFindAllWhenDatabaseIsEmpty() {
+            assertThat(repository.findAll())
+                .isEmpty();
+        }
+
+        @Test
+        void testFindAllWhenDatabaseIsNotEmpty() {
+            addTestDoctorToDB("doctor_1", "doc", "tor");
+            addTestDoctorToDB("doctor_2", "dok", "ter");
+            
+            assertThat(repository.findAll())
+                .containsExactly(
+                    Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"),
+                    Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
+        }
+        
+        @Test
+        void testSaveWhenDoctorIsNotAlreadyInDatabase() {
+            Doctor toInsert = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+            repository.save(toInsert);
+            
+            assertThat(readAllDoctorsFromDB())
+                .containsExactly(toInsert);
+        }
     }
     
-    @Test
-    void testFindAllWhenDatabaseIsNotEmpty() {
-        addTestDoctorToDB("doctor_1", "doc", "tor");
-        addTestDoctorToDB("doctor_2", "dok", "ter");
+    @Nested
+    class ExceptionalCases {
         
-        assertThat(repository.findAll())
-            .containsExactly(
-                Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"),
-                Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
+        @Test
+        void testSaveWhenDoctorIsAlreadyInDatabase() {
+            addTestDoctorToDB("doctor_id", "Original", "Doctor");
+            Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "A New", "Doctor");
+            
+            assertThrows(DuplicateDoctorException.class, () -> {
+                repository.save(newDoctorWithSameId);
+            });
+            assertThat(readAllDoctorsFromDB())
+                .doesNotContain(newDoctorWithSameId);
+        }
     }
 
     
@@ -79,5 +114,12 @@ class MongoDoctorRepositoryTest {
             .append("firstName", firstName)
             .append("lastName", lastName);
         doctorCollection.insertOne(toInsert);
+    }
+    
+    private List<Doctor> readAllDoctorsFromDB() {
+        return StreamSupport.stream(
+            doctorCollection.find().spliterator(), false)
+            .map(d -> Doctor.createDoctor(Id.createId(d.getString("id")), d.getString("firstName"), d.getString("lastName")))
+            .collect(Collectors.toList());
     }
 }

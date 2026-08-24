@@ -32,7 +32,12 @@ public class MongoDoctorRepository implements DoctorRepository {
 
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
-        
+        MongoCollection<Document> doctorCollection = client.getDatabase("hospital").getCollection("doctor");
+        doctorCollection.insertOne(
+            new Document()
+            .append("id", doctor.getId().getValue())
+            .append("firstName", doctor.getFirstName())
+            .append("lastName", doctor.getLastName()));
     }
 
     @Override
