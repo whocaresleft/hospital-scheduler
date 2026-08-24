@@ -1,8 +1,8 @@
 package org.duckdns.whocaresleft.repository.mongodb;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import java.util.Collections;
 
 import org.bson.Document;
 import org.duckdns.whocaresleft.core.Id;
@@ -26,8 +26,8 @@ public class MongoDoctorRepository implements DoctorRepository {
     public List<Doctor> findAll() {
         MongoCollection<Document> doctorCollection = client.getDatabase("hospital").getCollection("doctor");
         return StreamSupport.stream(doctorCollection.find().spliterator(), false)
-            .map(d -> Doctor.createDoctor(Id.createId(d.get("id"), d.get("firstName"), d.get("lastName"))))
-            .toList(); // Too cumbersome
+            .map(d -> Doctor.createDoctor(Id.createId(d.getString("id")), d.getString("firstName"), d.getString("lastName")))
+            .collect(Collectors.toList());
     }
 
     @Override
