@@ -13,8 +13,8 @@
     <assertj.version>3.27.7</assertj.version>
     <assertj.swing.version>3.27.7</assertj.swing.version>
     <mockito.version>4.11.0</mockito.version>
-    <mongo.driver.version>3.12.14</mongo.driver.version>
-    <mongo.java.server.version>1.39.0</mongo.java.server.version>
+    <mongo.driver.version>4.11.4</mongo.driver.version>
+    <mongo.java.server.version>1.45.0</mongo.java.server.version>
     <qos.logback.version>1.2.13</qos.logback.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <picocli.version>4.7.7</picocli.version>
@@ -68,7 +68,7 @@
 
       <dependency>
         <groupId>org.mongodb</groupId>
-        <artifactId>mongo-java-driver</artifactId>
+        <artifactId>mongodb-driver-sync</artifactId>
         <version>${mongo.driver.version}</version>
       </dependency>
 

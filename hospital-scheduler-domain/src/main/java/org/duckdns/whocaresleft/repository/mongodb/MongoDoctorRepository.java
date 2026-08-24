@@ -5,26 +5,26 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.bson.Document;
+//import org.bson.Document;
 import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 
 public class MongoDoctorRepository implements DoctorRepository {
 
-    private MongoClient client;
+    private final MongoCollection<Document> doctorCollection;
     
     public MongoDoctorRepository(MongoClient client) {
-        this.client = client;
+        doctorCollection = client.getDatabase("doctor").getCollection("doctor");
     }
 
     @Override
     public List<Doctor> findAll() {
-        MongoCollection<Document> doctorCollection = client.getDatabase("hospital").getCollection("doctor");
         return StreamSupport.stream(doctorCollection.find().spliterator(), false)
             .map(this::fromDocument)
             .collect(Collectors.toList());
@@ -32,7 +32,6 @@ public class MongoDoctorRepository implements DoctorRepository {
 
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
-        MongoCollection<Document> doctorCollection = client.getDatabase("hospital").getCollection("doctor");
         doctorCollection.insertOne(
             new Document()
             .append("id", doctor.getId().getValue())
