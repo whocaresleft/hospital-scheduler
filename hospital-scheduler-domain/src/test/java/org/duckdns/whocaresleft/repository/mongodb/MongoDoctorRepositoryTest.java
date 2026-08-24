@@ -1,5 +1,9 @@
 package org.duckdns.whocaresleft.repository.mongodb;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,48 +23,61 @@ import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
 class MongoDoctorRepositoryTest {
 
-    @Test
-    void testFindAllWhenDatabaseIsEmpty() {
-        MongoServer server = new MongoServer(new MemoryBackend());
-        InetSocketAddress serverAddress = server.bind();
-        MongoClient client = new MongoClient(new ServerAddress(serverAddress));
-        MongoDoctorRepository repository = new MongoDoctorRepository(client);
+    private static MongoServer server;
+    private static InetSocketAddress serverAddress;
+    
+    private MongoClient client;
+    private MongoDoctorRepository repository;
+    private MongoCollection<Document> doctorCollection;
+    
+    @BeforeAll
+    static void startMongoServer() {
+        server = new MongoServer(new MemoryBackend());
+        serverAddress = server.bind();
+    }
+    
+    @AfterAll
+    static void shutdownMongoServer() {
+        server.shutdown();
+    }
+    
+    @BeforeEach
+    void setup() {
+        client = new MongoClient(new ServerAddress(serverAddress));
+        repository = new MongoDoctorRepository(client);
         MongoDatabase database = client.getDatabase("hospital");
         database.drop();
-        
-        assertThat(repository.findAll()).isEmpty();
-        
+        doctorCollection = database.getCollection("doctor");
+    }
+    
+    @AfterEach
+    void teardown() {
         client.close();
-        server.shutdown();
+    }
+    
+    @Test
+    void testFindAllWhenDatabaseIsEmpty() {
+        assertThat(repository.findAll())
+            .isEmpty();
     }
     
     @Test
     void testFindAllWhenDatabaseIsNotEmpty() {
-        MongoServer server = new MongoServer(new MemoryBackend());
-        InetSocketAddress serverAddress = server.bind();
-        MongoClient client = new MongoClient(new ServerAddress(serverAddress));
-        MongoDoctorRepository repository = new MongoDoctorRepository(client);
-        MongoDatabase database = client.getDatabase("hospital");
-        database.drop();
-        MongoCollection<Document> doctorCollection = database.getCollection("doctor");
-        doctorCollection.insertOne(
-            new Document()
-               .append("id", "doctor_1")
-               .append("firstName", "doc")
-               .append("lastName", "tor"));
-        
-        doctorCollection.insertOne(
-                new Document()
-                   .append("id", "doctor_2")
-                   .append("firstName", "doc")
-                   .append("lastName", "ter"));
+        addTestDoctorToDB("doctor_1", "doc", "tor");
+        addTestDoctorToDB("doctor_2", "dok", "ter");
         
         assertThat(repository.findAll())
             .containsExactly(
                 Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"),
-                Doctor.createDoctor(Id.createId("doctor_2"), "doc", "ter"));
-        
-        client.close();
-        server.shutdown();
+                Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
+    }
+
+    
+    private void addTestDoctorToDB(String id, String firstName, String lastName) {
+        Document toInsert = new Document()
+            .append("id", id)
+            .append("firstName", firstName)
+            .append("lastName", lastName);
+        doctorCollection.insertOne(toInsert);
     }
 }

@@ -26,7 +26,7 @@ public class MongoDoctorRepository implements DoctorRepository {
     public List<Doctor> findAll() {
         MongoCollection<Document> doctorCollection = client.getDatabase("hospital").getCollection("doctor");
         return StreamSupport.stream(doctorCollection.find().spliterator(), false)
-            .map(d -> Doctor.createDoctor(Id.createId(d.getString("id")), d.getString("firstName"), d.getString("lastName")))
+            .map(this::fromDocument)
             .collect(Collectors.toList());
     }
 
@@ -45,4 +45,10 @@ public class MongoDoctorRepository implements DoctorRepository {
         
     }
 
+    private Doctor fromDocument(Document doc) {
+        return Doctor.createDoctor(
+            Id.createId(doc.getString("id")),
+            doc.getString("firstName"),
+            doc.getString("lastName"));
+    }
 }
