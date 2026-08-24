@@ -13,9 +13,9 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     
-    <maven.compiler.version>3.8.0</maven.compiler.version>
-    <maven.surefire.version>2.22.1</maven.surefire.version>
-    <maven.site.version>3.7.1</maven.site.version>
+    <maven.compiler.version>3.15.0</maven.compiler.version>
+    <maven.surefire.version>3.5.6</maven.surefire.version>
+    <maven.site.version>3.22.0</maven.site.version>
     <maven.build-helper.version>3.6.1</maven.build-helper.version>
     <maven.jacoco.version>0.8.5</maven.jacoco.version>
     <maven.pitest.version>1.16.1</maven.pitest.version>
