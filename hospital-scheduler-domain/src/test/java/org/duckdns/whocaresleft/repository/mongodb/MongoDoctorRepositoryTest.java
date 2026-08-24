@@ -17,6 +17,7 @@ import java.util.stream.StreamSupport;
 
 import org.bson.Document;
 import org.duckdns.whocaresleft.core.Id;
+import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 
@@ -92,6 +93,16 @@ class MongoDoctorRepositoryTest {
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(toInsert);
         }
+        
+        @Test
+        void testDeleteWhenDoctorIsPresentInDatabase() {
+            addTestDoctorToDB("doctor_id", "doc", "tor");
+            
+            repository.delete(Id.createId("doctor_id"));
+            
+            assertThat(readAllDoctorsFromDB())
+                .doesNotContain(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+        }
     }
     
     @Nested
@@ -107,6 +118,13 @@ class MongoDoctorRepositoryTest {
             });
             assertThat(readAllDoctorsFromDB())
                 .doesNotContain(newDoctorWithSameId);
+        }
+        
+        @Test
+        void testDeleteWhenDoctorIsNotPresentInDatabase() {
+            assertThrows(DoctorNotFoundException.class, () -> {
+                repository.delete(Id.createId("doctor_id"));
+            });
         }
     }
 

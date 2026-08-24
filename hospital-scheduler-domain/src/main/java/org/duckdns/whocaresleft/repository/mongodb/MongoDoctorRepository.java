@@ -15,6 +15,8 @@ import org.duckdns.whocaresleft.repository.DoctorRepository;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 
 public class MongoDoctorRepository implements DoctorRepository {
 
@@ -46,7 +48,9 @@ public class MongoDoctorRepository implements DoctorRepository {
 
     @Override
     public void delete(Id doctorId) throws DoctorNotFoundException {
-        
+        DeleteResult result = doctorCollection.deleteOne(Filters.eq("_id", doctorId.getValue()));
+        if (result.getDeletedCount() == 0)
+            throw new DoctorNotFoundException(doctorId);
     }
 
     @Override
