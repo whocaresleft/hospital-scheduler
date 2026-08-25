@@ -31,14 +31,14 @@ class HibernateTestcontainersLearningTestsIT {
     private EntityManager em;
     
     @BeforeAll
-    static void setupHibernatePropertiesAndEntityManagerFactory() {
+    static void setupEntityManagerFactory() {
         Map<String, String> properties = Map.of(
             "jakarta.persistence.jdbc.url", maria.getJdbcUrl(),
             "jakarta.persistence.jdbc.user", maria.getUsername(),
             "jakarta.persistence.jdbc.password", maria.getPassword(),
             "jakarta.persistence.jdbc.driver", "org.mariadb.jdbc.Driver",
             "hibernate.hbm2ddl.auto", "create-drop");
-        emf = Persistence.createEntityManagerFactory("learning", properties);
+        emf = Persistence.createEntityManagerFactory("for_learning_tests", properties);
     }
     
     @AfterAll
