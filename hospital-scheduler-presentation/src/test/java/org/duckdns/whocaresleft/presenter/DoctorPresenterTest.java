@@ -103,7 +103,7 @@ class DoctorPresenterTest {
         Id nonExistingDoctorId = Id.createId("doctor_1");
         Doctor nonExistingDoctor = Doctor.createDoctor(nonExistingDoctorId, "doc", "tor");
         
-        doThrow(new DoctorNotFoundException(nonExistingDoctor))
+        doThrow(new DoctorNotFoundException(nonExistingDoctorId))
             .when(doctorRepository)
             .delete(nonExistingDoctorId);
         
@@ -134,7 +134,7 @@ class DoctorPresenterTest {
         Doctor nonExistingOldDoctor = Doctor.createDoctor(nonExistingDoctorId, "doc", "tor");
         Doctor newDoctor = Doctor.createDoctor(nonExistingDoctorId, "dok", "thor");
         
-        doThrow(new DoctorNotFoundException(nonExistingOldDoctor))
+        doThrow(new DoctorNotFoundException(nonExistingDoctorId))
             .when(doctorRepository)
             .update(nonExistingDoctorId, newDoctor);
         
