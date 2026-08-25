@@ -137,6 +137,7 @@
             <excludes>
               <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
               <exclude>**/org/duckdns/whocaresleft/exception/*Exception*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/learning/*</exclude>
             </excludes>
           </configuration>
           <executions>
