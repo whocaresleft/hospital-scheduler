@@ -160,16 +160,18 @@ class MongoDoctorRepositoryTest {
         
         @Test @DisplayName("Delete when no doctor with the specified id is in the database should throw")
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
+            Id validDoctorId = Id.createId("doctor_id");
             assertThatExceptionOfType(DoctorNotFoundException.class)
-                .isThrownBy(() -> repository.delete(Id.createId("doctor_id")));
+                .isThrownBy(() -> repository.delete(validDoctorId));
         }
         
         @Test @DisplayName("Update when no doctor with the specified id is in the database should throw")
         void testUpdateWhenDoctorIsNotPresentInDatabaseShouldThrow() {
+            Id validDoctorId = Id.createId("doctor_id");
             Doctor doctorWithNonExistentId = Doctor.createDoctor(Id.createId("doctor_id"), "a", "doctor");
             
             assertThatExceptionOfType(DoctorNotFoundException.class)
-                .isThrownBy(() -> repository.update(Id.createId("doctor_id"), doctorWithNonExistentId));
+                .isThrownBy(() -> repository.update(validDoctorId, doctorWithNonExistentId));
         }
     }
 
