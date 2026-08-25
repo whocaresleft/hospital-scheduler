@@ -13,14 +13,13 @@
     <assertj.version>3.27.7</assertj.version>
     <assertj.swing.version>3.27.7</assertj.swing.version>
     <mockito.version>4.11.0</mockito.version>
-    <mongo.driver.version>4.11.4</mongo.driver.version>
-    <mongo.java.server.version>1.45.0</mongo.java.server.version>
+    <mongo.driver.version>5.10.0</mongo.driver.version>
     <qos.logback.version>1.2.13</qos.logback.version>
     <maria.driver.version>3.4.1</maria.driver.version>
     <hibernate.version>6.5.2.Final</hibernate.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <picocli.version>4.7.7</picocli.version>
-    <equalsverifier.version>3.19.4</equalsverifier.version>
+    <equalsverifier.version>4.5.1</equalsverifier.version>
   </properties>
 
   <dependencyManagement>
@@ -81,12 +80,7 @@
       </dependency>
 
       <dependency>
-        <groupId>de.bwaldvogel</groupId>
-        <artifactId>mongo-java-server</artifactId>
-        <version>${mongo.java.server.version}</version>
-        <scope>test</scope>
-      </dependency>
-
+    
       <dependency>
         <groupId>org.mariadb.jdbc</groupId>
         <artifactId>mariadb-java-client</artifactId>
