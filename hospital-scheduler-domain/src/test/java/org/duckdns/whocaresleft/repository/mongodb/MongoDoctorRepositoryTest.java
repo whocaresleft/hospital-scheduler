@@ -103,7 +103,6 @@ class MongoDoctorRepositoryTest {
             repository.delete(Id.createId("doctor_id"));
             
             assertThat(readAllDoctorsFromDB())
-                .doesNotContain(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"))
                 .isEmpty();
         }
         
