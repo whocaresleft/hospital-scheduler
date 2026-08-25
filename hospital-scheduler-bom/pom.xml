@@ -18,7 +18,7 @@
     <qos.logback.version>1.2.13</qos.logback.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <picocli.version>4.7.7</picocli.version>
-    <equalsverifier.version>3.19.4</equalsverifier.version>
+    <equalsverifier.version>4.5.1</equalsverifier.version>
   </properties>
 
   <dependencyManagement>
