@@ -83,7 +83,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).save(existingDoctor);
         inOrder.verify(doctorView)
-            .showErrorDuplicateDoctor("A doctor with id doctor_1 already exists", existingDoctor);
+            .showErrorDuplicateDoctor(existingDoctor.getId());
     }
     
     @Test @DisplayName("Method removeDoctor(doctor) when doctor exists")
@@ -112,7 +112,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).delete(nonExistingDoctorId);
         inOrder.verify(doctorView)
-            .showErrorDoctorNotFound("No doctor with id doctor_1 was found", nonExistingDoctorId);
+            .showErrorDoctorNotFound(nonExistingDoctorId);
     }
     
     @Test @DisplayName("Method updateDoctor(oldDoctor, newDoctor) when oldDoctor exists")
@@ -143,7 +143,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).update(nonExistingDoctorId, newDoctor);
         inOrder.verify(doctorView)
-            .showErrorDoctorNotFound("No doctor with id doctor_1 was found", nonExistingDoctorId);
+            .showErrorDoctorNotFound(nonExistingDoctorId);
     }
     
     @Test @DisplayName("Method findById(id) when doctor with such id exists")
@@ -172,6 +172,6 @@ class DoctorPresenterTest {
         
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).findById(nonExistentDoctorId);
-        inOrder.verify(doctorView).showErrorDoctorNotFound("No doctor with id doctor_id was found", nonExistentDoctorId);
+        inOrder.verify(doctorView).showErrorDoctorNotFound(nonExistentDoctorId);
     }
 }

@@ -13,6 +13,6 @@ public interface DoctorView {
     void doctorRemoved(Doctor doctor);
     void doctorUpdated(Doctor oldDoctor, Doctor newDoctor);
     
-    void showErrorDuplicateDoctor(String string, Doctor duplicated);
-    void showErrorDoctorNotFound(String string, Id notFound);
+    void showErrorDuplicateDoctor(Id duplicated);
+    void showErrorDoctorNotFound(Id notFound);
 }
