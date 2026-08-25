@@ -1,7 +1,6 @@
 package org.duckdns.whocaresleft.repository.mongodb;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.bson.Document;
@@ -30,7 +29,7 @@ public class MongoDoctorRepository implements DoctorRepository {
     public List<Doctor> findAll() {
         return StreamSupport.stream(doctorCollection.find().spliterator(), false)
             .map(this::fromDocument)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override

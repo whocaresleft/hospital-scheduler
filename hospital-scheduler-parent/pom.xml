@@ -185,11 +185,13 @@
             <targetClasses>
               <param>org.duckdns.whocaresleft.core.Id</param>
               <param>org.duckdns.whocaresleft.model.Shift</param>
+              <param>org.duckdns.whocaresleft.repository.mongodb.MongoDoctorRepository</param>
               <param>org.duckdns.whocaresleft.presenter.DoctorPresenter</param>
             </targetClasses>
             <targetTests>
               <param>org.duckdns.whocaresleft.core.Id*</param>
               <param>org.duckdns.whocaresleft.model.Shift*</param>
+              <param>org.duckdns.whocaresleft.repository.mongodb.MongoDoctorRepository*</param>
               <param>org.duckdns.whocaresleft.presenter.DoctorPresenter*</param>
             </targetTests>
             <mutationThreshold>80</mutationThreshold>

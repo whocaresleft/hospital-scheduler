@@ -9,11 +9,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.bson.Document;
@@ -153,27 +152,24 @@ class MongoDoctorRepositoryTest {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
             
-            assertThrows(DuplicateDoctorException.class, () -> {
-                repository.save(newDoctorWithSameId);
-            });
+            assertThatExceptionOfType(DuplicateDoctorException.class)
+                .isThrownBy(() -> repository.save(newDoctorWithSameId));
             assertThat(readAllDoctorsFromDB())
                 .doesNotContain(newDoctorWithSameId);
         }
         
         @Test @DisplayName("Delete when no doctor with the specified id is in the database should throw")
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
-            assertThrows(DoctorNotFoundException.class, () -> {
-                repository.delete(Id.createId("doctor_id"));
-            });
+            assertThatExceptionOfType(DoctorNotFoundException.class)
+                .isThrownBy(() -> repository.delete(Id.createId("doctor_id")));
         }
         
         @Test @DisplayName("Update when no doctor with the specified id is in the database should throw")
         void testUpdateWhenDoctorIsNotPresentInDatabaseShouldThrow() {
             Doctor doctorWithNonExistentId = Doctor.createDoctor(Id.createId("doctor_id"), "a", "doctor");
             
-            assertThrows(DoctorNotFoundException.class, () -> {
-                repository.update(Id.createId("doctor_id"), doctorWithNonExistentId);
-            });
+            assertThatExceptionOfType(DoctorNotFoundException.class)
+                .isThrownBy(() -> repository.update(Id.createId("doctor_id"), doctorWithNonExistentId));
         }
     }
 
@@ -190,6 +186,6 @@ class MongoDoctorRepositoryTest {
         return StreamSupport.stream(
             doctorCollection.find().spliterator(), false)
             .map(d -> Doctor.createDoctor(Id.createId(d.getString("_id")), d.getString("firstName"), d.getString("lastName")))
-            .collect(Collectors.toList());
+            .toList();
     }
 }
