@@ -155,7 +155,7 @@ class MongoDoctorRepositoryTest {
         @Test @DisplayName("FindById when the doctor is not present in the database should return null")
         void testFindByIdWhenDoctorIsNotPresentInDatabaseShouldReturnNull() {
             assertThat(repository.findById(Id.createId("doctor_id")))
-                .isEqualTo(null);
+                .isNull();
         }
     }
     
