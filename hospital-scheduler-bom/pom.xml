@@ -17,6 +17,7 @@
     <mongo.java.server.version>1.45.0</mongo.java.server.version>
     <qos.logback.version>1.2.13</qos.logback.version>
     <maria.driver.version>3.4.1</maria.driver.version>
+    <hibernate.version>6.5.2.Final</hibernate.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <picocli.version>4.7.7</picocli.version>
     <equalsverifier.version>3.19.4</equalsverifier.version>
@@ -112,6 +113,12 @@
         <artifactId>mariadb</artifactId>
         <version>${testcontainers.version}</version>
         <scope>test</scope>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${hibernate.version}</version>
       </dependency>
       
       <dependency>

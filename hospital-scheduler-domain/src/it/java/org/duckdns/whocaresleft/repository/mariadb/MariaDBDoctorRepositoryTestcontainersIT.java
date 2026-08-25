@@ -9,8 +9,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers @DisplayName("Integration tests for MariaDoctorRepository using testcontainers")
 class MariaDBDoctorRepositoryTestcontainersIT {
 
-    @Container
-    private static final MariaDBContainer maria = new MariaDBContainer("mariadb:10.3.39");
+    //@Container
+    //private static final MariaDBContainer maria = new MariaDBContainer("mariadb:10.3.39");
     
-    private MariaDBClient client;
+    //private MariaDBClient client;
 }
