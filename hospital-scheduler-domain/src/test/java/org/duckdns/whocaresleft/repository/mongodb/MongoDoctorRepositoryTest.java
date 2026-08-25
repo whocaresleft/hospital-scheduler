@@ -142,6 +142,21 @@ class MongoDoctorRepositoryTest {
                     newDoctorWithSameId,
                     Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
         }
+        
+        @Test @DisplayName("FindById when the doctor is present in the database should return the doctor with that id")
+        void testFindByIdWhenDoctorIsPresentInDatabaseShouldReturnSuchDoctor() {
+            addTestDoctorToDB("doctor_id", "doc", "tor");
+            addTestDoctorToDB("doctor_id2", "dok", "ter");
+            
+            assertThat(repository.findById(Id.createId("doctor_id")))
+                .isEqualTo(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+        }
+        
+        @Test @DisplayName("FindById when the doctor is not present in the database should return null")
+        void testFindByIdWhenDoctorIsNotPresentInDatabaseShouldReturnNull() {
+            assertThat(repository.findById(Id.createId("doctor_id")))
+                .isEqualTo(null);
+        }
     }
     
     @Nested
