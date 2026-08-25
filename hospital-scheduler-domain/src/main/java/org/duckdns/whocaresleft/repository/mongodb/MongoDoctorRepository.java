@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.bson.Document;
-//import org.bson.Document;
 import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
@@ -17,6 +16,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 public class MongoDoctorRepository implements DoctorRepository {
 
@@ -36,11 +36,7 @@ public class MongoDoctorRepository implements DoctorRepository {
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
         try {
-            doctorCollection.insertOne(
-                new Document()
-                .append("_id", doctor.getId().getValue())
-                 .append("firstName", doctor.getFirstName())
-                .append("lastName", doctor.getLastName()));
+            doctorCollection.insertOne(toDocument(doctor));
         } catch (MongoWriteException e) {
             throw new DuplicateDoctorException(doctor);
         }
@@ -55,7 +51,11 @@ public class MongoDoctorRepository implements DoctorRepository {
 
     @Override
     public void update(Id doctorId, Doctor newDoctor) throws DoctorNotFoundException {
-        
+        UpdateResult result = doctorCollection.replaceOne(
+            Filters.eq("_id", doctorId.getValue()),
+            toDocument(newDoctor));
+        if (result.getMatchedCount() == 0)
+            throw new DoctorNotFoundException(doctorId);
     }
 
     private Doctor fromDocument(Document doc) {
@@ -63,5 +63,12 @@ public class MongoDoctorRepository implements DoctorRepository {
             Id.createId(doc.getString("_id")),
             doc.getString("firstName"),
             doc.getString("lastName"));
+    }
+    
+    private Document toDocument(Doctor doc) {
+        return new Document()
+            .append("_id", doc.getId().getValue())
+            .append("firstName", doc.getFirstName())
+            .append("lastName", doc.getLastName());
     }
 }
