@@ -70,7 +70,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>${maven.build-helper.version}</version> <!--TODO configuration-->
+          <version>${maven.build-helper.version}</version>
           <executions>
             <execution>
               <id>add-test-source</id>
@@ -185,16 +185,16 @@
             <targetClasses>
               <param>org.duckdns.whocaresleft.core.Id</param>
               <param>org.duckdns.whocaresleft.model.Shift</param>
-              <param>org.duckdns.whocaresleft.repository.mongodb.MongoDoctorRepository</param>
-              <param>org.duckdns.whocaresleft.presenter.DoctorPresenter</param>
+              <param>org.duckdns.whocaresleft.repository.*</param>
+              <param>org.duckdns.whocaresleft.presenter.*</param>
             </targetClasses>
             <targetTests>
               <param>org.duckdns.whocaresleft.core.Id*</param>
               <param>org.duckdns.whocaresleft.model.Shift*</param>
-              <param>org.duckdns.whocaresleft.repository.mongodb.MongoDoctorRepository*</param>
-              <param>org.duckdns.whocaresleft.presenter.DoctorPresenter*</param>
+              <param>org.duckdns.whocaresleft.repository.*</param>
+              <param>org.duckdns.whocaresleft.presenter.*</param>
             </targetTests>
-            <mutationThreshold>80</mutationThreshold>
+            <mutationThreshold>90</mutationThreshold>
             <outputFormats>
               <outputFormat>HTML</outputFormat>
               <outputFormat>XML</outputFormat>
@@ -208,7 +208,7 @@
               <param>set*</param>
             </excludedMethods>
             <avoidCallsTo>
-              <param>org.apache.log4j</param>
+              <param>org.apache.logging.log4j</param>
             </avoidCallsTo>
             <threads>4</threads>
           </configuration>

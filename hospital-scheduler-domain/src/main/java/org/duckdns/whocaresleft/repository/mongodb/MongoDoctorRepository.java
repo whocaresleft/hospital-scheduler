@@ -33,6 +33,14 @@ public class MongoDoctorRepository implements DoctorRepository {
     }
 
     @Override
+    public Doctor findById(Id doctorId) {
+        Document d = doctorCollection.find(Filters.eq("_id", doctorId.getValue())).first();
+        if (d == null)
+            return null;
+        return fromDocument(d);
+    }
+
+    @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
         try {
             doctorCollection.insertOne(toDocument(doctor));

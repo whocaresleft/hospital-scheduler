@@ -83,7 +83,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).save(existingDoctor);
         inOrder.verify(doctorView)
-            .showErrorDuplicateDoctor("A doctor with id doctor_1 already exists", existingDoctor);
+            .showErrorDuplicateDoctor(existingDoctor.getId());
     }
     
     @Test @DisplayName("Method removeDoctor(doctor) when doctor exists")
@@ -112,7 +112,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).delete(nonExistingDoctorId);
         inOrder.verify(doctorView)
-            .showErrorDoctorNotFound("No doctor with id doctor_1 was found", nonExistingDoctor);
+            .showErrorDoctorNotFound(nonExistingDoctorId);
     }
     
     @Test @DisplayName("Method updateDoctor(oldDoctor, newDoctor) when oldDoctor exists")
@@ -143,6 +143,35 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).update(nonExistingDoctorId, newDoctor);
         inOrder.verify(doctorView)
-            .showErrorDoctorNotFound("No doctor with id doctor_1 was found", nonExistingOldDoctor);
+            .showErrorDoctorNotFound(nonExistingDoctorId);
+    }
+    
+    @Test @DisplayName("Method findById(id) when doctor with such id exists")
+    void testFindByIdWhenDoctorWithSuchIdExists() {
+        Id id = Id.createId("doctor_id");
+        Doctor doctor = Doctor.createDoctor(id, "doc", "tor");
+        
+        when(doctorRepository.findById(id))
+            .thenReturn(doctor);
+        
+        doctorPresenter.oneDoctor(id);
+        
+        InOrder inOrder = inOrder(doctorRepository, doctorView);
+        inOrder.verify(doctorRepository).findById(id);
+        inOrder.verify(doctorView).showSingleDoctor(doctor);
+    }
+    
+    @Test @DisplayName("Method findById(id) when no doctor with such id exists")
+    void testFindByIdWhenNoDoctorWithSuchIdExists() {
+        Id nonExistentDoctorId = Id.createId("doctor_id");
+        
+        when(doctorRepository.findById(nonExistentDoctorId))
+            .thenReturn(null);
+        
+        doctorPresenter.oneDoctor(nonExistentDoctorId);
+        
+        InOrder inOrder = inOrder(doctorRepository, doctorView);
+        inOrder.verify(doctorRepository).findById(nonExistentDoctorId);
+        inOrder.verify(doctorView).showErrorDoctorNotFound(nonExistentDoctorId);
     }
 }
