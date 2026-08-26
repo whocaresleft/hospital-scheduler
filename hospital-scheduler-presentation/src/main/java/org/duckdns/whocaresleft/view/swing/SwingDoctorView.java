@@ -384,7 +384,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     @Override
     public void showErrorDoctorNotFound(Id notFound) {
-        errorLabel.setText("No doctor with id " + notFound + " was found");
+        errorLabel.setText("No existing doctor with id " + notFound);
     }
     
     private void clearErrorLabel() {

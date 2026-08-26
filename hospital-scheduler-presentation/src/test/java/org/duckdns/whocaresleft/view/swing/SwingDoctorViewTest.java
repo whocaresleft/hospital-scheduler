@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-@DisplayName("UI tests for SwingDoctorViewTest")
+@DisplayName("UI tests for SwingDoctorView")
 class SwingDoctorViewTest {
     
     @Mock
@@ -296,7 +296,7 @@ class SwingDoctorViewTest {
         Id id = Id.createId("doctor_id");
         GuiActionRunner.execute(() -> doctorView.showErrorDoctorNotFound(id));
         
-        window.label("errorLabel").requireText("No doctor with id doctor_id was found");
+        window.label("errorLabel").requireText("No existing doctor with id doctor_id");
     }
     
     @Test
