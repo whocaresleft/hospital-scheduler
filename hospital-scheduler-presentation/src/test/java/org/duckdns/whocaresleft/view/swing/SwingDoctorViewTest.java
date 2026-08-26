@@ -2,6 +2,8 @@ package org.duckdns.whocaresleft.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.Arrays;
 
@@ -16,14 +18,21 @@ import org.assertj.swing.fixture.JCheckBoxFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
 import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.model.Doctor;
+import org.duckdns.whocaresleft.presenter.DoctorPresenter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 @DisplayName("UI tests for SwingDoctorViewTest")
 class SwingDoctorViewTest {
+    
+    @Mock
+    private DoctorPresenter doctorPresenter;
+    private AutoCloseable closeable;
     
     private FrameFixture window;
     private SwingDoctorView doctorView;
@@ -35,15 +44,18 @@ class SwingDoctorViewTest {
     
     @BeforeEach
     void setup() {
+        closeable = MockitoAnnotations.openMocks(this);
         GuiActionRunner.execute(() -> {
             doctorView = new SwingDoctorView();
+            doctorView.setPresenter(doctorPresenter);
             return doctorView;
         });
         window = Containers.showInFrame(doctorView);
     }
     
     @AfterEach
-    void teardown() {
+    void teardown() throws Exception {
+        closeable.close();
         if (window != null)
             window.cleanUp();
     }
@@ -150,12 +162,12 @@ class SwingDoctorViewTest {
         JCheckBoxFixture editCheckbox = window.checkBox("editDoctor");
         
         assertThatExceptionOfType(IllegalStateException.class)
-            .isThrownBy(() -> editCheckbox.check());
+            .isThrownBy(() -> editCheckbox.click());
         
         window.list("doctorList").selectItem(0);
         editCheckbox.requireEnabled();
         
-        editCheckbox.check();
+        editCheckbox.click();
         editCheckbox.requireSelected();
         
         window.list("doctorList").clearSelection();
@@ -217,13 +229,13 @@ class SwingDoctorViewTest {
         selectedFirstNameTextBox.requireDisabled();
         selectedLastNameTextBox.requireDisabled();
         
-        editCheckbox.check();
+        editCheckbox.click();
         
         selectedIdTextBox.requireDisabled();
         selectedFirstNameTextBox.requireEnabled();
         selectedLastNameTextBox.requireEnabled();
         
-        editCheckbox.uncheck();
+        editCheckbox.click();
         
         selectedIdTextBox.requireDisabled();
         selectedFirstNameTextBox.requireDisabled();
@@ -238,7 +250,7 @@ class SwingDoctorViewTest {
         window.list("doctorList").selectItem(0);
         window.checkBox("editDoctor")
             .requireEnabled()
-            .check()
+            .click()
             .requireSelected();
         
         JTextComponentFixture selectedFirstNameTextBox = window.textBox("selectedFirstNameTextBox");
@@ -348,5 +360,68 @@ class SwingDoctorViewTest {
         window.label("errorLabel").requireText(" ");
     }
     
-    // Test interaction with controller
+    @Test
+    void testAddButtonShouldDelegateToDoctorPresenterAddDoctor() {
+        window.textBox("idTextBox").enterText("doctor_id");
+        window.textBox("firstNameTextBox").enterText("doc");
+        window.textBox("lastNameTextBox").enterText("tor");
+        
+        window.button("addBtn").click();
+        
+        verify(doctorPresenter)
+            .addDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+    }
+    
+    @Test
+    void testAddButtonWhenDoctorCreationThrowsBecauseOfIdDoesNotDelegateAndShowsAnError() {
+        window.textBox("idTextBox").enterText("SUPER)INVALID==@ID");
+        window.textBox("firstNameTextBox").enterText("doc");
+        window.textBox("lastNameTextBox").enterText("tor");
+        
+        window.button("addBtn").click();
+        
+        verifyNoInteractions(doctorPresenter);
+        window.label("errorLabel").requireText("Invalid id, must be [\\w]+");
+    }
+    
+    @Test
+    void testDeleteButtonShouldDeletageToDoctorPresenterRemoveDoctor() {
+        Doctor doc1 = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        Doctor doc2 = Doctor.createDoctor(Id.createId("doctor_2"), "dock", "thor");
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Doctor> doctorListModel = doctorView.getDoctorListModel();
+            doctorListModel.addElement(doc1);
+            doctorListModel.addElement(doc2);
+        });
+        
+        window.list("doctorList").selectItem(1);
+        window.button("deleteBtn").click();
+        
+        verify(doctorPresenter)
+            .removeDoctor(doc2);
+    }
+    
+    @Test
+    void testUpdateButtonShouldDeletageToDoctorPresenterUpdateDoctor() {
+        Doctor docOriginal = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+        Doctor docNew = Doctor.createDoctor(Id.createId("doctor_id"), "dock", "thor");
+        
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Doctor> doctorListModel = doctorView.getDoctorListModel();
+            doctorListModel.addElement(docOriginal);
+        });
+        
+        window.list("doctorList").selectItem(0);
+        window.checkBox("editDoctor").requireEnabled().click();
+        
+        window.textBox("selectedFirstNameTextBox").setText("");
+        window.textBox("selectedFirstNameTextBox").enterText("dock");
+        window.textBox("selectedLastNameTextBox").setText("");
+        window.textBox("selectedLastNameTextBox").enterText("thor");
+        
+        window.button("updateBtn").click();
+        
+        verify(doctorPresenter)
+            .updateDoctor(docOriginal, docNew);
+    }
 }

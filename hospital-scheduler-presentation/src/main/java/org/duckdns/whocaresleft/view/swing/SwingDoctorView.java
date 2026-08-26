@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 
 import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.model.Doctor;
+import org.duckdns.whocaresleft.presenter.DoctorPresenter;
 import org.duckdns.whocaresleft.view.DoctorView;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -41,6 +42,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     private JList<Doctor> doctorList;
     private DefaultListModel<Doctor> doctorListModel;
     private JLabel errorLabel;
+    
+    private DoctorPresenter presenter;
     
     public SwingDoctorView() {
         GridBagLayout gridBagLayout = new GridBagLayout();
@@ -316,6 +319,34 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_errorLabel.gridx = 1;
         gbc_errorLabel.gridy = 17;
         add(errorLabel, gbc_errorLabel);
+        
+        addBtn.addActionListener(
+            e -> {
+                try {
+                    presenter.addDoctor(Doctor.createDoctor(
+                        Id.createId(idTextBox.getText()),
+                        fnTextBox.getText(),
+                        lnTextBox.getText()));
+                } catch (IllegalArgumentException iae) {
+                    idTextBox.setText("");
+                    fnTextBox.setText("");
+                    lnTextBox.setText("");
+                    errorLabel.setText("Invalid id, must be [\\w]+");
+                }
+            });
+        
+        deleteBtn.addActionListener(
+            e -> presenter.removeDoctor(
+                doctorList.getSelectedValue()));
+        
+        updateBtn.addActionListener(
+            e -> presenter.updateDoctor(
+                doctorList.getSelectedValue(),
+                Doctor.createDoctor(
+                    Id.createId(selectedIdTextBox.getText()),
+                    selectedFnTextBox.getText(),
+                    selectedLnTextBox.getText()
+                )));
     }
     
     DefaultListModel<Doctor> getDoctorListModel() { return doctorListModel; }
@@ -345,19 +376,19 @@ public class SwingDoctorView extends JPanel implements DoctorView {
 
     @Override
     public void showErrorDuplicateDoctor(Id duplicated) {
-        setErrorLabelText("There already is a Doctor with id " + duplicated);
+        errorLabel.setText("There already is a Doctor with id " + duplicated);
     }
     
     @Override
     public void showErrorDoctorNotFound(Id notFound) {
-        setErrorLabelText("No doctor with id " + notFound + " was found");
+        errorLabel.setText("No doctor with id " + notFound + " was found");
     }
     
     private void clearErrorLabel() {
-        setErrorLabelText(" ");
+        errorLabel.setText(" ");
     }
-    
-    private void setErrorLabelText(String text) {
-        errorLabel.setText(text);
+
+    public void setPresenter(DoctorPresenter presenter) {
+        this.presenter = presenter;
     }
 }
