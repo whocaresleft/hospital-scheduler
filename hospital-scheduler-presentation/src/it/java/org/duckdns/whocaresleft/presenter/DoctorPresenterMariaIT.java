@@ -92,17 +92,6 @@ class DoctorPresenterMariaIT {
     }
     
     @Test
-    void testOneDoctor() {
-        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
-        repository.save(doctor);
-        
-        presenter.oneDoctor(Id.createId("doctor_id"));
-        
-        verify(view)
-            .showSingleDoctor(doctor);
-    }
-    
-    @Test
     void testAddDoctor() {
         Doctor doctorToAdd = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
         
