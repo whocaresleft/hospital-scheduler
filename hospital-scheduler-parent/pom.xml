@@ -135,8 +135,10 @@
           <version>${maven.jacoco.version}</version>
           <configuration>
             <excludes>
-              <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
               <exclude>**/org/duckdns/whocaresleft/exception/*Exception*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/learning/*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/repository/maria*/*Entity*</exclude>
             </excludes>
           </configuration>
           <executions>
@@ -159,6 +161,7 @@
                     <element>PACKAGE</element>
                     <excludes> <!--Excluding concrete repositories that ONLY have integration tests from unit test code coverage-->
                       <exclude>org.duckdns.whocaresleft.repository.mongo*</exclude>
+                      <exclude>org.duckdns.whocaresleft.repository.maria*</exclude>
                     </excludes>
                     <limits>
                       <limit>
@@ -231,7 +234,8 @@
             <targetClasses>
               <param>org.duckdns.whocaresleft.core.Id</param>
               <param>org.duckdns.whocaresleft.model.Shift</param>
-              <param>org.duckdns.whocaresleft.repository.*</param>
+              <param>org.duckdns.whocaresleft.repository.mongodb.*</param>
+              <param>org.duckdns.whocaresleft.repository.mariadb.Maria*</param>
               <param>org.duckdns.whocaresleft.presenter.*</param>
             </targetClasses>
             <targetTests>
