@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
+import org.duckdns.whocaresleft.core.Id;
+import org.duckdns.whocaresleft.model.Doctor;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,6 +51,9 @@ class MariaDoctorRepositoryTestcontainersIT {
     @BeforeEach
     void setup() {
         entityManager = emf.createEntityManager();
+        
+        repository = new MariaDoctorRepository(entityManager);
+        
         entityManager.getTransaction().begin();
         entityManager.createQuery("DELETE FROM DoctorEntity").executeUpdate();
         entityManager.getTransaction().commit();
@@ -70,6 +75,20 @@ class MariaDoctorRepositoryTestcontainersIT {
         void testFindAllWhenDatabaseIsEmptyShouldReturnEmptyList() {
             assertThat(repository.findAll())
                 .isEmpty();
+        }
+        
+        @Test @DisplayName("FindAll when database is not empty should return all the doctors")
+        void testFindAllWhenDatabaseIsNotEmptyShouldReturnAllDoctors() {
+            entityManager.getTransaction().begin();
+            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
+            entityManager.persist(new DoctorEntity("doctor_2", "dok", "ter"));
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+            
+            assertThat(repository.findAll())
+                .containsExactly(
+                    Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"),
+                    Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
         }
     }
 }

@@ -8,15 +8,22 @@ import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 
+import jakarta.persistence.EntityManager;
+
 public class MariaDoctorRepository implements DoctorRepository {
 
-    public MariaDoctorRepository() {
-        
+    private EntityManager entityManager;
+    
+    public MariaDoctorRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
     
     @Override
     public List<Doctor> findAll() {
-        return null;
+        return entityManager.createQuery("SELECT e FROM DoctorEntity e", DoctorEntity.class)
+            .getResultStream()
+            .map(DoctorEntity::toDoctor)
+            .toList();
     }
 
     @Override
