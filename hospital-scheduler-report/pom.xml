@@ -21,6 +21,10 @@
     </dependency>
   </dependencies>
   
+  <build>
+    
+  </build>
+  
   <profiles>
     <profile>
       <id>jacoco</id>

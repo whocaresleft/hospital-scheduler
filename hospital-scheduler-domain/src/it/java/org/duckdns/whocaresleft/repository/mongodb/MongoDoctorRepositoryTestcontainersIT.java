@@ -39,10 +39,7 @@ class MongoDoctorRepositoryTestcontainersIT {
     
     @BeforeEach
     void setup() {
-        String connectionString = String.format("mongodb://%s:%d",
-            mongo.getHost(),
-            mongo.getFirstMappedPort());
-        client = MongoClients.create(connectionString);
+        client = MongoClients.create(mongo.getConnectionString());
         repository = new MongoDoctorRepository(client);
         MongoDatabase database = client.getDatabase("hospital");
         database.drop();
@@ -146,7 +143,7 @@ class MongoDoctorRepositoryTestcontainersIT {
         }
     }
     
-    @Nested
+    @Nested @DisplayName("Error cases")
     class ExceptionalCases {
         
         @Test @DisplayName("Save when a doctor with the sane id is already present in the database should throw and not add")
