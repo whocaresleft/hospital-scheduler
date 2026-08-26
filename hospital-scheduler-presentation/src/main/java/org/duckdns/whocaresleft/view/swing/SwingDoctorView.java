@@ -302,9 +302,12 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         KeyAdapter updateBtnEnabler = new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                updateBtn.setEnabled(
-                    !selectedFnTextBox.getText().isBlank()
-                    && !selectedLnTextBox.getText().isBlank());
+                Doctor selected = doctorList.getSelectedValue();
+                
+                boolean bothEqualToExisting = selectedFnTextBox.getText().equals(selected.getFirstName()) && selectedLnTextBox.getText().equals(selected.getLastName());
+                boolean atLeastOneEmpty = selectedFnTextBox.getText().isBlank() || selectedLnTextBox.getText().isBlank();
+                
+                updateBtn.setEnabled(!(bothEqualToExisting || atLeastOneEmpty));
             }
         };
         selectedFnTextBox.addKeyListener(updateBtnEnabler);

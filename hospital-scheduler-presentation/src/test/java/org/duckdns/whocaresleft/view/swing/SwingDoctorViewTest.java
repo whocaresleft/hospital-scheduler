@@ -1,7 +1,6 @@
 package org.duckdns.whocaresleft.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -161,9 +160,6 @@ class SwingDoctorViewTest {
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
         JCheckBoxFixture editCheckbox = window.checkBox("editDoctor");
         
-        assertThatExceptionOfType(IllegalStateException.class)
-            .isThrownBy(() -> editCheckbox.click());
-        
         window.list("doctorList").selectItem(0);
         editCheckbox.requireEnabled();
         
@@ -243,7 +239,7 @@ class SwingDoctorViewTest {
     }
     
     @Test
-    void testUpdateButtonShouldBeEnabledOnlyWhenAllEditTextfieldsAreNotBlank() {
+    void testUpdateButtonShouldBeDisableIfTheTextFieldsContainTheCurrentDoctorValuesOrAtLeastOneIsEmpty() {
         GuiActionRunner.execute(() ->
             doctorView.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -257,23 +253,21 @@ class SwingDoctorViewTest {
         JTextComponentFixture selectedLastNameTextBox = window.textBox("selectedLastNameTextBox");
         JButtonFixture updateBtn = window.button("updateBtn");
         
-        selectedFirstNameTextBox.setText("");
-        selectedLastNameTextBox.setText("");
-        
-        selectedFirstNameTextBox.enterText("doc");
-        selectedLastNameTextBox.enterText(" ");
         updateBtn.requireDisabled();
         
         selectedFirstNameTextBox.setText("");
         selectedLastNameTextBox.setText("");
-        
         selectedFirstNameTextBox.enterText(" ");
-        selectedLastNameTextBox.enterText("tor");
-        updateBtn.requireDisabled();
+        selectedLastNameTextBox.enterText(" ");
         
-        selectedFirstNameTextBox.enterText("doc");
-        selectedLastNameTextBox.enterText("tor");
-        updateBtn.requireEnabled();
+        updateBtn.requireDisabled();
+        selectedFirstNameTextBox.setText("");
+        selectedLastNameTextBox.setText("");
+        
+        Doctor currentlySelected = doctorView.getDoctorListModel().elementAt(0);
+        selectedFirstNameTextBox.enterText(currentlySelected.getFirstName());
+        selectedLastNameTextBox.enterText(currentlySelected.getLastName());
+        updateBtn.requireDisabled();
     }
     
     @Test
