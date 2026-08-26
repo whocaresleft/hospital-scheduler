@@ -1,10 +1,13 @@
 package org.duckdns.whocaresleft.repository.mariadb;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import java.util.List;
 import java.util.Map;
 
 import org.duckdns.whocaresleft.core.Id;
+import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -90,20 +93,63 @@ class MariaDoctorRepositoryTestcontainersIT {
                     Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"),
                     Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
         }
+        
+        @Test @DisplayName("FindById when database doctor is not present should return null")
+        void testFindByIdWhenDoctorIsNotPresentInDatabaseShouldReturnNull() {
+            entityManager.getTransaction().begin();
+            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+            
+            assertThat(repository.findById(Id.createId("doctor_2")))
+                .isNull();
+        }
+        
+        @Test @DisplayName("FindById when the doctor is present in the database should return the doctor with that id")
+        void testFindByIdWhenDoctorIsPresentInDatabaseShouldReturnSuchDoctor() {
+            entityManager.getTransaction().begin();
+            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
+            entityManager.persist(new DoctorEntity("doctor_2", "dok", "ter"));
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+            
+            assertThat(repository.findById(Id.createId("doctor_2")))
+                .isEqualTo(Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter")); 
+        }
+        @Test @DisplayName("Save when the no doctor with the same is already in the database should add")
+        void testSaveWhenNoDoctorWithSameIdIsAlreadyInDatabaseShouldAdd() {
+            Doctor toBeInserted = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+            
+            repository.save(toBeInserted);
+            
+            List<Doctor> doctors = entityManager.createQuery("SELECT e FROM DoctorEntity e", DoctorEntity.class)
+                    .getResultStream()
+                    .map(DoctorEntity::toDoctor)
+                    .toList();
+            assertThat(doctors)
+                .containsExactly(toBeInserted);
+        }
+    }
+    
+    @Nested @DisplayName("Error cases")
+    class ExceptionalCases {
+        
+        @Test @DisplayName("Save when a doctor with the sane id is already present in the database should throw and not add")
+        void testSaveWhenDoctorWithSameIdIsAlreadyInDatabaseShouldThrowAndNotSave() {
+            entityManager.getTransaction().begin();
+            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+            Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_1"), "dok", "thor");
+            
+            assertThatExceptionOfType(DuplicateDoctorException.class)
+                .isThrownBy(() -> repository.save(newDoctorWithSameId));
+            List<Doctor> doctors = entityManager.createQuery("SELECT e FROM DoctorEntity e", DoctorEntity.class)
+                    .getResultStream()
+                    .map(DoctorEntity::toDoctor)
+                    .toList();
+            assertThat(doctors)
+                .doesNotContain(newDoctorWithSameId);
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

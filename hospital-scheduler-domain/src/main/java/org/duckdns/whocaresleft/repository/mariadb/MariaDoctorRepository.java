@@ -28,12 +28,22 @@ public class MariaDoctorRepository implements DoctorRepository {
 
     @Override
     public Doctor findById(Id id) {
+        DoctorEntity doc = entityManager.find(DoctorEntity.class, id.getValue());
+        if (doc != null)
+            return doc.toDoctor();
         return null;
     }
 
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
+        entityManager.getTransaction().begin();
+        entityManager.persist(DoctorEntity.fromDoctor(doctor));
         
+        try {
+            entityManager.getTransaction().commit();
+        } catch (jakarta.persistence.RollbackException e) {
+            throw new DuplicateDoctorException(doctor);
+        }
     }
 
     @Override
