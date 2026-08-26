@@ -196,6 +196,24 @@ class HibernateTestcontainersLearningTestsIT {
             .isNull();
     }
     
+    @Test @DisplayName("Removing entity that does not exist")
+    void testRemoveEntityThatDoesNotExistPassingTheEntityDoesNotThrow() {
+        em.getTransaction().begin();
+        LearningEntity le = new LearningEntity("id", "name");
+        em.remove(le);
+        em.getTransaction().commit();
+    }
+    
+    @Test @DisplayName("Removing entity that does not exist using find throws at REMOVE because it's null")
+    void testRemoveEntityThatDoesNotExistUsingFindThrowsAtRemove() {
+        em.getTransaction().begin();
+        LearningEntity toBeRemoved = em.find(LearningEntity.class, "le_id");
+        
+        assertThatExceptionOfType(Exception.class)
+            .isThrownBy(() -> em.remove(toBeRemoved));
+        em.getTransaction().rollback();
+    }
+    
     @Test @DisplayName("Finding a single entity does not require a transaction")
     void testFindCanBeUsedAlsoWithoutTransactions() {
         addTestLearningEntity("le_id", "Entity 1");

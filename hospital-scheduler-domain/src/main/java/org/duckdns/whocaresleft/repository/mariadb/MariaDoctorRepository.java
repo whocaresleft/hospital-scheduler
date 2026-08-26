@@ -48,7 +48,14 @@ public class MariaDoctorRepository implements DoctorRepository {
 
     @Override
     public void delete(Id doctorId) throws DoctorNotFoundException {
-        
+        entityManager.getTransaction().begin();
+        DoctorEntity toBeRemoved = entityManager.find(DoctorEntity.class, doctorId.getValue());
+        if (toBeRemoved == null) {
+            entityManager.getTransaction().rollback();
+            throw new DoctorNotFoundException(doctorId);
+        }
+        entityManager.remove(toBeRemoved);
+        entityManager.getTransaction().commit();
     }
 
     @Override

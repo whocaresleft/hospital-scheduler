@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.duckdns.whocaresleft.core.Id;
+import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.junit.jupiter.api.AfterAll;
@@ -116,6 +117,27 @@ class MariaDoctorRepositoryTestcontainersIT {
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(toBeInserted);
         }
+        
+        @Test @DisplayName("Delete when a doctor with the specified id is present in the database should delete existing doctor")
+        void testDeleteWhenDoctorIsPresentInDatabaseShouldDeleteExistingDoctor() {
+            addTestDoctorToDB("doctor_id", "doc", "tor");
+            
+            repository.delete(Id.createId("doctor_id"));
+            
+            assertThat(readAllDoctorsFromDB())
+                .isEmpty();
+        }
+        
+        @Test @DisplayName("Delete when the doctor is present in the database, as well as other doctors, should only delete the specified one")
+        void testDeleteWhenDoctorIsPresentInDatabaseAsWellAsAnotherDoctorsShouldDeleteOnlySpecifiedDoctor() {
+            addTestDoctorToDB("doctor_id", "doc", "tor");
+            addTestDoctorToDB("doctor_id2", "dok", "ter");
+            
+            repository.delete(Id.createId("doctor_id"));
+            
+            assertThat(readAllDoctorsFromDB())
+                .containsExactly(Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
+        }
     }
     
     @Nested @DisplayName("Error cases")
@@ -130,6 +152,12 @@ class MariaDoctorRepositoryTestcontainersIT {
                 .isThrownBy(() -> repository.save(newDoctorWithSameId));
             assertThat(readAllDoctorsFromDB())
                 .doesNotContain(newDoctorWithSameId);
+        }
+        
+        @Test @DisplayName("Delete when no doctor with the specified id is in the database should throw")
+        void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
+            assertThatExceptionOfType(DoctorNotFoundException.class)
+                .isThrownBy(() -> repository.delete(Id.createId("doctor_id")));
         }
     }
     
