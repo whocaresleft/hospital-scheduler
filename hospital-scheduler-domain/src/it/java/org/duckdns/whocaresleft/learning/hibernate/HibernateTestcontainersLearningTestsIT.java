@@ -1,6 +1,7 @@
 package org.duckdns.whocaresleft.learning.hibernate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;;
+import jakarta.persistence.Persistence;
 
 @Testcontainers @DisplayName("Learning tests for Hibernate API")
 class HibernateTestcontainersLearningTestsIT {
@@ -198,10 +199,13 @@ class HibernateTestcontainersLearningTestsIT {
     
     @Test @DisplayName("Removing entity that does not exist")
     void testRemoveEntityThatDoesNotExistPassingTheEntityDoesNotThrow() {
-        em.getTransaction().begin();
         LearningEntity le = new LearningEntity("id", "name");
-        em.remove(le);
-        em.getTransaction().commit();
+        
+        assertThatCode(() -> {
+            em.getTransaction().begin();
+            em.remove(le);
+            em.getTransaction().commit();
+        }).doesNotThrowAnyException();
     }
     
     @Test @DisplayName("Removing entity that does not exist using find throws at REMOVE because it's null")

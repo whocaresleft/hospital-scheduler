@@ -181,8 +181,9 @@ class MariaDoctorRepositoryTestcontainersIT {
         
         @Test @DisplayName("Delete when no doctor with the specified id is in the database should throw")
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
+            Id nonExistendDoctorId = Id.createId("doctor_id");
             assertThatExceptionOfType(DoctorNotFoundException.class)
-                .isThrownBy(() -> repository.delete(Id.createId("doctor_id")));
+                .isThrownBy(() -> repository.delete(nonExistendDoctorId));
         }
         
         @Test @DisplayName("Update when no doctor with the specified id is in the database should throw")
