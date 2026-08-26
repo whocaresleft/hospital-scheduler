@@ -82,11 +82,8 @@ class MariaDoctorRepositoryTestcontainersIT {
         
         @Test @DisplayName("FindAll when database is not empty should return all the doctors")
         void testFindAllWhenDatabaseIsNotEmptyShouldReturnAllDoctors() {
-            entityManager.getTransaction().begin();
-            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
-            entityManager.persist(new DoctorEntity("doctor_2", "dok", "ter"));
-            entityManager.getTransaction().commit();
-            entityManager.clear();
+            addTestDoctorToDB("doctor_1", "doc", "tor");
+            addTestDoctorToDB("doctor_2", "dok", "ter");
             
             assertThat(repository.findAll())
                 .containsExactly(
@@ -96,10 +93,7 @@ class MariaDoctorRepositoryTestcontainersIT {
         
         @Test @DisplayName("FindById when database doctor is not present should return null")
         void testFindByIdWhenDoctorIsNotPresentInDatabaseShouldReturnNull() {
-            entityManager.getTransaction().begin();
-            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
-            entityManager.getTransaction().commit();
-            entityManager.clear();
+            addTestDoctorToDB("doctor_1", "doc", "tor");
             
             assertThat(repository.findById(Id.createId("doctor_2")))
                 .isNull();
@@ -107,11 +101,8 @@ class MariaDoctorRepositoryTestcontainersIT {
         
         @Test @DisplayName("FindById when the doctor is present in the database should return the doctor with that id")
         void testFindByIdWhenDoctorIsPresentInDatabaseShouldReturnSuchDoctor() {
-            entityManager.getTransaction().begin();
-            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
-            entityManager.persist(new DoctorEntity("doctor_2", "dok", "ter"));
-            entityManager.getTransaction().commit();
-            entityManager.clear();
+            addTestDoctorToDB("doctor_1", "doc", "tor");
+            addTestDoctorToDB("doctor_2", "dok", "ter");
             
             assertThat(repository.findById(Id.createId("doctor_2")))
                 .isEqualTo(Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter")); 
@@ -122,11 +113,7 @@ class MariaDoctorRepositoryTestcontainersIT {
             
             repository.save(toBeInserted);
             
-            List<Doctor> doctors = entityManager.createQuery("SELECT e FROM DoctorEntity e", DoctorEntity.class)
-                    .getResultStream()
-                    .map(DoctorEntity::toDoctor)
-                    .toList();
-            assertThat(doctors)
+            assertThat(readAllDoctorsFromDB())
                 .containsExactly(toBeInserted);
         }
     }
@@ -136,20 +123,27 @@ class MariaDoctorRepositoryTestcontainersIT {
         
         @Test @DisplayName("Save when a doctor with the sane id is already present in the database should throw and not add")
         void testSaveWhenDoctorWithSameIdIsAlreadyInDatabaseShouldThrowAndNotSave() {
-            entityManager.getTransaction().begin();
-            entityManager.persist(new DoctorEntity("doctor_1", "doc", "tor"));
-            entityManager.getTransaction().commit();
-            entityManager.clear();
+            addTestDoctorToDB("doctor_1", "doc", "tor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_1"), "dok", "thor");
             
             assertThatExceptionOfType(DuplicateDoctorException.class)
                 .isThrownBy(() -> repository.save(newDoctorWithSameId));
-            List<Doctor> doctors = entityManager.createQuery("SELECT e FROM DoctorEntity e", DoctorEntity.class)
-                    .getResultStream()
-                    .map(DoctorEntity::toDoctor)
-                    .toList();
-            assertThat(doctors)
+            assertThat(readAllDoctorsFromDB())
                 .doesNotContain(newDoctorWithSameId);
         }
+    }
+    
+    private void addTestDoctorToDB(String id, String firstName, String lastName) {
+        entityManager.getTransaction().begin();
+        entityManager.persist(new DoctorEntity(id, firstName, lastName));
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+    }
+    
+    private List<Doctor> readAllDoctorsFromDB() {
+        return entityManager.createQuery("SELECT e FROM DoctorEntity e", DoctorEntity.class)
+            .getResultStream()
+            .map(DoctorEntity::toDoctor)
+            .toList();
     }
 }
