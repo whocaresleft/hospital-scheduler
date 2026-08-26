@@ -14,6 +14,7 @@
     
     <maven.compiler.version>3.15.0</maven.compiler.version>
     <maven.surefire.version>3.5.6</maven.surefire.version>
+    <maven.surefire.report.version>3.5.6</maven.surefire.report.version>
     <maven.site.version>3.22.0</maven.site.version>
     <maven.build-helper.version>3.6.1</maven.build-helper.version>
     <maven.jacoco.version>0.8.14</maven.jacoco.version>
@@ -60,6 +61,11 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven.surefire.version}</version>
+        </plugin>
+        
+        <plugin>
+          <artifactId>maven-surefire-report-plugin</artifactId>
+          <version>${maven.surefire.report.version}</version>
         </plugin>
         
         <plugin>
@@ -116,7 +122,6 @@
         </plugin>
         
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>${maven.failsafe.version}</version>
           <executions>
@@ -337,6 +342,27 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>test-report</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-report-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>generate-reports</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report-only</goal>
+                  <goal>failsafe-report-only</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
