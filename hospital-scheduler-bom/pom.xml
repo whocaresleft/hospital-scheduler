@@ -11,7 +11,7 @@
     <junit.version>5.11.0</junit.version>
     <log4j.version>2.24.3</log4j.version>
     <assertj.version>3.27.7</assertj.version>
-    <assertj.swing.version>3.27.7</assertj.swing.version>
+    <assertj.swing.version>3.17.1</assertj.swing.version>
     <mockito.version>4.11.0</mockito.version>
     <mongo.driver.version>5.10.0</mongo.driver.version>
     <qos.logback.version>1.2.13</qos.logback.version>
@@ -57,6 +57,13 @@
         <version>${assertj.version}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-swing-junit</artifactId>
+        <version>${assertj.swing.version}</version>
+        <scope>test</scope>
       </dependency>
 
       <dependency>
