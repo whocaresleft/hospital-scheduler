@@ -60,7 +60,15 @@ public class MariaDoctorRepository implements DoctorRepository {
 
     @Override
     public void update(Id doctorId, Doctor newDoctor) throws DoctorNotFoundException {
-        
+        entityManager.getTransaction().begin();
+        DoctorEntity toBeUpdated = entityManager.find(DoctorEntity.class, doctorId.getValue());
+        if (toBeUpdated == null) {
+            entityManager.getTransaction().rollback();
+            throw new DoctorNotFoundException(doctorId);
+        }
+        toBeUpdated.setFirstName(newDoctor.getFirstName());
+        toBeUpdated.setLastName(newDoctor.getLastName());
+        entityManager.getTransaction().commit();
     }
 
 }

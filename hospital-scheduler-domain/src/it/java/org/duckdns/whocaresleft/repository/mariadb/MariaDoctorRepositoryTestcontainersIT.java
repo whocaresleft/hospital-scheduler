@@ -138,6 +138,31 @@ class MariaDoctorRepositoryTestcontainersIT {
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
         }
+        
+        @Test @DisplayName("Update when a doctor with the specified id is present in the database should update the existing doctor")
+        void testUpdateWhenDoctorIsPresentInDatabaseShouldUpdateExistingDoctor() {
+            addTestDoctorToDB("doctor_id", "original", "doctor");
+            Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
+            
+            repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
+            
+            assertThat(readAllDoctorsFromDB())
+                .containsExactly(newDoctorWithSameId);
+        }
+        
+        @Test @DisplayName("Update when the doctor is present in the database, as well as other doctors, should only update the specified one")
+        void testUpdateWhenDoctorIsPresentInDatabaseAsWellAsAnotherDoctorsShouldUpdateOnlySpecifiedDoctor() {
+            addTestDoctorToDB("doctor_id", "original", "doctor");
+            addTestDoctorToDB("doctor_id2", "dok", "ter");
+            Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
+            
+            repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
+            
+            assertThat(readAllDoctorsFromDB())
+                .containsExactly(
+                    newDoctorWithSameId,
+                    Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
+        }
     }
     
     @Nested @DisplayName("Error cases")
@@ -158,6 +183,15 @@ class MariaDoctorRepositoryTestcontainersIT {
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.delete(Id.createId("doctor_id")));
+        }
+        
+        @Test @DisplayName("Update when no doctor with the specified id is in the database should throw")
+        void testUpdateWhenDoctorIsNotPresentInDatabaseShouldThrow() {
+            Id validDoctorId = Id.createId("doctor_id");
+            Doctor doctorWithNonExistentId = Doctor.createDoctor(Id.createId("doctor_id"), "a", "doctor");
+            
+            assertThatExceptionOfType(DoctorNotFoundException.class)
+                .isThrownBy(() -> repository.update(validDoctorId, doctorWithNonExistentId));
         }
     }
     

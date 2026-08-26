@@ -252,6 +252,17 @@ class HibernateTestcontainersLearningTestsIT {
                 .isEmpty();
     }
     
+    @Test @DisplayName("Calling merge with a non existing entity adds it")
+    void callingMergeWithANonExistingEntityAddsItNorThrows() {
+        em.getTransaction().begin();
+        em.merge(new LearningEntity("id", "name"));
+        em.getTransaction().commit();
+        em.clear();
+        
+        assertThat(em.find(LearningEntity.class, "id"))
+            .isEqualTo(new LearningEntity("id", "name"));
+    }
+    
     @Test @DisplayName("Adding an entity with duplicated id will have transaction rollbacked, the wrong entity is NOT cached")
     void testPersistWithDuplicateIdInTrasactionGetsRollbackedWithExceptionOnCommitAndWrongEntityIsNotCached() {
         addTestLearningEntity("le_id", "Original");

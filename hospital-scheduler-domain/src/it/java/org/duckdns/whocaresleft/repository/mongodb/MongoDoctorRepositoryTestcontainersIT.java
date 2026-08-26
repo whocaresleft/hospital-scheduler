@@ -117,7 +117,7 @@ class MongoDoctorRepositoryTestcontainersIT {
         }
         
         @Test @DisplayName("Update when the doctor is present in the database, as well as other doctors, should only update the specified one")
-        void testUpdateWhenDoctorIsPresentInDatabaseAsWellAsAnotherDoctorsShouldDeleteOnlySpecifiedDoctor() {
+        void testUpdateWhenDoctorIsPresentInDatabaseAsWellAsAnotherDoctorsShouldUpdateOnlySpecifiedDoctor() {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             addTestDoctorToDB("doctor_id2", "dok", "ter");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
