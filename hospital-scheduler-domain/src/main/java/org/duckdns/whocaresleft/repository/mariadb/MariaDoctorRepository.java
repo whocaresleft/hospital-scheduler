@@ -36,12 +36,11 @@ public class MariaDoctorRepository implements DoctorRepository {
 
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
-        entityManager.getTransaction().begin();
-        entityManager.persist(DoctorEntity.fromDoctor(doctor));
-        
         try {
+            entityManager.getTransaction().begin();
+            entityManager.persist(DoctorEntity.fromDoctor(doctor));
             entityManager.getTransaction().commit();
-        } catch (jakarta.persistence.RollbackException e) {
+        } catch (Exception e) {
             throw new DuplicateDoctorException(doctor);
         }
     }

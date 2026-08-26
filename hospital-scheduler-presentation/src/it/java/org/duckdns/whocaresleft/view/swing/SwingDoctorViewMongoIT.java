@@ -136,7 +136,7 @@ class SwingDoctorViewMongoIT {
             
             window.button("addBtn").click();
             
-            assertThat(window.list().contents())
+            assertThat(window.list("doctorList").contents())
                 .isEmpty();
             window.label("errorLabel")
                 .requireText("There already is a Doctor with id " + Id.createId("doctor_id"));
