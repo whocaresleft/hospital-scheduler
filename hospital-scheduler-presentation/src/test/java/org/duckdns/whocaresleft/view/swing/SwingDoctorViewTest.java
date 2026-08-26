@@ -172,7 +172,7 @@ class SwingDoctorViewTest {
     }
     
     @Test
-    void editTextFieldsShouldContainTheValuesFromTheSelectedDoctorEvenIfDisabled() {
+    void testEditTextFieldsShouldContainTheValuesFromTheSelectedDoctorEvenIfDisabled() {
         GuiActionRunner.execute(() ->
         doctorView.getDoctorListModel()
             .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
