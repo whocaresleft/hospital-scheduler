@@ -6,14 +6,20 @@ import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
+import org.duckdns.whocaresleft.repository.RepositoryProvider;
+import org.duckdns.whocaresleft.transactions.TransactionCode;
+import org.duckdns.whocaresleft.transactions.TransactionManager;
 import org.duckdns.whocaresleft.view.DoctorView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.AdditionalAnswers.answer;
 
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
@@ -26,6 +32,9 @@ import java.util.List;
 class DoctorPresenterTest {
 
     @Mock
+    private TransactionManager transactionManager;
+    
+    private RepositoryProvider repositoryProvider;
     private DoctorRepository doctorRepository;
     
     @Mock
@@ -38,6 +47,15 @@ class DoctorPresenterTest {
     @BeforeEach
     void setup() {
         closeable = MockitoAnnotations.openMocks(this);
+        
+        repositoryProvider = mock(RepositoryProvider.class);
+        doctorRepository = mock(DoctorRepository.class);
+        
+        when(transactionManager.doInTransaction(any()))
+            .thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryProvider)));
+        
+        when(repositoryProvider.getDoctorRepository())
+            .thenReturn(doctorRepository);
     }
     
     @AfterEach

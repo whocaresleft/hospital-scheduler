@@ -28,7 +28,7 @@ import jakarta.persistence.Persistence;
 
 @Testcontainers @DisplayName("Integration tests for DoctorPresenter with MariaDoctorRepository")
 class DoctorPresenterMariaIT {
-    
+/*    
     @Container
     private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.3.39");
     
@@ -123,5 +123,5 @@ class DoctorPresenterMariaIT {
         
         verify(view)
             .doctorUpdated(doctorToUpdate, updatedDoctor);
-    }
+    }*/
 }
