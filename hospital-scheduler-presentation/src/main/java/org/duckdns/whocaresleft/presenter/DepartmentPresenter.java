@@ -8,6 +8,7 @@ import org.duckdns.whocaresleft.exception.DepartmentNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDepartmentException;
 import org.duckdns.whocaresleft.model.Department;
 import org.duckdns.whocaresleft.repository.DepartmentRepository;
+import org.duckdns.whocaresleft.repository.ShiftRepository;
 import org.duckdns.whocaresleft.transactions.TransactionManager;
 import org.duckdns.whocaresleft.view.DepartmentView;
 
@@ -51,6 +52,12 @@ public class DepartmentPresenter {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
+                ShiftRepository shiftRepository = repositoryProvider.getShiftRepository();
+                
+                shiftRepository.findByDepartmentId(department.getId())
+                    .stream()
+                    .forEach(shift -> shiftRepository.delete(shift));
+                
                 repository.delete(department.getId());
                 return null;
             });

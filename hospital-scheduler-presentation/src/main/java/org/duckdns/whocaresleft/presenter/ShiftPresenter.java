@@ -91,6 +91,11 @@ public class ShiftPresenter {
     public void updateShift(Shift oldShift, Shift newShift) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
+                if (repositoryProvider.getDoctorRepository().findById(newShift.getDoctorId()) == null)
+                    throw new DoctorNotFoundException(newShift.getDoctorId());
+                if (repositoryProvider.getDepartmentRepository().findById(newShift.getDepartmentId()) == null) 
+                    throw new DepartmentNotFoundException(newShift.getDepartmentId());
+                
                 ShiftRepository repository = repositoryProvider.getShiftRepository();
                 
                 Optional<Shift> conflicting =
@@ -115,6 +120,14 @@ public class ShiftPresenter {
         } catch (OverlappedShiftException e) {
             LOGGER.warn("{}", e.getMessage());
             view.showErrorOverlappedShift(e.getConflictingShift(), e.getOverlappedShift());
+            
+        } catch (DoctorNotFoundException e) {
+            LOGGER.warn("{}", e.getMessage());
+            view.showErrorDoctorNotFound(e.getDoctorId());
+            
+        } catch (DepartmentNotFoundException e) {
+            LOGGER.warn("{}", e.getMessage());
+            view.showErrorDepartmentNotFound(e.getDepartmentId());
         }
     }
 }

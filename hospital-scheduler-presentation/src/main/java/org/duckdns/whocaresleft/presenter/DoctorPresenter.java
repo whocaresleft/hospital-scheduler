@@ -8,6 +8,7 @@ import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
+import org.duckdns.whocaresleft.repository.ShiftRepository;
 import org.duckdns.whocaresleft.transactions.TransactionManager;
 import org.duckdns.whocaresleft.view.DoctorView;
 
@@ -50,8 +51,14 @@ public class DoctorPresenter {
     public void removeDoctor(Doctor doctor) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
-                DoctorRepository repository = repositoryProvider.getDoctorRepository();
-                repository.delete(doctor.getId());
+                DoctorRepository doctorRepository = repositoryProvider.getDoctorRepository();
+                ShiftRepository shiftRepository = repositoryProvider.getShiftRepository();
+                
+                shiftRepository.findByDoctorId(doctor.getId())
+                    .stream()
+                    .forEach(shift -> shiftRepository.delete(shift));
+                
+                doctorRepository.delete(doctor.getId());
                 return null;
             });
             LOGGER.debug("Doctor {} was deleted from repository", doctor);

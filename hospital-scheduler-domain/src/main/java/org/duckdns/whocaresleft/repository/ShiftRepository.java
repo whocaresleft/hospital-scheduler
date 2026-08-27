@@ -10,6 +10,7 @@ public interface ShiftRepository {
     
     List<Shift> findAll();
     List<Shift> findByDoctorId(Id doctorId);
+    List<Shift> findByDepartmentId(Id departmentId);
     void save(Shift shift);
     void delete(Shift shift) throws ShiftNotFoundException;
     void update(Shift oldShift, Shift newShift) throws ShiftNotFoundException;

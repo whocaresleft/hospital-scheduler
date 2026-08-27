@@ -28,7 +28,6 @@ import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.AdditionalAnswers.answer;
 
@@ -247,6 +246,57 @@ class ShiftPresenterTest {
             .showErrorShiftNotFound(nonExistingShift);
     }
     
+    @Test @DisplayName("Method updateShift(oldShift, newShift) when the relative new doctor does not exist")
+    void testUpdateShiftWhenNewDoctorDoesNotExist() {
+        Id existentDoctorId = Id.createId("doctor_id_exist");
+        Id nonExistentDoctorId = Id.createId("doctor_id_non_exist");
+        
+        Id departmentId = Id.createId("department_id");
+        
+        Shift oldShift = Shift.createShift(
+                existentDoctorId, departmentId, DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift newShift = Shift.createShift(
+                nonExistentDoctorId, departmentId, DATE_24_07_2026, TIME_08_30, TIME_09_30);
+        
+        when(doctorRepository.findById(nonExistentDoctorId))
+            .thenReturn(null);
+        
+        shiftPresenter.updateShift(oldShift, newShift);
+        
+        InOrder inOrder = inOrder(doctorRepository, shiftView);
+        inOrder.verify(doctorRepository).findById(nonExistentDoctorId);
+        inOrder.verify(shiftView).showErrorDoctorNotFound(nonExistentDoctorId);
+        verifyNoMoreInteractions(ignoreStubs(shiftRepository));
+        verifyNoMoreInteractions(ignoreStubs(doctorRepository));
+        verifyNoMoreInteractions(ignoreStubs(departmentRepository));
+    }
+    
+    @Test @DisplayName("Method updateShift(oldShift, newShift) when the relative new department does not exist")
+    void testUpdateShiftWhenNewDepartmentDoesNotExist() {
+        Id doctorId = Id.createId("doctor_id");
+        Id existendDepartmentId = Id.createId("er");
+        Id nonExistentDepartmentId = Id.createId("non_existing_room");
+        
+        Shift oldShift = Shift.createShift(
+                doctorId, existendDepartmentId, DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift newShift = Shift.createShift(
+                doctorId, nonExistentDepartmentId, DATE_24_07_2026, TIME_08_30, TIME_09_30);
+        
+        when(doctorRepository.findById(doctorId))
+            .thenReturn(Doctor.createDoctor(doctorId, "doc", "tor"));
+        when(departmentRepository.findById(nonExistentDepartmentId))
+            .thenReturn(null);
+        
+        shiftPresenter.updateShift(oldShift, newShift);
+        
+        InOrder inOrder = inOrder(departmentRepository, shiftView);
+        inOrder.verify(departmentRepository).findById(nonExistentDepartmentId);
+        inOrder.verify(shiftView).showErrorDepartmentNotFound(nonExistentDepartmentId);
+        verifyNoMoreInteractions(ignoreStubs(shiftRepository));
+        verifyNoMoreInteractions(ignoreStubs(doctorRepository));
+        verifyNoMoreInteractions(ignoreStubs(departmentRepository));
+    }
+    
     @Test @DisplayName("Method updateShift(oldShift, newShift) when oldShift exists, and newShift doesn't overlap")
     void testUpdateShiftWhenShiftExistsAndDoesNotOverlap() {
         Id doctorId = Id.createId("doctor_id");
@@ -255,6 +305,11 @@ class ShiftPresenterTest {
                 doctorId, departmentId, DATE_24_07_2026, TIME_08_00, TIME_09_00);
         Shift newShift = Shift.createShift(
                 doctorId, departmentId, DATE_24_07_2026, TIME_08_30, TIME_09_30);
+        
+        when(doctorRepository.findById(doctorId))
+            .thenReturn(Doctor.createDoctor(doctorId, "doc", "tor"));
+        when(departmentRepository.findById(departmentId))
+            .thenReturn(Department.createDepartment(departmentId, "er"));
         
         when(shiftRepository.findByDoctorId(doctorId))
             .thenReturn(Collections.emptyList());
@@ -280,6 +335,11 @@ class ShiftPresenterTest {
         Shift newShift1 = Shift.createShift(
                 doctorId, departmentId2, DATE_24_07_2026, TIME_08_30, TIME_09_30);
         
+        when(doctorRepository.findById(doctorId))
+            .thenReturn(Doctor.createDoctor(doctorId, "doc", "tor"));
+        when(departmentRepository.findById(departmentId2))
+            .thenReturn(Department.createDepartment(departmentId2, "er"));
+        
         when(shiftRepository.findByDoctorId(doctorId))
             .thenReturn(Arrays.asList(oldShift2));
         
@@ -298,6 +358,10 @@ class ShiftPresenterTest {
         Shift newShift = Shift.createShift(
                 doctorId, departmentId, DATE_24_07_2026, TIME_08_30, TIME_09_30);
         
+        when(doctorRepository.findById(doctorId))
+            .thenReturn(Doctor.createDoctor(doctorId, "doc", "tor"));
+        when(departmentRepository.findById(departmentId))
+            .thenReturn(Department.createDepartment(departmentId, "er"));
         doThrow(new ShiftNotFoundException(oldNonExistentShift))
             .when(shiftRepository)
             .update(oldNonExistentShift, newShift);
