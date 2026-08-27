@@ -10,6 +10,7 @@ import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
+import org.duckdns.whocaresleft.repository.mariadb.entity.DoctorEntity;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -112,7 +113,9 @@ class MariaDoctorRepositoryTestcontainersIT {
         void testSaveWhenNoDoctorWithSameIdIsAlreadyInDatabaseShouldAdd() {
             Doctor toBeInserted = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
             
+            entityManager.getTransaction().begin();
             repository.save(toBeInserted);
+            entityManager.getTransaction().commit();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(toBeInserted);
@@ -122,7 +125,9 @@ class MariaDoctorRepositoryTestcontainersIT {
         void testDeleteWhenDoctorIsPresentInDatabaseShouldDeleteExistingDoctor() {
             addTestDoctorToDB("doctor_id", "doc", "tor");
             
+            entityManager.getTransaction().begin();
             repository.delete(Id.createId("doctor_id"));
+            entityManager.getTransaction().commit();
             
             assertThat(readAllDoctorsFromDB())
                 .isEmpty();
@@ -133,7 +138,9 @@ class MariaDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_id", "doc", "tor");
             addTestDoctorToDB("doctor_id2", "dok", "ter");
             
+            entityManager.getTransaction().begin();
             repository.delete(Id.createId("doctor_id"));
+            entityManager.getTransaction().commit();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
@@ -144,7 +151,9 @@ class MariaDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "rotcod");
             
+            entityManager.getTransaction().begin();
             repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
+            entityManager.getTransaction().commit();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(newDoctorWithSameId);
@@ -155,8 +164,10 @@ class MariaDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             addTestDoctorToDB("doctor_id2", "dok", "ter");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
-            
+
+            entityManager.getTransaction().begin();
             repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
+            entityManager.getTransaction().commit();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(
@@ -173,8 +184,12 @@ class MariaDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_1", "doc", "tor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_1"), "dok", "thor");
             
+            entityManager.getTransaction().begin();
+            
             assertThatExceptionOfType(DuplicateDoctorException.class)
                 .isThrownBy(() -> repository.save(newDoctorWithSameId));
+            entityManager.getTransaction().rollback();
+            
             assertThat(readAllDoctorsFromDB())
                 .doesNotContain(newDoctorWithSameId);
         }
@@ -183,8 +198,13 @@ class MariaDoctorRepositoryTestcontainersIT {
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
             Id nonExistendDoctorId = Id.createId("doctor_id");
             
+            entityManager.getTransaction().begin();
+            
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.delete(nonExistendDoctorId));
+            
+            entityManager.getTransaction().rollback();
+            
             assertThat(entityManager.getTransaction().isActive())
                 .isFalse();
         }
@@ -194,8 +214,13 @@ class MariaDoctorRepositoryTestcontainersIT {
             Id validDoctorId = Id.createId("doctor_id");
             Doctor doctorWithNonExistentId = Doctor.createDoctor(Id.createId("doctor_id"), "a", "doctor");
             
+            entityManager.getTransaction().begin();
+            
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.update(validDoctorId, doctorWithNonExistentId));
+            
+            entityManager.getTransaction().rollback();
+            
             assertThat(entityManager.getTransaction().isActive())
                 .isFalse();
         }

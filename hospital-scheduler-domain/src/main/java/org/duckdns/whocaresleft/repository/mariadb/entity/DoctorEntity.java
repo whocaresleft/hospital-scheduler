@@ -1,4 +1,4 @@
-package org.duckdns.whocaresleft.repository.mariadb;
+package org.duckdns.whocaresleft.repository.mariadb.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

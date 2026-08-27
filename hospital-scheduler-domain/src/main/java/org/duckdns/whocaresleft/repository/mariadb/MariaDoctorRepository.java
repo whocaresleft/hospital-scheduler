@@ -7,6 +7,7 @@ import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
+import org.duckdns.whocaresleft.repository.mariadb.entity.DoctorEntity;
 
 import jakarta.persistence.EntityManager;
 
@@ -36,39 +37,32 @@ public class MariaDoctorRepository implements DoctorRepository {
 
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
-        entityManager.getTransaction().begin();
-        entityManager.persist(DoctorEntity.fromDoctor(doctor));
-        
         try {
-            entityManager.getTransaction().commit();
-        } catch (jakarta.persistence.RollbackException e) {
+            if (findById(doctor.getId()) != null)
+                throw new DuplicateDoctorException(doctor);
+            entityManager.persist(DoctorEntity.fromDoctor(doctor));
+        } catch (Exception e) {
             throw new DuplicateDoctorException(doctor);
         }
     }
 
     @Override
     public void delete(Id doctorId) throws DoctorNotFoundException {
-        entityManager.getTransaction().begin();
         DoctorEntity toBeRemoved = entityManager.find(DoctorEntity.class, doctorId.getValue());
         if (toBeRemoved == null) {
-            entityManager.getTransaction().rollback();
             throw new DoctorNotFoundException(doctorId);
         }
         entityManager.remove(toBeRemoved);
-        entityManager.getTransaction().commit();
     }
 
     @Override
     public void update(Id doctorId, Doctor newDoctor) throws DoctorNotFoundException {
-        entityManager.getTransaction().begin();
         DoctorEntity toBeUpdated = entityManager.find(DoctorEntity.class, doctorId.getValue());
         if (toBeUpdated == null) {
-            entityManager.getTransaction().rollback();
             throw new DoctorNotFoundException(doctorId);
         }
         toBeUpdated.setFirstName(newDoctor.getFirstName());
         toBeUpdated.setLastName(newDoctor.getLastName());
-        entityManager.getTransaction().commit();
     }
 
 }
