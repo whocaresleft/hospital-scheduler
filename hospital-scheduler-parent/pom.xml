@@ -142,6 +142,7 @@
             <excludes>
               <exclude>**/org/duckdns/whocaresleft/exception/*Exception*</exclude>
               <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/model/Department*</exclude>
               <exclude>**/org/duckdns/whocaresleft/learning/*</exclude>
               <exclude>**/org/duckdns/whocaresleft/repository/maria*/*Entity*</exclude>
             </excludes>
