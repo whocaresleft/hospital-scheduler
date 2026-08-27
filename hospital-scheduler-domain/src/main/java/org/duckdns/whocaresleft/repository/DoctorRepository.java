@@ -8,7 +8,7 @@ import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.model.Doctor;
 
 public interface DoctorRepository {
-
+    
     public List<Doctor> findAll();
     public Doctor findById(Id id);
     public void save(Doctor doctor) throws DuplicateDoctorException;
