@@ -6,7 +6,7 @@ import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.model.Doctor;
 
 public interface DoctorView {
-
+    
     void showAllDoctors(List<Doctor> doctors);
     void doctorAdded(Doctor doctor);
     void doctorRemoved(Doctor doctor);

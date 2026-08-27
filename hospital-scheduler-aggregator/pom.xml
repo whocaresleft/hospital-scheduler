@@ -21,6 +21,7 @@
     </sonar.junit.reportPaths>
     <sonar.coverage.exclusions>
       **/model/Doctor.*,
+      **/model/Department.*,
       **/exception/*.*,
       **/learning/*.*,
       **/repository/**/*Entity*

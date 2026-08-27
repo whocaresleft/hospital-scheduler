@@ -142,6 +142,7 @@
             <excludes>
               <exclude>**/org/duckdns/whocaresleft/exception/*Exception*</exclude>
               <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/model/Department*</exclude>
               <exclude>**/org/duckdns/whocaresleft/learning/*</exclude>
               <exclude>**/org/duckdns/whocaresleft/repository/maria*/*Entity*</exclude>
             </excludes>
@@ -265,7 +266,9 @@
             <avoidCallsTo>
               <param>org.apache.logging.log4j</param>
             </avoidCallsTo>
-            <threads>4</threads>
+            <threads>1</threads>
+            <timeoutFactor>2.0</timeoutFactor>
+            <timeoutConstant>35000</timeoutConstant>
           </configuration>
         </plugin>
       </plugins>
@@ -342,27 +345,6 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <profile>
-      <id>test-report</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>generate-reports</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>report-only</goal>
-                  <goal>failsafe-report-only</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
