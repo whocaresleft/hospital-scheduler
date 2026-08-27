@@ -142,7 +142,7 @@ class MariaDoctorRepositoryTestcontainersIT {
         @Test @DisplayName("Update when a doctor with the specified id is present in the database should update the existing doctor")
         void testUpdateWhenDoctorIsPresentInDatabaseShouldUpdateExistingDoctor() {
             addTestDoctorToDB("doctor_id", "original", "doctor");
-            Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
+            Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "rotcod");
             
             repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
             
@@ -182,8 +182,11 @@ class MariaDoctorRepositoryTestcontainersIT {
         @Test @DisplayName("Delete when no doctor with the specified id is in the database should throw")
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
             Id nonExistendDoctorId = Id.createId("doctor_id");
+            
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.delete(nonExistendDoctorId));
+            assertThat(entityManager.getTransaction().isActive())
+                .isFalse();
         }
         
         @Test @DisplayName("Update when no doctor with the specified id is in the database should throw")
@@ -193,6 +196,8 @@ class MariaDoctorRepositoryTestcontainersIT {
             
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.update(validDoctorId, doctorWithNonExistentId));
+            assertThat(entityManager.getTransaction().isActive())
+                .isFalse();
         }
     }
     
@@ -204,6 +209,7 @@ class MariaDoctorRepositoryTestcontainersIT {
     }
     
     private List<Doctor> readAllDoctorsFromDB() {
+        entityManager.clear();
         return entityManager.createQuery("SELECT e FROM DoctorEntity e", DoctorEntity.class)
             .getResultStream()
             .map(DoctorEntity::toDoctor)

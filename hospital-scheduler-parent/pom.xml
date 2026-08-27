@@ -266,7 +266,9 @@
             <avoidCallsTo>
               <param>org.apache.logging.log4j</param>
             </avoidCallsTo>
-            <threads>4</threads>
+            <threads>1</threads>
+            <timeoutFactor>2.0</timeoutFactor>
+            <timeoutConstant>35000</timeoutConstant>
           </configuration>
         </plugin>
       </plugins>
