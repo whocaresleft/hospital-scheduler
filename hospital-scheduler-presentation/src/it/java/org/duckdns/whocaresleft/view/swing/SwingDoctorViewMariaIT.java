@@ -174,7 +174,7 @@ public class SwingDoctorViewMariaIT {
             window.button("deleteBtn").click();
             
             assertThat(window.list("doctorList").contents())
-                .containsExactly(doctor.toString());
+                .isEmpty();
             window.label("errorLabel")
                 .requireText("No existing doctor with id " + doctor.getId());
         }
@@ -193,7 +193,7 @@ public class SwingDoctorViewMariaIT {
             window.button("updateBtn").click();
             
             assertThat(window.list("doctorList").contents())
-                .containsExactly(doctor.toString());
+                .isEmpty();
             window.label("errorLabel")
                 .requireText("No existing doctor with id " + doctor.getId());
         }

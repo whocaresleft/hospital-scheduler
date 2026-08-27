@@ -1,5 +1,6 @@
 package org.duckdns.whocaresleft.view.swing;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -331,11 +332,11 @@ public class SwingDoctorView extends JPanel implements DoctorView {
                         fnTextBox.getText(),
                         lnTextBox.getText()));
                 } catch (IllegalArgumentException iae) {
-                    idTextBox.setText("");
-                    fnTextBox.setText("");
-                    lnTextBox.setText("");
                     errorLabel.setText("Invalid id, must be [\\w]+");
                 }
+                idTextBox.setText("");
+                fnTextBox.setText("");
+                lnTextBox.setText("");
             });
         
         deleteBtn.addActionListener(
@@ -385,6 +386,12 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     @Override
     public void showErrorDoctorNotFound(Id notFound) {
         errorLabel.setText("No existing doctor with id " + notFound);
+        
+        Collections.list(doctorListModel.elements())
+            .stream()
+            .filter(doctor -> doctor.getId().equals(notFound))
+            .findFirst()
+            .ifPresent(doctorListModel::removeElement);
     }
     
     private void clearErrorLabel() {

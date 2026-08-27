@@ -152,7 +152,7 @@ class SwingDoctorViewMongoIT {
             window.button("deleteBtn").click();
             
             assertThat(window.list("doctorList").contents())
-                .containsExactly(doctor.toString());
+                .isEmpty();
             window.label("errorLabel")
                 .requireText("No existing doctor with id " + doctor.getId());
         }
@@ -171,7 +171,7 @@ class SwingDoctorViewMongoIT {
             window.button("updateBtn").click();
             
             assertThat(window.list("doctorList").contents())
-                .containsExactly(doctor.toString());
+                .isEmpty();
             window.label("errorLabel")
                 .requireText("No existing doctor with id " + doctor.getId());
         }

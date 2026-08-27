@@ -128,6 +128,25 @@ class SwingDoctorViewTest {
     }
     
     @Test
+    void testAddButtonShouldClearTextFields() {
+        JTextComponentFixture idTextBox = window.textBox("idTextBox");
+        JTextComponentFixture fnTextBox = window.textBox("firstNameTextBox");
+        JTextComponentFixture lnTextBox = window.textBox("lastNameTextBox");
+        JButtonFixture addBtn = window.button("addBtn");
+        
+        idTextBox.enterText("doctor_id");
+        fnTextBox.enterText("doc");
+        lnTextBox.enterText("tor");
+        addBtn.requireEnabled();
+        
+        addBtn.click();
+        
+        idTextBox.requireText("");
+        fnTextBox.requireText("");
+        lnTextBox.requireText("");
+    }
+    
+    @Test
     void testDeleteButtonShouldBeEnabledOnlyWhenADoctorIsSelected() {
         GuiActionRunner.execute(() ->
             doctorView.getDoctorListModel()
@@ -300,6 +319,21 @@ class SwingDoctorViewTest {
     }
     
     @Test
+    void testShowErrorDoctorNotFoundShouldAlsoRemoveDoctorVisuallyIfPresent() {
+        Doctor doc = Doctor.createDoctor(Id.createId("doc"), "doc", "tor");
+        
+        GuiActionRunner.execute(() -> {
+            doctorView.getDoctorListModel().addElement(doc);
+        });
+        
+        Id id = Id.createId("doc");
+        GuiActionRunner.execute(() -> doctorView.showErrorDoctorNotFound(id));
+        
+        String[] listContents = window.list("doctorList").contents();
+        assertThat(listContents).isEmpty();
+    }
+    
+    @Test
     void testDoctorAddedShouldAddDoctorToTheListAndClearErrorLabel() {
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
         GuiActionRunner.execute(() ->
@@ -376,6 +410,10 @@ class SwingDoctorViewTest {
         
         verifyNoInteractions(doctorPresenter);
         window.label("errorLabel").requireText("Invalid id, must be [\\w]+");
+        
+        window.textBox("idTextBox").requireText("");
+        window.textBox("firstNameTextBox").requireText("");
+        window.textBox("lastNameTextBox").requireText("");
     }
     
     @Test
