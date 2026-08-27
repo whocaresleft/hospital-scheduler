@@ -6,14 +6,13 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.exception.DoctorNotFoundException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 import org.duckdns.whocaresleft.view.DoctorView;
 
 public class DoctorPresenter {
-
+    
     private static final Logger LOGGER = LogManager.getLogger(DoctorPresenter.class);
     
     private DoctorRepository repository;
@@ -29,18 +28,7 @@ public class DoctorPresenter {
         LOGGER.debug("Retrieved {} doctors from repository.", doctors.size());
         view.showAllDoctors(doctors);
     }
-
-    public void oneDoctor(Id id) {
-        Doctor doctor = repository.findById(id);
-        if (doctor == null) {
-            LOGGER.debug("No doctor was found with id {}", id);
-            view.showErrorDoctorNotFound(id);
-        } else {
-            LOGGER.debug("A doctor was found with id {}", id);
-            view.showSingleDoctor(doctor);
-        }
-    }
-
+    
     public void addDoctor(Doctor doctor) {
         try {
             repository.save(doctor);
@@ -51,7 +39,7 @@ public class DoctorPresenter {
             view.showErrorDuplicateDoctor(doctor.getId());
         }
     }
-
+    
     public void removeDoctor(Doctor doctor) {
         try {
             repository.delete(doctor.getId());
@@ -62,7 +50,7 @@ public class DoctorPresenter {
             view.showErrorDoctorNotFound(doctor.getId());
         }
     }
-
+    
     public void updateDoctor(Doctor oldDoctor, Doctor newDoctor) {
         try {
             repository.update(oldDoctor.getId(), newDoctor);

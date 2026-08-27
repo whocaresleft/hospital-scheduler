@@ -12,7 +12,7 @@
     <sonar.host.url>http://localhost:9000</sonar.host.url>
     <sonar.tests>
       src/test/java,
-      <!--src/it/java, --> 
+      src/it/java,
       <!--src/e2e/java, these are not present yet  --> 
     </sonar.tests>
     <sonar.junit.reportPaths>
