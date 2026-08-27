@@ -347,26 +347,5 @@
         </plugins>
       </build>
     </profile>
-    
-    <profile>
-      <id>test-report</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>generate-reports</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>report-only</goal>
-                  <goal>failsafe-report-only</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 </project>
