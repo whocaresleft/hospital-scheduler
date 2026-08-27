@@ -2,8 +2,11 @@ package org.duckdns.whocaresleft.presenter;
 
 import java.util.List;
 import static java.util.Arrays.asList;
+import static org.mockito.AdditionalAnswers.answer;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.duckdns.whocaresleft.core.Id;
@@ -11,6 +14,9 @@ import org.duckdns.whocaresleft.exception.DepartmentNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDepartmentException;
 import org.duckdns.whocaresleft.model.Department;
 import org.duckdns.whocaresleft.repository.DepartmentRepository;
+import org.duckdns.whocaresleft.repository.RepositoryProvider;
+import org.duckdns.whocaresleft.transactions.TransactionCode;
+import org.duckdns.whocaresleft.transactions.TransactionManager;
 import org.duckdns.whocaresleft.view.DepartmentView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +31,9 @@ import org.mockito.MockitoAnnotations;
 public class DepartmentPresenterTest {
     
     @Mock
+    private TransactionManager transactionManager;
+    
+    private RepositoryProvider repositoryProvider;
     private DepartmentRepository departmentRepository;
     
     @Mock
@@ -37,6 +46,15 @@ public class DepartmentPresenterTest {
     @BeforeEach
     void setup () {
         closeable = MockitoAnnotations.openMocks(this);
+        
+        repositoryProvider = mock(RepositoryProvider.class);
+        departmentRepository = mock(DepartmentRepository.class);
+        
+        when(transactionManager.doInTransaction(any()))
+            .thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryProvider)));
+    
+        when(repositoryProvider.getDepartmentRepository())
+            .thenReturn(departmentRepository);
     }
     
     @AfterEach
