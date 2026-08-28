@@ -89,7 +89,7 @@ class ShiftPresenterTest {
         closeable.close();
     }
     
-    @Test @DisplayName("Method allShifts()")
+    @Test
     void testAllShifts() {
         Id doctorId = Id.createId("doctor_id");
         Id departmentId = Id.createId("department_id");
@@ -107,7 +107,7 @@ class ShiftPresenterTest {
         inOrder.verify(shiftView).showAllShifts(shifts);
     }
     
-    @Test @DisplayName("Method addShift(Shift) when the relative doctor does not exist")
+    @Test
     void testAddShiftWhenDoctorDoesNotExist() {
         Id doctorId = Id.createId("doctor");
         Id departmentId = Id.createId("sur_1");
@@ -124,7 +124,7 @@ class ShiftPresenterTest {
         verifyNoMoreInteractions(ignoreStubs(departmentRepository));
     }
     
-    @Test @DisplayName("Method addShift(Shift) when the relative department does not exist")
+    @Test
     void testAddShiftWhenDepartmentDoesNotExist() {
         Id doctorId = Id.createId("doctor");
         Doctor doctor = Doctor.createDoctor(doctorId, "doc", "tor");
@@ -144,7 +144,7 @@ class ShiftPresenterTest {
         verifyNoMoreInteractions(ignoreStubs(departmentRepository));
     }
     
-    @Test @DisplayName("Method addShift(Shift) when Shift doesn't overlap")
+    @Test
     void testAddShiftWhenDoctorAndDepartmentExistAndShiftDoesNotOverlap() {
         Id doctorId = Id.createId("doctor");
         Doctor doctor = Doctor.createDoctor(doctorId, "doc", "tor");
@@ -166,7 +166,7 @@ class ShiftPresenterTest {
         inOrder.verify(shiftView).shiftAdded(shift);
     }
     
-    @Test @DisplayName("Method addShift(Shift) for a doctor, when another shift for the same doctor exists, in the same department")
+    @Test
     void testAddShiftForDoctorWhenAnotherExistingShiftForSameDoctorExistsInSameDepartment() {
         Id doctorId = Id.createId("doctor");
         Doctor doctor = Doctor.createDoctor(doctorId, "doc", "tor");
@@ -190,7 +190,7 @@ class ShiftPresenterTest {
         verifyNoMoreInteractions(ignoreStubs(shiftRepository));
     }
     
-    @Test @DisplayName("Method addShift(Shift) for a doctor, when another shift for the same doctor exists, in any department")
+    @Test
     void testAddShiftWhenShiftOverlapsWithAnExistingShiftInAnyDepartment() {
         Id doctorId = Id.createId("doctor");
         Doctor doctor = Doctor.createDoctor(doctorId, "doc", "tor");
@@ -216,7 +216,7 @@ class ShiftPresenterTest {
         verifyNoMoreInteractions(ignoreStubs(shiftRepository));
     }
     
-    @Test @DisplayName("Method removeShift(Shift) when Shift exists")
+    @Test
     void testRemoveShiftWhenShiftExists() {
         Id doctorId = Id.createId("doctor_id");
         Id departmentId = Id.createId("department_id");
@@ -230,7 +230,7 @@ class ShiftPresenterTest {
         inOrder.verify(shiftView).shiftRemoved(existingShift);
     }
     
-    @Test @DisplayName("Method removeShift(Shift) when Shift doesn't exist")
+    @Test
     void testRemoveShiftWhenShiftDoesNotExist() {
         Id doctorId = Id.createId("doctor_id");
         Id departmentId = Id.createId("department_id");
@@ -249,7 +249,7 @@ class ShiftPresenterTest {
             .showErrorShiftNotFound(nonExistingShift);
     }
     
-    @Test @DisplayName("Method updateShift(oldShift, newShift) when the relative new doctor does not exist")
+    @Test
     void testUpdateShiftWhenNewDoctorDoesNotExist() {
         Id existentDoctorId = Id.createId("doctor_id_exist");
         Id nonExistentDoctorId = Id.createId("doctor_id_non_exist");
@@ -274,7 +274,7 @@ class ShiftPresenterTest {
         verifyNoMoreInteractions(ignoreStubs(departmentRepository));
     }
     
-    @Test @DisplayName("Method updateShift(oldShift, newShift) when the relative new department does not exist")
+    @Test
     void testUpdateShiftWhenNewDepartmentDoesNotExist() {
         Id doctorId = Id.createId("doctor_id");
         Id existendDepartmentId = Id.createId("er");
@@ -300,7 +300,7 @@ class ShiftPresenterTest {
         verifyNoMoreInteractions(ignoreStubs(departmentRepository));
     }
     
-    @Test @DisplayName("Method updateShift(oldShift, newShift) when oldShift exists, and newShift doesn't overlap")
+    @Test
     void testUpdateShiftWhenShiftExistsAndDoesNotOverlap() {
         Id doctorId = Id.createId("doctor_id");
         Id departmentId = Id.createId("department_id");
@@ -324,7 +324,7 @@ class ShiftPresenterTest {
         inOrder.verify(shiftView).shiftUpdated(oldShift, newShift);
     }
     
-    @Test @DisplayName("Method updateShift(oldShift, newShift) when oldShift exists, and newShift overlaps with an existing one")
+    @Test
     void testUpdateShiftWhenShiftExistsAndOverlaps() {
         Id doctorId = Id.createId("doctor_id");
         Id departmentId1 = Id.createId("department_1");
@@ -352,7 +352,7 @@ class ShiftPresenterTest {
         verifyNoMoreInteractions(ignoreStubs(shiftRepository));
     }
     
-    @Test @DisplayName("Method updateShift(oldShift, newShift) when oldShift doesn't exist")
+    @Test
     void testUpdateShiftWhenShiftDoesNotExist() {
         Id doctorId = Id.createId("doctor_id");
         Id departmentId = Id.createId("department_id");

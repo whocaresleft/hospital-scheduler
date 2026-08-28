@@ -26,7 +26,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
-@Testcontainers
+@Testcontainers @DisplayName("Integration tests for MariaDepartmentRepository using Testcontainers")
 class MariaDepartmentRepositoryTestcontainersIT {
     
     @Container

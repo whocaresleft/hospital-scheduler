@@ -76,7 +76,7 @@ class DepartmentPresenterTest {
         closeable.close();
     }
     
-    @Test @DisplayName("Method allDepartments()")
+    @Test
     void testAllDepartments() {
         List<Department> departments = asList(Department.createDepartment(Id.createId("er"), "ER"));
         
@@ -90,7 +90,7 @@ class DepartmentPresenterTest {
         inOrder.verify(departmentView).showAllDepartments(departments);
     }
     
-    @Test @DisplayName("Method addDepartment(Department) when the department doesn't already exist")
+    @Test
     void testAddDepartmentWhenDepartmentDoesNotAlreadyExist() {
         Department nonExistingDepartment = Department.createDepartment(Id.createId("er"), "ER");
         
@@ -101,7 +101,7 @@ class DepartmentPresenterTest {
         inOrder.verify(departmentView).departmentAdded(nonExistingDepartment);
     }
     
-    @Test @DisplayName("Method addDepartment(Department) when department already exists")
+    @Test
     void testAddDepartmentWhenDepartmentAlreadyExists() {
         Department alreadyExisting = Department.createDepartment(Id.createId("er"), "ER");
         
@@ -116,7 +116,7 @@ class DepartmentPresenterTest {
         inOrder.verify(departmentView).showDuplicateDepartmentError(alreadyExisting.getId());
     }
     
-    @Test @DisplayName("Method removeDepartment(Department) when department exists")
+    @Test
     void testRemoveDepartmentWhenDepartmentExists() {
         Id existingDepartmentId = Id.createId("er");
         Department existingDepartment = Department.createDepartment(existingDepartmentId, "ER");
@@ -128,7 +128,7 @@ class DepartmentPresenterTest {
         inOrder.verify(departmentView).departmentRemoved(existingDepartment);
     }
     
-    @Test @DisplayName("Method removeDepartment(Department) when department doesn't exist")
+    @Test
     void testRemoveDepartmentWhenDepartmentDoesNotExist() {
         Id nonExistingDepartmentId = Id.createId("er");
         Department nonExistingDepartment = Department.createDepartment(nonExistingDepartmentId, "ER");
@@ -144,7 +144,7 @@ class DepartmentPresenterTest {
         inOrder.verify(departmentView).showDepartmentNotFoundError(nonExistingDepartmentId);
     }
     
-    @Test @DisplayName("Method updateDepartment(Department) when department exists")
+    @Test
     void testUpdateDepartmentWhenDepartmentExists() {
         Id existingDeparmentId = Id.createId("er");
         Department oldDepartment = Department.createDepartment(existingDeparmentId, "old-ER");
@@ -157,7 +157,7 @@ class DepartmentPresenterTest {
         inOrder.verify(departmentView).departmentUpdated(oldDepartment, newDepartment);
     }
     
-    @Test @DisplayName("Method updateDepartment(Department) when department doesn't exist")
+    @Test
     void testUpdateDepartmentWhenDepartmentDoesNotExists() {
         Id nonAlreadyExistingDeparmentId = Id.createId("er");
         Department nonExistingOldDepartment = Department.createDepartment(nonAlreadyExistingDeparmentId, "old-ER");
@@ -174,7 +174,7 @@ class DepartmentPresenterTest {
         inOrder.verify(departmentView).showDepartmentNotFoundError(nonAlreadyExistingDeparmentId);
     }
     
-    @Test @DisplayName("Method removeDepartment(Department) should also remove its shifts if present")
+    @Test
     void testDeleteDepartmentShouldAlsoRemoveItsShifts() {
         Id departmentId = Id.createId("e_r");
         Department department = Department.createDepartment(departmentId, "ER");

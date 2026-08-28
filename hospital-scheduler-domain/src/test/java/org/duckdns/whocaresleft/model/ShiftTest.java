@@ -30,7 +30,7 @@ class ShiftTest {
     @Nested @DisplayName("Happy cases")
     class HappyCases {
         
-        @Test @DisplayName("Shift created with valid parameters should have a valid state")
+        @Test
         void testShiftCreatedWithValidParametersShouldHaveValidState() {
             Shift shift = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, START_TIME, END_TIME);
             
@@ -42,7 +42,7 @@ class ShiftTest {
             assertThat(shift.getEndTime()).isEqualTo(END_TIME);
         }
 
-        @Test @DisplayName("Equals contract using EqualsVerifier")
+        @Test
         void testEqualsContractUsingEqualsVerifier() {
             EqualsVerifier.forClass(Shift.class).verify();
         }
@@ -62,7 +62,7 @@ class ShiftTest {
                 .hasToString(expected);
         }
         
-        @Test @DisplayName("Shifts on different dates should not overlap")
+        @Test
         void testShiftsWithDifferentDatesShouldNotOverlap() {
             LocalDate date = LocalDate.of(2026, 6, 15);
             LocalDate anotherDate = LocalDate.of(2026, 6, 16);
@@ -74,7 +74,7 @@ class ShiftTest {
                 .isFalse();
         }
         
-        @Test @DisplayName("Shifts on the same day, where the first ends before the second starts, should not overlap")
+        @Test
         void testShiftsOnSameDateWhereTheFirstEndsBeforeTheSecondStartsShouldNotOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_09_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_10_00, TIME_11_00);
@@ -83,7 +83,7 @@ class ShiftTest {
                 .isFalse();
         }
         
-        @Test @DisplayName("Shifts on the same day, where the first ends when the second starts, should not overlap")
+        @Test
         void testShiftsOnSameDateWhereTheFirstEndsWhenTheSecondStartsShouldNotOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_09_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_09_00, TIME_11_00);
@@ -92,7 +92,7 @@ class ShiftTest {
                 .isFalse();
         }
         
-        @Test @DisplayName("Shifts on the same day, where the second ends before the first starts, should not overlap")
+        @Test
         void testShiftsOnSameDateWhereTheFirstStartsAfterTheSecondEndsShouldNotOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_10_00, TIME_11_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_09_00);
@@ -101,7 +101,7 @@ class ShiftTest {
                 .isFalse();
         }
         
-        @Test @DisplayName("Shifts on the same day, where the secon ends when the second starts, should not overlap")
+        @Test
         void testShiftsOnSameDateWhereTheFirstStartsWhenTheSecondEndsShouldNotOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_09_00, TIME_11_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_09_00);
@@ -110,7 +110,7 @@ class ShiftTest {
                 .isFalse();
         }
         
-        @Test @DisplayName("Shifts on the same day that start on the same time should overlap")
+        @Test
         void testShiftsOnSameDateThatStartAtTheSameTimeShouldOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_09_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_11_00);
@@ -119,7 +119,7 @@ class ShiftTest {
                 .isTrue();
         }
         
-        @Test @DisplayName("Shifts on the same day that end on the same time should overlap")
+        @Test
         void testShiftsOnSameDateThatEndAtTheSameTimeShouldOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_11_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_09_00, TIME_11_00);
@@ -128,7 +128,7 @@ class ShiftTest {
                 .isTrue();
         }
         
-        @Test @DisplayName("Shifts on the same day where the first starts before, and ends later, the second, should overlap")
+        @Test
         void testShiftsOnSameDateWhereFirstStartsBeforeAndEndsAfterTheSecondShouldOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_11_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_09_00, TIME_10_00);
@@ -137,7 +137,7 @@ class ShiftTest {
                 .isTrue();
         }
         
-        @Test @DisplayName("Shifts on the same day where the second starts before, and ends later, the first, should overlap")
+        @Test
         void testShiftsOnSameDateWhereSecondStartsBeforeAndEndsAfterTheFirstShouldOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_09_00, TIME_10_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_11_00);
@@ -146,7 +146,7 @@ class ShiftTest {
                 .isTrue();
         }
         
-        @Test @DisplayName("Shifts on the same day where the first and second both start and end at the same time should overlap")
+        @Test
         void testShiftsOnSameDateWhereTheyStartAndEndAtTheSameTimesShouldOverlap() {
             Shift first  = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_11_00);
             Shift second = Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_08_00, TIME_11_00);
@@ -159,49 +159,49 @@ class ShiftTest {
     @Nested @DisplayName("Error cases")
     class ExceptionalCases {
         
-        @Test @DisplayName("Null doctor id during creation should result in exception")
+        @Test
         void testNullDoctorIdShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Shift.createShift(null, DEPARTMENT_ID, DATE, START_TIME, END_TIME))
                 .withMessage("Doctor Id cannot be null");
         }
         
-        @Test @DisplayName("Null department id during creation should result in exception")
+        @Test
         void testNullDepartmentIdShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Shift.createShift(DOCTOR_ID, null, DATE, START_TIME, END_TIME))
                 .withMessage("Department Id cannot be null");
         }
         
-        @Test @DisplayName("Null date during creation should result in exception")
+        @Test
         void testNullDateShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, null, START_TIME, END_TIME))
                 .withMessage("Date cannot be null");
         }
       
-        @Test @DisplayName("Null start time during creation should result in exception")
+        @Test
         void testNullStartTimeShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, null, END_TIME))
                 .withMessage("Starting time cannot be null");
         }
         
-        @Test @DisplayName("Null end time during creation should result in exception")
+        @Test
         void testNullEndTimeShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, START_TIME, null))
                 .withMessage("Ending time cannot be null");
         }
         
-        @Test @DisplayName("Zero shift duration (starting time = ending time) should result in exception")
+        @Test
         void testZeroDurationShiftShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_10_00, TIME_10_00))
                 .withMessage("Shift has zero duration, starting time equals ending time");
         }
         
-        @Test @DisplayName("Negative shift duration (starting time > ending time) should result in exception")
+        @Test
         void testNegativeDurationShiftShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Shift.createShift(DOCTOR_ID, DEPARTMENT_ID, DATE, TIME_09_00, TIME_08_00))

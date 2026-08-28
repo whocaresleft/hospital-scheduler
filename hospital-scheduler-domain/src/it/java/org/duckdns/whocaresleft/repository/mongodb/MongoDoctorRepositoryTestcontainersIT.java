@@ -27,7 +27,7 @@ import com.mongodb.client.MongoDatabase;
 
 import org.testcontainers.junit.jupiter.Container;
 
-@Testcontainers @DisplayName("Integration tests for MongoDoctorRepository using testcontainers")
+@Testcontainers @DisplayName("Integration tests for MongoDoctorRepository using Testcontainers")
 class MongoDoctorRepositoryTestcontainersIT {
     
     @Container
@@ -55,13 +55,13 @@ class MongoDoctorRepositoryTestcontainersIT {
     @Nested @DisplayName("Happy cases")
     class HappyCases {
         
-        @Test @DisplayName("FindAll when database is empty should return empty list")
+        @Test
         void testFindAllWhenDatabaseIsEmptyShouldReturnEmptyList() {
             assertThat(repository.findAll())
                 .isEmpty();
         }
 
-        @Test @DisplayName("FindAll when database is not empty should return all the doctors")
+        @Test
         void testFindAllWhenDatabaseIsNotEmptyShouldReturnAllDoctors() {
             addTestDoctorToDB("doctor_1", "doc", "tor");
             addTestDoctorToDB("doctor_2", "dok", "ter");
@@ -72,7 +72,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                     Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
         }
         
-        @Test @DisplayName("Save when the no doctor with the same is already in the database should add")
+        @Test
         void testSaveWhenNoDoctorWithSameIdIsAlreadyInDatabaseShouldAdd() {
             Doctor toBeInserted = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
             repository.save(toBeInserted);
@@ -81,7 +81,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                 .containsExactly(toBeInserted);
         }
         
-        @Test @DisplayName("Delete when a doctor with the specified id is present in the database should delete existing doctor")
+        @Test
         void testDeleteWhenDoctorIsPresentInDatabaseShouldDeleteExistingDoctor() {
             addTestDoctorToDB("doctor_id", "doc", "tor");
             
@@ -91,7 +91,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                 .isEmpty();
         }
         
-        @Test @DisplayName("Delete when the doctor is present in the database, as well as other doctors, should only delete the specified one")
+        @Test
         void testDeleteWhenDoctorIsPresentInDatabaseAsWellAsAnotherDoctorsShouldDeleteOnlySpecifiedDoctor() {
             addTestDoctorToDB("doctor_id", "doc", "tor");
             addTestDoctorToDB("doctor_id2", "dok", "ter");
@@ -102,7 +102,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                 .containsExactly(Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
         }
         
-        @Test @DisplayName("Update when a doctor with the specified id is present in the database should update the existing doctor")
+        @Test
         void testUpdateWhenDoctorIsPresentInDatabaseShouldUpdateExistingDoctor() {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
@@ -113,7 +113,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                 .containsExactly(newDoctorWithSameId);
         }
         
-        @Test @DisplayName("Update when the doctor is present in the database, as well as other doctors, should only update the specified one")
+        @Test
         void testUpdateWhenDoctorIsPresentInDatabaseAsWellAsAnotherDoctorsShouldUpdateOnlySpecifiedDoctor() {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             addTestDoctorToDB("doctor_id2", "dok", "ter");
@@ -127,7 +127,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                     Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
         }
         
-        @Test @DisplayName("FindById when the doctor is present in the database should return the doctor with that id")
+        @Test
         void testFindByIdWhenDoctorIsPresentInDatabaseShouldReturnSuchDoctor() {
             addTestDoctorToDB("doctor_id", "doc", "tor");
             addTestDoctorToDB("doctor_id2", "dok", "ter");
@@ -136,7 +136,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                 .isEqualTo(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
         }
         
-        @Test @DisplayName("FindById when the doctor is not present in the database should return null")
+        @Test
         void testFindByIdWhenDoctorIsNotPresentInDatabaseShouldReturnNull() {
             assertThat(repository.findById(Id.createId("doctor_id")))
                 .isNull();
@@ -146,7 +146,7 @@ class MongoDoctorRepositoryTestcontainersIT {
     @Nested @DisplayName("Error cases")
     class ExceptionalCases {
         
-        @Test @DisplayName("Save when a doctor with the sane id is already present in the database should throw and not add")
+        @Test
         void testSaveWhenDoctorWithSameIdIsAlreadyInDatabaseShouldThrowAndNotSave() {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
@@ -157,14 +157,14 @@ class MongoDoctorRepositoryTestcontainersIT {
                 .doesNotContain(newDoctorWithSameId);
         }
         
-        @Test @DisplayName("Delete when no doctor with the specified id is in the database should throw")
+        @Test
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
             Id validDoctorId = Id.createId("doctor_id");
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.delete(validDoctorId));
         }
         
-        @Test @DisplayName("Update when no doctor with the specified id is in the database should throw")
+        @Test
         void testUpdateWhenDoctorIsNotPresentInDatabaseShouldThrow() {
             Id validDoctorId = Id.createId("doctor_id");
             Doctor doctorWithNonExistentId = Doctor.createDoctor(Id.createId("doctor_id"), "a", "doctor");

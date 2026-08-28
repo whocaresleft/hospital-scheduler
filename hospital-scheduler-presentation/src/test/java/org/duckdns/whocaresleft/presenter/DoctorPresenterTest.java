@@ -78,7 +78,7 @@ class DoctorPresenterTest {
         closeable.close();
     }
     
-    @Test @DisplayName("Method allDoctors()")
+    @Test
     void testAllDoctors() {
         List<Doctor> doctors = asList(Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"));
         
@@ -92,7 +92,7 @@ class DoctorPresenterTest {
         inOrder.verify(doctorView).showAllDoctors(doctors);
     }
     
-    @Test @DisplayName("Method addDoctor(doctor) when doctor doesn't already exist")
+    @Test
     void testAddDoctorWhenDoctorDoesNotAlreadyExist() {
         Doctor nonExistingDoctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         
@@ -103,7 +103,7 @@ class DoctorPresenterTest {
         inOrder.verify(doctorView).doctorAdded(nonExistingDoctor);
     }
     
-    @Test @DisplayName("Method addDoctor(doctor) when doctor already exists")
+    @Test
     void testAddDoctorWhenDoctorAlreadyExists() {
         Doctor existingDoctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         
@@ -119,7 +119,7 @@ class DoctorPresenterTest {
             .showErrorDuplicateDoctor(existingDoctor.getId());
     }
     
-    @Test @DisplayName("Method removeDoctor(doctor) when doctor exists")
+    @Test
     void testRemoveDoctorWhenDoctorExists() {
         Id existingDoctorId = Id.createId("doctor_1");
         Doctor existingDoctor = Doctor.createDoctor(existingDoctorId, "doc", "tor");
@@ -131,7 +131,7 @@ class DoctorPresenterTest {
         inOrder.verify(doctorView).doctorRemoved(existingDoctor);
     }
     
-    @Test @DisplayName("Method removeDoctor(doctor) when doctor doesn't exist")
+    @Test
     void testRemoveDoctorWhenDoctorDoesNotExist() {
         Id nonExistingDoctorId = Id.createId("doctor_1");
         Doctor nonExistingDoctor = Doctor.createDoctor(nonExistingDoctorId, "doc", "tor");
@@ -148,7 +148,7 @@ class DoctorPresenterTest {
             .showErrorDoctorNotFound(nonExistingDoctorId);
     }
     
-    @Test @DisplayName("Method updateDoctor(oldDoctor, newDoctor) when oldDoctor exists")
+    @Test
     void testUpdateDoctorWhenDoctorExists() {
         Id existingDoctorId = Id.createId("doctor_1");
         Doctor oldDoctor = Doctor.createDoctor(existingDoctorId, "doc", "tor");
@@ -161,7 +161,7 @@ class DoctorPresenterTest {
         inOrder.verify(doctorView).doctorUpdated(oldDoctor, newDoctor);
     }
     
-    @Test @DisplayName("Method updateDoctor(oldDoctor, newDoctor) when oldDoctor doesn't exist")
+    @Test
     void testUpdateDoctorWhenDoctorDoesNotExist() {
         Id nonExistingDoctorId = Id.createId("doctor_1");
         Doctor nonExistingOldDoctor = Doctor.createDoctor(nonExistingDoctorId, "doc", "tor");
@@ -179,7 +179,7 @@ class DoctorPresenterTest {
             .showErrorDoctorNotFound(nonExistingDoctorId);
     }
     
-    @Test @DisplayName("Method removeDoctor(Doctor) should also remove its shifts if present")
+    @Test
     void testRemoveDoctorShouldAlsoRemoveItsShifts() {
         Id doctorId = Id.createId("doctor_id");
         Doctor doctor = Doctor.createDoctor(doctorId, "doc", "tor");

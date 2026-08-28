@@ -19,7 +19,7 @@ class IdTest {
         
         private static final String VALID_ID = "valid_id";
 
-        @Test @DisplayName("Valid Id value with leading and trailing spaces gets trimmed")
+        @Test
         void testValidIdWithBothLeadingAndTrailingWhitespacesGetTrimmed() {
             
             Id id = Id.createId(" valid_id ");
@@ -27,19 +27,19 @@ class IdTest {
                 .isEqualTo("valid_id"); 
         }
         
-        @Test @DisplayName("Valid Id value with no leading or trailing spaces remains itself")
+        @Test
         void testValidIdWithNoLeadingOrTrailingWhitespacesRemainsItself() {
             Id id = Id.createId(VALID_ID);
             assertThat(id.getValue())
                 .isEqualTo(VALID_ID); 
         }
 
-        @Test @DisplayName("Equals contract using EqualsVerifier")
+        @Test
         void testEqualsContractUsingEqualsVerifier() {
             EqualsVerifier.forClass(Id.class).verify();
         }
         
-        @Test @DisplayName("The string representation of Id is just its value")
+        @Test
         void testIdToStringShouldJustBeTheValue() {
             Id id = Id.createId(VALID_ID);
             
@@ -51,21 +51,21 @@ class IdTest {
     @Nested @DisplayName("ErrorCases")
     class ExceptionCases {
         
-        @Test @DisplayName("Creating an Id with null value should result in an exception")
+        @Test
         void testNullValueShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Id.createId(null))
                 .withMessage("Id value cannot be null");
         }
         
-        @Test @DisplayName("Creating an Id with empty string should result in an exception")
+        @Test
         void testEmptyStringValueShouldThrow() {
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> Id.createId(""))
                 .withMessage("Id value cannot be empty");
         }
         
-        @ParameterizedTest @DisplayName("Creating an Id with a string consisting only of whitespaces should result in an exception")
+        @ParameterizedTest
         @ValueSource(strings = {
             " ", "\t", "   ", "\t\t\t", "\t   \t  \t "
         })
@@ -75,7 +75,7 @@ class IdTest {
                 .withMessage("Id value cannot be empty");
         }
         
-        @ParameterizedTest @DisplayName("Creating an Id with a non-permitted character should result in an exception")
+        @ParameterizedTest
         @ValueSource(strings = {
             "id.", "id?", "i d", "id#", "id@"
         })

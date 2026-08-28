@@ -28,7 +28,7 @@ import com.mongodb.client.MongoDatabase;
 
 import org.testcontainers.junit.jupiter.Container;
 
-@Testcontainers
+@Testcontainers  @DisplayName("Integration tests for MongoShiftRepository using Testcontainers")
 class MongoShiftRepositoryTestcontainersIT {
     
     private static final LocalDate DATE_24_07_2026 = LocalDate.of(2026, 7, 24);
@@ -61,13 +61,13 @@ class MongoShiftRepositoryTestcontainersIT {
     @Nested @DisplayName("Happy cases")
     class HappyCases {
         
-        @Test @DisplayName("FindALl when databse is empty should return empty list")
+        @Test
         void testFindAllWhenDatabaseIsEmptyShouldReturnEmptyList() {
             assertThat(repository.findAll())
                 .isEmpty();
         }
         
-        @Test @DisplayName("FindAll when database is not empty should return all shifts")
+        @Test
         void testFindAllWhenDatabaseIsNotEmptyShouldReturnAllShifts() {
             addTestShiftToDB("doc1", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
             addTestShiftToDB("doc2", "er", DATE_24_07_2026, TIME_08_30, TIME_09_30);
@@ -78,7 +78,7 @@ class MongoShiftRepositoryTestcontainersIT {
                     Shift.createShift(Id.createId("doc2"), Id.createId("er"), DATE_24_07_2026, TIME_08_30, TIME_09_30));
         }
         
-        @Test @DisplayName("FindByDoctorId when database is empty should return empty list")
+        @Test
         void testFindByDoctorIdWhenDatabseIsEmptyShouldReturnEmptyList() {
             Id doctorId = Id.createId("doks");
             
@@ -86,7 +86,7 @@ class MongoShiftRepositoryTestcontainersIT {
                 .isEmpty();
         }
         
-        @Test @DisplayName("FindByDoctorId should only return shifts of that doctor")
+        @Test
         void testFindByDoctorIdShouldOnlyReturnShiftsOfSaidDoctor() {
             addTestShiftToDB("doc1", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
             addTestShiftToDB("doc2", "sr", DATE_24_07_2026, TIME_08_00, TIME_09_30);
@@ -99,7 +99,7 @@ class MongoShiftRepositoryTestcontainersIT {
                     Shift.createShift(Id.createId("doc1"), Id.createId("sr"), DATE_24_07_2026, TIME_08_00, TIME_09_30));
         }
         
-        @Test @DisplayName("FindByDepartmentId when database is empty should return empty list")
+        @Test
         void testFindByDepartmentIdWhenDatabseIsEmptyShouldReturnEmptyList() {
             Id departmentId = Id.createId("er");
             
@@ -107,7 +107,7 @@ class MongoShiftRepositoryTestcontainersIT {
                 .isEmpty();
         }
         
-        @Test @DisplayName("FindByDepartmentId should only return shifts with that department")
+        @Test
         void testFindByDepartmentIdShouldOnlyReturnShiftsWithSaidDepartment() {
             addTestShiftToDB("doc1", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
             addTestShiftToDB("doc2", "sr", DATE_24_07_2026, TIME_08_00, TIME_09_30);
@@ -120,7 +120,7 @@ class MongoShiftRepositoryTestcontainersIT {
                     Shift.createShift(Id.createId("doc2"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30));
         }
         
-        @Test @DisplayName("Save when the exact shift values combination is NOT already present should add normally")
+        @Test
         void testSaveWhenTheExactShiftCombinationIsNotPresentShouldAddToDB() {
             Shift toBeInserted =
                 Shift.createShift(
@@ -137,7 +137,7 @@ class MongoShiftRepositoryTestcontainersIT {
                 .containsExactly(toBeInserted);
         }
         
-        @Test @DisplayName("Delete when the exact shift exists should remove it from database")
+        @Test
         void testDeleteWhenExactShiftExistsShouldRemoveItFromDatabase() {
             addTestShiftToDB("dok", "er", DATE_24_07_2026, TIME_09_00, TIME_09_30);
             addTestShiftToDB("doc", "sr", DATE_24_07_2026, TIME_08_30, TIME_09_00);
@@ -158,7 +158,7 @@ class MongoShiftRepositoryTestcontainersIT {
                     TIME_09_30));
         }
         
-        @Test @DisplayName("Update when the exact shift exists should update it in database")
+        @Test
         void testUpdateWhenExactShiftExistsShouldUpdateItInDatabase() {
             addTestShiftToDB("doc", "sr", DATE_24_07_2026, TIME_08_30, TIME_09_00);
             
@@ -187,7 +187,7 @@ class MongoShiftRepositoryTestcontainersIT {
     @Nested @DisplayName("Error cases")
     class ExceptionalCases {
         
-        @Test @DisplayName("Save when the exact shift values combination is already present should throw")
+        @Test
         void testSaveWhenTheExactCombinationIsPresentShouldThrow() {
             addTestShiftToDB("doc", "sr", DATE_24_07_2026, TIME_08_30, TIME_09_00);
             
@@ -206,7 +206,7 @@ class MongoShiftRepositoryTestcontainersIT {
                 .contains(alreadyInserted);
         }
         
-        @Test @DisplayName("Delete when the exact shift values combination is not present should throw")
+        @Test
         void testDeleteWhenTheExactCombinationIsNotPresentShouldThrow() {
             Shift notPresent = Shift.createShift(
                 Id.createId("doc"),

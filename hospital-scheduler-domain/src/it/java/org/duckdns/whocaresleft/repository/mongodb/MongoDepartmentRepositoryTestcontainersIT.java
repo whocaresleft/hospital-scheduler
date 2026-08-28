@@ -26,7 +26,7 @@ import com.mongodb.client.MongoDatabase;
 
 import org.testcontainers.junit.jupiter.Container;
 
-@Testcontainers
+@Testcontainers @DisplayName("Integration tests for MongoDepartmentRepository using Testcontainers")
 class MongoDepartmentRepositoryTestcontainersIT {
     
     @Container
@@ -53,13 +53,13 @@ class MongoDepartmentRepositoryTestcontainersIT {
     @Nested @DisplayName("Happy cases")
     class HappyCases {
         
-        @Test @DisplayName("FindAll when database is empty should return empty list")
+        @Test
         void testFindAllWhenDatabaseIsEmptyShouldReturnEmptyList() {
             assertThat(repository.findAll())
                 .isEmpty();
         }
 
-        @Test @DisplayName("FindAll when database is not empty should return all the departments")
+        @Test
         void testFindAllWhenDatabaseIsNotEmptyShouldReturnAllDepartments() {
             addTestDepartmentToDB("er", "ER");
             addTestDepartmentToDB("sr", "Surgery Room");
@@ -70,7 +70,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                     Department.createDepartment(Id.createId("sr"), "Surgery Room"));
         }
         
-        @Test @DisplayName("Save when the no department with the same is already in the database should add")
+        @Test
         void testSaveWhenNoDepartmentWithSameIdIsAlreadyInDatabaseShouldAdd() {
             Department toBeInserted = Department.createDepartment(Id.createId("er"), "ER");
             
@@ -80,7 +80,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                 .containsExactly(toBeInserted);
         }
         
-        @Test @DisplayName("Delete when a department with the specified id is present in the database should delete existing department")
+        @Test
         void testDeleteWhenDepartmentIsPresentInDatabaseShouldDeleteExistingDepartment() {
             addTestDepartmentToDB("er", "ER");
             
@@ -90,7 +90,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                 .isEmpty();
         }
         
-        @Test @DisplayName("Delete when the department is present in the database, as well as other departments, should only delete the specified one")
+        @Test
         void testDeleteWhenDepartmentIsPresentInDatabaseAsWellAsAnotherDepartmentsShouldDeleteOnlySpecifiedDepartment() {
             addTestDepartmentToDB("er", "ER");
             addTestDepartmentToDB("sr", "Surgery Room");
@@ -101,7 +101,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                 .containsExactly(Department.createDepartment(Id.createId("sr"), "Surgery Room"));
         }
         
-        @Test @DisplayName("Update when a department with the specified id is present in the database should update the existing department")
+        @Test
         void testUpdateWhenDepartmentIsPresentInDatabaseShouldUpdateExistingDepartment() {
             addTestDepartmentToDB("er", "ER");
             Department newDepartmentWithSameId = Department.createDepartment(Id.createId("er"), "Newly Improved ER");
@@ -112,7 +112,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                 .containsExactly(newDepartmentWithSameId);
         }
         
-        @Test @DisplayName("Update when the department is present in the database, as well as other departments, should only update the specified one")
+        @Test
         void testUpdateWhenDepartmentIsPresentInDatabaseAsWellAsAnotherDepartmentsShouldUpdateOnlySpecifiedDepartment() {
             addTestDepartmentToDB("er", "ER");
             addTestDepartmentToDB("sr", "Surgery Room");
@@ -126,7 +126,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                     Department.createDepartment(Id.createId("sr"), "Surgery Room"));
         }
         
-        @Test @DisplayName("FindById when the department is present in the database should return the department with that id")
+        @Test
         void testFindByIdWhenDepartmentIsPresentInDatabaseShouldReturnSuchDepartment() {
             addTestDepartmentToDB("er", "ER");
             addTestDepartmentToDB("sr", "Surgery Room");
@@ -135,7 +135,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                 .isEqualTo(Department.createDepartment(Id.createId("sr"), "Surgery Room"));
         }
         
-        @Test @DisplayName("FindById when the department is not present in the database should return null")
+        @Test
         void testFindByIdWhenDepartmentIsNotPresentInDatabaseShouldReturnNull() {
             assertThat(repository.findById(Id.createId("sr")))
                 .isNull();
@@ -145,7 +145,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
     @Nested @DisplayName("Error cases")
     class ExceptionalCases {
         
-        @Test @DisplayName("Save when a department with the sane id is already present in the database should throw and not add")
+        @Test
         void testSaveWhenDepartmentWithSameIdIsAlreadyInDatabaseShouldThrowAndNotSave() {
             addTestDepartmentToDB("er", "ER");
             Department newDepartmentWithSameId = Department.createDepartment(Id.createId("er"), "Newly Improved ER");
@@ -156,7 +156,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                 .doesNotContain(newDepartmentWithSameId);
         }
         
-        @Test @DisplayName("Delete when no department with the specified id is in the database should throw")
+        @Test
         void testDeleteWhenDepartmentIsNotPresentInDatabaseShouldThrow() {
             Id nonExistentDepartmentId = Id.createId("er");
             
@@ -164,7 +164,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
                 .isThrownBy(() -> repository.delete(nonExistentDepartmentId));
         }
         
-        @Test @DisplayName("Update when no department with the specified id is in the database should throw")
+        @Test
         void testUpdateWhenDepartmentIsNotPresentInDatabaseShouldThrow() {
             Id nonExistentDepartmentId = Id.createId("er");
             Department departmentWithNonExistentId = Department.createDepartment(nonExistentDepartmentId, "New ER");
