@@ -55,8 +55,7 @@ public class DoctorPresenter {
                 ShiftRepository shiftRepository = repositoryProvider.getShiftRepository();
                 
                 shiftRepository.findByDoctorId(doctor.getId())
-                    .stream()
-                    .forEach(shift -> shiftRepository.delete(shift));
+                    .forEach(shiftRepository::delete);
                 
                 doctorRepository.delete(doctor.getId());
                 return null;

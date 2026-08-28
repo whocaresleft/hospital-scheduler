@@ -55,8 +55,7 @@ public class DepartmentPresenter {
                 ShiftRepository shiftRepository = repositoryProvider.getShiftRepository();
                 
                 shiftRepository.findByDepartmentId(department.getId())
-                    .stream()
-                    .forEach(shift -> shiftRepository.delete(shift));
+                    .forEach(shiftRepository::delete);
                 
                 repository.delete(department.getId());
                 return null;

@@ -4,7 +4,7 @@ import org.duckdns.whocaresleft.model.Shift;
 
 public class ShiftNotFoundException extends RuntimeException {
     
-    private Shift shift;
+    private transient final Shift shift;
     
     public ShiftNotFoundException(Shift shift) {
         super("No shift was found: " + shift);

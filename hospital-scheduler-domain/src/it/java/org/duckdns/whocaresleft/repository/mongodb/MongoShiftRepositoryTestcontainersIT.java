@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -30,7 +29,7 @@ import com.mongodb.client.MongoDatabase;
 import org.testcontainers.junit.jupiter.Container;
 
 @Testcontainers
-public class MongoShiftRepositoryTestcontainersIT {
+class MongoShiftRepositoryTestcontainersIT {
     
     private static final LocalDate DATE_24_07_2026 = LocalDate.of(2026, 7, 24);
     private static final LocalTime TIME_08_00 = LocalTime.of(8, 0);
@@ -209,14 +208,15 @@ public class MongoShiftRepositoryTestcontainersIT {
         
         @Test @DisplayName("Delete when the exact shift values combination is not present should throw")
         void testDeleteWhenTheExactCombinationIsNotPresentShouldThrow() {
+            Shift notPresent = Shift.createShift(
+                Id.createId("doc"),
+                Id.createId("sr"),
+                DATE_24_07_2026,
+                TIME_08_30,
+                TIME_09_00);
+            
             assertThatExceptionOfType(ShiftNotFoundException.class)
-                .isThrownBy(() ->
-                    repository.delete(Shift.createShift(
-                        Id.createId("doc"),
-                        Id.createId("sr"),
-                        DATE_24_07_2026,
-                        TIME_08_30,
-                        TIME_09_00)));
+                .isThrownBy(() -> repository.delete(notPresent));
         }
     }
     
@@ -232,7 +232,7 @@ public class MongoShiftRepositoryTestcontainersIT {
             .append("_id", documentId)
             .append("doctorId", doctorId)
             .append("departmentId", departmentId)
-            .append("date", date)
+            .append("date", date.toString())
             .append("startTime", startTime.toString())
             .append("endTime", endTime.toString());
         shiftCollection.insertOne(toInsert);
@@ -242,13 +242,10 @@ public class MongoShiftRepositoryTestcontainersIT {
         return StreamSupport.stream(
             shiftCollection.find().spliterator(), false)
                 .map(s -> {
-                    LocalDate ld = s.getDate("date")
-                        .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    
                     return Shift.createShift(
                         Id.createId(s.getString("doctorId")),
                         Id.createId(s.getString("departmentId")),
-                        ld,
+                        LocalDate.parse(s.getString("date")),
                         LocalTime.parse(s.getString("startTime")),
                         LocalTime.parse(s.getString("endTime")));
                 })

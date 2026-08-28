@@ -4,7 +4,7 @@ import org.duckdns.whocaresleft.core.Id;
 
 public class DepartmentNotFoundException extends RuntimeException {
     
-    private Id departmentId;
+    private transient final Id departmentId;
     
     public DepartmentNotFoundException(Id departmentId) {
         super("No department with id " + departmentId + " was found");

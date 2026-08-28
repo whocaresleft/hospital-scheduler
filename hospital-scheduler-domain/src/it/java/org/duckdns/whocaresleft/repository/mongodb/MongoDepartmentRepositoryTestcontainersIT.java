@@ -27,7 +27,7 @@ import com.mongodb.client.MongoDatabase;
 import org.testcontainers.junit.jupiter.Container;
 
 @Testcontainers
-public class MongoDepartmentRepositoryTestcontainersIT {
+class MongoDepartmentRepositoryTestcontainersIT {
     
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");

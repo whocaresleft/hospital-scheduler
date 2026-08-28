@@ -2,8 +2,6 @@ package org.duckdns.whocaresleft.repository.mongodb;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -22,6 +20,8 @@ import com.mongodb.client.result.DeleteResult;
 
 public class MongoShiftRepository implements ShiftRepository {
     
+    private static final String DOCTOR_ID_FIELD_NAME = "doctorId";
+    private static final String DEPARTMENT_ID_FIELD_NAME = "departmentId";
     private final MongoCollection<Document> shiftCollection;
     
     public MongoShiftRepository(MongoClient client) {
@@ -37,14 +37,14 @@ public class MongoShiftRepository implements ShiftRepository {
     
     @Override
     public List<Shift> findByDoctorId(Id doctorId) {
-        return StreamSupport.stream(shiftCollection.find(Filters.eq("doctorId", doctorId.getValue())).spliterator(), false)
+        return StreamSupport.stream(shiftCollection.find(Filters.eq(DOCTOR_ID_FIELD_NAME, doctorId.getValue())).spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
     
     @Override
     public List<Shift> findByDepartmentId(Id departmentId) {
-        return StreamSupport.stream(shiftCollection.find(Filters.eq("departmentId", departmentId.getValue())).spliterator(), false)
+        return StreamSupport.stream(shiftCollection.find(Filters.eq(DEPARTMENT_ID_FIELD_NAME, departmentId.getValue())).spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
@@ -72,13 +72,10 @@ public class MongoShiftRepository implements ShiftRepository {
     }
     
     private Shift fromDocument(Document doc) {
-        Date d = doc.getDate("date");
-        LocalDate ld = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        
         return Shift.createShift(
-            Id.createId(doc.getString("doctorId")),
-            Id.createId(doc.getString("departmentId")),
-            ld,
+            Id.createId(doc.getString(DOCTOR_ID_FIELD_NAME)),
+            Id.createId(doc.getString(DEPARTMENT_ID_FIELD_NAME)),
+            LocalDate.parse(doc.getString("date")),
             LocalTime.parse(doc.getString("startTime")),
             LocalTime.parse(doc.getString("endTime")));
     }
@@ -86,9 +83,9 @@ public class MongoShiftRepository implements ShiftRepository {
     private Document toDocument(Shift sh) {
         return new Document()
             .append("_id", generateDocumentId(sh))
-            .append("doctorId", sh.getDoctorId().getValue())
-            .append("departmentId", sh.getDepartmentId().getValue())
-            .append("date", sh.getDate())
+            .append(DOCTOR_ID_FIELD_NAME, sh.getDoctorId().getValue())
+            .append(DEPARTMENT_ID_FIELD_NAME, sh.getDepartmentId().getValue())
+            .append("date", sh.getDate().toString())
             .append("startTime", sh.getStartTime().toString())
             .append("endTime", sh.getEndTime().toString());
     }

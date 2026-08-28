@@ -27,12 +27,12 @@ public class ShiftPresenter {
     }
     
     public void allShifts() {
-        List<Shift> Shifts = transactionManager.doInTransaction(repositoryProvider -> {
+        List<Shift> shifts = transactionManager.doInTransaction(repositoryProvider -> {
             ShiftRepository repository = repositoryProvider.getShiftRepository();
             return repository.findAll();
         });
-        LOGGER.debug("Retrieved {} shifts from repository.", Shifts.size());
-        view.showAllShifts(Shifts);
+        LOGGER.debug("Retrieved {} shifts from repository.", shifts.size());
+        view.showAllShifts(shifts);
     }
     
     public void addShift(Shift shift) {
