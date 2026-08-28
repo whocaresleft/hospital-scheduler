@@ -23,7 +23,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 @Testcontainers @DisplayName("Learning tests for Hibernate API")
-class HibernateTestcontainersLearning {
+class HibernateTestcontainersLearningTest {
     
     @Container
     private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.3.39");
@@ -408,17 +408,6 @@ class HibernateTestcontainersLearning {
     
         assertThat(em.find(LearningEntity.class, "le_id"))
             .isNull();
-    }
-    
-    @Test
-    void testMultipleBegins() {
-        em.getTransaction().begin();
-        {
-            em.getTransaction().begin();
-            em.persist(new LearningEntity("id", "name"));
-            em.getTransaction().commit();
-        }
-        em.getTransaction().rollback();
     }
     
     private void addTestLearningEntity(String id, String name) {

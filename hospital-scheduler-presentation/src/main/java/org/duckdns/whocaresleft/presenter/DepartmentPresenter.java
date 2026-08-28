@@ -8,29 +8,38 @@ import org.duckdns.whocaresleft.exception.DepartmentNotFoundException;
 import org.duckdns.whocaresleft.exception.DuplicateDepartmentException;
 import org.duckdns.whocaresleft.model.Department;
 import org.duckdns.whocaresleft.repository.DepartmentRepository;
+import org.duckdns.whocaresleft.repository.ShiftRepository;
+import org.duckdns.whocaresleft.transactions.TransactionManager;
 import org.duckdns.whocaresleft.view.DepartmentView;
 
 public class DepartmentPresenter {
     
     private static final Logger LOGGER = LogManager.getLogger(DepartmentPresenter.class);
-    
-    private DepartmentRepository repository;
+
+    private TransactionManager transactionManager;
     private DepartmentView view;
     
-    public DepartmentPresenter(DepartmentRepository repository, DepartmentView view) {
-        this.repository = repository;
+    public DepartmentPresenter(TransactionManager transactionManager, DepartmentView view) {
+        this.transactionManager = transactionManager;
         this.view = view;
     }
     
     public void allDepartments() {
-        List<Department> departments = repository.findAll();
+        List<Department> departments = transactionManager.doInTransaction(repositoryProvider -> {
+            DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
+            return repository.findAll();
+        });
         LOGGER.debug("Retrieved {} departments from repository.", departments.size());
         view.showAllDepartments(departments);
     }
     
     public void addDepartment(Department department) {
         try {
-            repository.save(department);
+            transactionManager.doInTransaction(repositoryProvider -> {
+                DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
+                repository.save(department);
+                return null;
+            });
             LOGGER.debug("Department {} was saved to repository", department);
             view.departmentAdded(department);
         } catch (DuplicateDepartmentException e) {
@@ -41,7 +50,16 @@ public class DepartmentPresenter {
     
     public void removeDepartment(Department department) {
         try {
-            repository.delete(department.getId());
+            transactionManager.doInTransaction(repositoryProvider -> {
+                DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
+                ShiftRepository shiftRepository = repositoryProvider.getShiftRepository();
+                
+                shiftRepository.findByDepartmentId(department.getId())
+                    .forEach(shiftRepository::delete);
+                
+                repository.delete(department.getId());
+                return null;
+            });
             LOGGER.debug("Department {} was deleted from repository", department);
             view.departmentRemoved(department);
         } catch (DepartmentNotFoundException e) {
@@ -52,7 +70,11 @@ public class DepartmentPresenter {
     
     public void updateDepartment(Department oldDepartment, Department newDepartment) {
         try {
-            repository.update(oldDepartment.getId(), newDepartment);
+            transactionManager.doInTransaction(repositoryProvider -> {
+                DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
+                repository.update(oldDepartment.getId(), newDepartment);
+                return null;
+            });
             LOGGER.debug("Department {} was updated into {}", oldDepartment, newDepartment);
             view.departmentUpdated(oldDepartment, newDepartment);
         } catch (DepartmentNotFoundException e) {

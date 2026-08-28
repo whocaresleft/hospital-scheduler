@@ -18,20 +18,20 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
 public class MongoDoctorRepository implements DoctorRepository {
-
+    
     private final MongoCollection<Document> doctorCollection;
     
     public MongoDoctorRepository(MongoClient client) {
         doctorCollection = client.getDatabase("hospital").getCollection("doctor");
     }
-
+    
     @Override
     public List<Doctor> findAll() {
         return StreamSupport.stream(doctorCollection.find().spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
-
+    
     @Override
     public Doctor findById(Id doctorId) {
         Document d = doctorCollection.find(Filters.eq("_id", doctorId.getValue())).first();
@@ -39,7 +39,7 @@ public class MongoDoctorRepository implements DoctorRepository {
             return null;
         return fromDocument(d);
     }
-
+    
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
         try {
@@ -48,14 +48,14 @@ public class MongoDoctorRepository implements DoctorRepository {
             throw new DuplicateDoctorException(doctor);
         }
     }
-
+    
     @Override
     public void delete(Id doctorId) throws DoctorNotFoundException {
         DeleteResult result = doctorCollection.deleteOne(Filters.eq("_id", doctorId.getValue()));
         if (result.getDeletedCount() == 0)
             throw new DoctorNotFoundException(doctorId);
     }
-
+    
     @Override
     public void update(Id doctorId, Doctor newDoctor) throws DoctorNotFoundException {
         UpdateResult result = doctorCollection.replaceOne(
@@ -64,7 +64,7 @@ public class MongoDoctorRepository implements DoctorRepository {
         if (result.getMatchedCount() == 0)
             throw new DoctorNotFoundException(doctorId);
     }
-
+    
     private Doctor fromDocument(Document doc) {
         return Doctor.createDoctor(
             Id.createId(doc.getString("_id")),

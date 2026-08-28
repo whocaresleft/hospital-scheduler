@@ -6,7 +6,9 @@
 
     <persistence-unit name="maria_doctor_repository_it" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>org.duckdns.whocaresleft.repository.mariadb.DoctorEntity</class>
+        <class>org.duckdns.whocaresleft.repository.mariadb.entity.DoctorEntity</class>
+        <class>org.duckdns.whocaresleft.repository.mariadb.entity.DepartmentEntity</class>
+        <class>org.duckdns.whocaresleft.repository.mariadb.entity.ShiftEntity</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
             <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>

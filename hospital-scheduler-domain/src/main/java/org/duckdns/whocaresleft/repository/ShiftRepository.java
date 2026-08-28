@@ -1,0 +1,18 @@
+package org.duckdns.whocaresleft.repository;
+
+import java.util.List;
+
+import org.duckdns.whocaresleft.core.Id;
+import org.duckdns.whocaresleft.exception.OverlappedShiftException;
+import org.duckdns.whocaresleft.exception.ShiftNotFoundException;
+import org.duckdns.whocaresleft.model.Shift;
+
+public interface ShiftRepository {
+    
+    List<Shift> findAll();
+    List<Shift> findByDoctorId(Id doctorId);
+    List<Shift> findByDepartmentId(Id departmentId);
+    void save(Shift shift) throws OverlappedShiftException;
+    void delete(Shift shift) throws ShiftNotFoundException;
+    void update(Shift oldShift, Shift newShift) throws ShiftNotFoundException, OverlappedShiftException;
+}

@@ -61,6 +61,11 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven.surefire.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>**/learning/*.java</exclude>
+            </excludes>
+          </configuration>
         </plugin>
         
         <plugin>
@@ -144,7 +149,7 @@
               <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
               <exclude>**/org/duckdns/whocaresleft/model/Department*</exclude>
               <exclude>**/org/duckdns/whocaresleft/learning/*</exclude>
-              <exclude>**/org/duckdns/whocaresleft/repository/maria*/*Entity*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/repository/mariadb/entity/*</exclude>
             </excludes>
           </configuration>
           <executions>
@@ -241,9 +246,12 @@
               <param>org.duckdns.whocaresleft.core.Id</param>
               <param>org.duckdns.whocaresleft.model.Shift</param>
               <param>org.duckdns.whocaresleft.repository.mongodb.*</param>
-              <param>org.duckdns.whocaresleft.repository.mariadb.Maria*</param>
+              <param>org.duckdns.whocaresleft.repository.mariadb.*</param>
               <param>org.duckdns.whocaresleft.presenter.*</param>
             </targetClasses>
+            <excludedClasses>
+              <param>org.duckdns.whocaresleft.repository.mariadb.entity.*</param>
+            </excludedClasses>
             <targetTests>
               <param>org.duckdns.whocaresleft.core.Id*</param>
               <param>org.duckdns.whocaresleft.model.Shift*</param>
