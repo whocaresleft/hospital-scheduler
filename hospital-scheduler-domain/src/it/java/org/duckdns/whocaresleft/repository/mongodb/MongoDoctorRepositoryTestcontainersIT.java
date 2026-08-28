@@ -186,7 +186,7 @@ class MongoDoctorRepositoryTestcontainersIT {
     private List<Doctor> readAllDoctorsFromDB() {
         return StreamSupport.stream(
             doctorCollection.find().spliterator(), false)
-            .map(d -> Doctor.createDoctor(Id.createId(d.getString("_id")), d.getString("firstName"), d.getString("lastName")))
-            .toList();
+                .map(d -> Doctor.createDoctor(Id.createId(d.getString("_id")), d.getString("firstName"), d.getString("lastName")))
+                .toList();
     }
 }

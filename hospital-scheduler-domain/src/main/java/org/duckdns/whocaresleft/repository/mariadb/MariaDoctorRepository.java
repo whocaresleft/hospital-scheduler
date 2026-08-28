@@ -12,7 +12,7 @@ import org.duckdns.whocaresleft.repository.mariadb.entity.DoctorEntity;
 import jakarta.persistence.EntityManager;
 
 public class MariaDoctorRepository implements DoctorRepository {
-
+    
     private EntityManager entityManager;
     
     public MariaDoctorRepository(EntityManager entityManager) {

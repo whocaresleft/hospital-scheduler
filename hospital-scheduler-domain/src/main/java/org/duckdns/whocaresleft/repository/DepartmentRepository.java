@@ -13,5 +13,5 @@ public interface DepartmentRepository {
     Department findById(Id departmentId);
     void save(Department department) throws DuplicateDepartmentException;
     void delete(Id departmentId) throws DepartmentNotFoundException;
-    void update(Id deparmentId, Department department) throws DepartmentNotFoundException;
+    void update(Id departmentId, Department newDepartment) throws DepartmentNotFoundException;
 }

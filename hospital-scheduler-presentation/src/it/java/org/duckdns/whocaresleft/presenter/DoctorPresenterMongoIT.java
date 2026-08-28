@@ -1,5 +1,5 @@
 package org.duckdns.whocaresleft.presenter;
-
+/*
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import com.mongodb.client.MongoClients;
 
 @Testcontainers @DisplayName("Integration tests for DoctorPresenter with MongoDoctorRepository")
 class DoctorPresenterMongoIT {
-/*    
+    
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
     
@@ -96,5 +96,5 @@ class DoctorPresenterMongoIT {
         
         verify(view)
             .doctorUpdated(doctorToUpdate, updatedDoctor);
-    }*/
-}
+    }
+}*/
