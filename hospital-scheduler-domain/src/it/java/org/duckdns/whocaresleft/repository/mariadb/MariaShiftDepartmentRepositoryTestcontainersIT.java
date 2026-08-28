@@ -86,11 +86,174 @@ class MariaShiftDepartmentRepositoryTestcontainersIT {
     @Nested @DisplayName("Happy cases")
     class HappyCases {
         
+        @Test
+        void testFindAllWhenDatabaseIsEmptyShouldReturnEmptyList() {
+            assertThat(repository.findAll())
+                .isEmpty();
+        }
+        
+        @Test
+        void testFindAllWhenDatabaseIsNotEmptyShouldReturnAllShifts() {
+            addTestShiftToDB("doc1", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
+            addTestShiftToDB("doc2", "er", DATE_24_07_2026, TIME_08_30, TIME_09_30);
+            
+            assertThat(repository.findAll())
+                .containsExactlyInAnyOrder(
+                    Shift.createShift(Id.createId("doc1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30),
+                    Shift.createShift(Id.createId("doc2"), Id.createId("er"), DATE_24_07_2026, TIME_08_30, TIME_09_30));
+        }
+        
+        @Test
+        void testFindByDoctorIdWhenDatabaseIsEmptyShouldReturnEmptyList() {
+            Id doctorId = Id.createId("doctor_id");
+            
+            assertThat(repository.findByDoctorId(doctorId))
+                .isEmpty();
+        }
+        
+        @Test
+        void testFindByDoctorIdWhenDatabaseIsNotEmptyShouldReturnShiftsOfSaidDoctor() {
+            addTestShiftToDB("doc1", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
+            addTestShiftToDB("doc2", "sr", DATE_24_07_2026, TIME_08_00, TIME_09_30);
+            addTestShiftToDB("doc1", "sr", DATE_24_07_2026, TIME_08_00, TIME_09_30);
+            addTestShiftToDB("doc2", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
+            
+            assertThat(repository.findByDoctorId(Id.createId("doc1")))
+                .containsExactlyInAnyOrder(
+                    Shift.createShift(Id.createId("doc1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30),
+                    Shift.createShift(Id.createId("doc1"), Id.createId("sr"), DATE_24_07_2026, TIME_08_00, TIME_09_30));
+        }
+        
+        @Test
+        void testFindByDepartmentIdWhenDatabaseIsEmptyShouldReturnEmptyList() {
+            Id departmentId = Id.createId("department_id");
+            
+            assertThat(repository.findByDepartmentId(departmentId))
+                .isEmpty();
+        }
+        
+        @Test
+        void testFindByDepartmentIdShouldOnlyReturnShiftWithSaidDepartment() {
+            addTestShiftToDB("doc1", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
+            addTestShiftToDB("doc2", "sr", DATE_24_07_2026, TIME_08_00, TIME_09_30);
+            addTestShiftToDB("doc1", "sr", DATE_24_07_2026, TIME_08_00, TIME_09_30);
+            addTestShiftToDB("doc2", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
+            
+            assertThat(repository.findByDepartmentId(Id.createId("er")))
+                .containsExactlyInAnyOrder(
+                    Shift.createShift(Id.createId("doc1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30),
+                    Shift.createShift(Id.createId("doc2"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30));
+        }
+        
+        @Test
+        void testSaveWhenTheExactShiftCombinationISNotPresentShouldAddToDB() {
+            Shift toBeInserted =
+                Shift.createShift(
+                    Id.createId("doc"),
+                    Id.createId("sr"),
+                    DATE_24_07_2026,
+                    TIME_08_30,
+                    TIME_09_00
+                );
+            
+            entityManager.getTransaction().begin();
+            repository.save(toBeInserted);
+            entityManager.getTransaction().commit();
+            
+            assertThat(readAllShiftsFromDB())
+                .containsExactly(toBeInserted);
+        }
+        
+        @Test
+        void testDeleteWhenTheExactCombinationIsPresentShouldRemoveFromDB() {
+            addTestShiftToDB("dok", "er", DATE_24_07_2026, TIME_09_00, TIME_09_30);
+            addTestShiftToDB("doc", "sr", DATE_24_07_2026, TIME_08_30, TIME_09_00);
+            
+            entityManager.getTransaction().begin();
+            repository.delete(Shift.createShift(
+                Id.createId("doc"),
+                Id.createId("sr"),
+                DATE_24_07_2026,
+                TIME_08_30,
+                TIME_09_00));
+            entityManager.getTransaction().commit();
+            
+            assertThat(readAllShiftsFromDB())
+                .containsExactlyInAnyOrder(Shift.createShift(
+                    Id.createId("dok"),
+                    Id.createId("er"),
+                    DATE_24_07_2026,
+                    TIME_09_00,
+                    TIME_09_30));
+        }
+        
+        @Test
+        void testUpdateWhenExactShiftExistsShouldUpdateItInDatabase() {
+            addTestShiftToDB("doc", "sr", DATE_24_07_2026, TIME_08_30, TIME_09_00);
+            
+            Shift oldDocShift
+                = Shift.createShift(
+                    Id.createId("doc"),
+                    Id.createId("sr"),
+                    DATE_24_07_2026,
+                    TIME_08_30,
+                    TIME_09_00);
+            Shift newDocShift
+                = Shift.createShift(
+                    Id.createId("doc"),
+                    Id.createId("playground"),
+                    DATE_24_07_2026,
+                    TIME_09_00,
+                    TIME_09_30);
+            
+            entityManager.getTransaction().begin();
+            repository.update(oldDocShift, newDocShift);
+            entityManager.getTransaction().commit();
+            
+            assertThat(readAllShiftsFromDB())
+                .containsExactly(newDocShift);
+        }
     }
     
     @Nested @DisplayName("Error cases")
     class ExceptionalCases {
         
+        @Test
+        void testSaveWhenTheExactCombinationIsPresendShouldThrow() {
+            addTestShiftToDB("doc", "sr", DATE_24_07_2026, TIME_08_30, TIME_09_00);
+            
+            Shift alreadyInserted =
+                Shift.createShift(
+                    Id.createId("doc"),
+                    Id.createId("sr"),
+                    DATE_24_07_2026,
+                    TIME_08_30,
+                    TIME_09_00
+                );
+            
+            entityManager.getTransaction().begin();
+            assertThatExceptionOfType(OverlappedShiftException.class)
+                .isThrownBy(() -> repository.save(alreadyInserted));
+            entityManager.getTransaction().rollback();
+            
+            assertThat(readAllShiftsFromDB())
+                .contains(alreadyInserted);
+        }
+        
+        @Test
+        void testDeleteWhenTheExactCombinationIsNotPresendShouldThrow() {
+            Shift notPresent = Shift.createShift(
+                Id.createId("doc"),
+                Id.createId("sr"),
+                DATE_24_07_2026,
+                TIME_08_30,
+                TIME_09_00);
+
+            entityManager.getTransaction().begin();
+            assertThatExceptionOfType(ShiftNotFoundException.class)
+                .isThrownBy(() -> repository.delete(notPresent));
+            entityManager.getTransaction().rollback();
+        }
     }
     
     private void addTestShiftToDB(String doctorId, String departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {

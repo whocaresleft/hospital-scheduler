@@ -100,7 +100,7 @@ public class ShiftEntity {
             sh.getEndTime());
     }
     
-    private static String generateEntityId(Shift sh) {
+    public static String generateEntityId(Shift sh) {
         return String.format("%s-%s-%s-%s-%s",
             sh.getDoctorId().getValue(),
             sh.getDepartmentId().getValue(),
