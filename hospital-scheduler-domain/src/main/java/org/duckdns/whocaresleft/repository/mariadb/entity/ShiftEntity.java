@@ -2,6 +2,7 @@ package org.duckdns.whocaresleft.repository.mariadb.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
@@ -9,10 +10,13 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 import org.duckdns.whocaresleft.model.Shift;
-import org.duckdns.whocaresleft.core.Id;
+import static org.duckdns.whocaresleft.core.Id.createId;
 
 @Entity @Table(name = "shifts")
 public class ShiftEntity {
+    
+    @Id @Column(name = "id")
+    private String id;
     
     @Column(name = "doctor_id")
     private String doctorId;
@@ -25,7 +29,8 @@ public class ShiftEntity {
     private LocalTime endTime;
     
     public ShiftEntity() {}
-    public ShiftEntity(String doctorId, String departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    public ShiftEntity(String id, String doctorId, String departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        this.id = id;
         this.doctorId = doctorId;
         this.departmentId = departmentId;
         this.date = date;
@@ -33,20 +38,23 @@ public class ShiftEntity {
         this.endTime = endTime;
     }
     
+    public String getId() { return id; }
     public String getDoctorId() { return doctorId; }
     public String getDepartmentId() { return departmentId; }
     public LocalDate getDate() { return date; }
     public LocalTime getStartTime() { return startTime; }
     public LocalTime getEndTime() { return endTime; }
     
+    public void setId(String id) { this.id = id; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
     public void setDepartmentId(String departmentId) { this.departmentId = departmentId; }
     public void setDate(LocalDate date) { this.date = date; }
     public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
     public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+    
     @Override
     public int hashCode() {
-        return Objects.hash(date, departmentId, doctorId, endTime, startTime);
+        return Objects.hash(id, date, departmentId, doctorId, endTime, startTime);
     }
     @Override
     public boolean equals(Object other) {
@@ -60,7 +68,8 @@ public class ShiftEntity {
             return false;
         
         ShiftEntity otherShift = (ShiftEntity)other;
-        return Objects.equals(date, otherShift.date)
+        return Objects.equals(id, otherShift.id)
+            && Objects.equals(date, otherShift.date)
             && Objects.equals(departmentId, otherShift.departmentId)
             && Objects.equals(doctorId, otherShift.doctorId)
             && Objects.equals(endTime, otherShift.endTime)
@@ -68,20 +77,35 @@ public class ShiftEntity {
     }
     @Override
     public String toString() {
-        return "ShiftEntity [doctorId=" + doctorId + ", departmentId=" + departmentId + ", date=" + date
+        return "ShiftEntity [id=" + id +", doctorId=" + doctorId + ", departmentId=" + departmentId + ", date=" + date
                 + ", startTime=" + startTime + ", endTime=" + endTime + "]";
     }
     
     public Shift toShift() {
         return Shift.createShift(
-            Id.createId(doctorId),
-            Id.createId(departmentId),
+            createId(doctorId),
+            createId(departmentId),
             date,
             startTime,
             endTime);
     }
     
     public static ShiftEntity fromShift(Shift sh) {
-        return new ShiftEntity(sh.getDoctorId().getValue(), sh.getDepartmentId().getValue(), sh.getDate(), sh.getStartTime(), sh.getEndTime());
+        return new ShiftEntity(
+            generateEntityId(sh),
+            sh.getDoctorId().getValue(),
+            sh.getDepartmentId().getValue(),
+            sh.getDate(),
+            sh.getStartTime(),
+            sh.getEndTime());
+    }
+    
+    private static String generateEntityId(Shift sh) {
+        return String.format("%s-%s-%s-%s-%s",
+            sh.getDoctorId().getValue(),
+            sh.getDepartmentId().getValue(),
+            sh.getDate().toString(),
+            sh.getStartTime().toString(),
+            sh.getEndTime().toString());
     }
 }
