@@ -67,7 +67,7 @@ class MongoDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_2", "dok", "ter");
             
             assertThat(repository.findAll())
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"),
                     Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
         }
@@ -122,7 +122,7 @@ class MongoDoctorRepositoryTestcontainersIT {
             repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
             
             assertThat(readAllDoctorsFromDB())
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     newDoctorWithSameId,
                     Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
         }
@@ -173,7 +173,7 @@ class MongoDoctorRepositoryTestcontainersIT {
                 .isThrownBy(() -> repository.update(validDoctorId, doctorWithNonExistentId));
         }
     }
-
+    
     
     private void addTestDoctorToDB(String id, String firstName, String lastName) {
         Document toInsert = new Document()

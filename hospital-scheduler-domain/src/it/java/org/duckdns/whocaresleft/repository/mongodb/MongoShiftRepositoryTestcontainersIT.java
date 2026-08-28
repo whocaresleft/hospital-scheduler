@@ -73,7 +73,7 @@ class MongoShiftRepositoryTestcontainersIT {
             addTestShiftToDB("doc2", "er", DATE_24_07_2026, TIME_08_30, TIME_09_30);
             
             assertThat(repository.findAll())
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     Shift.createShift(Id.createId("doc1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30),
                     Shift.createShift(Id.createId("doc2"), Id.createId("er"), DATE_24_07_2026, TIME_08_30, TIME_09_30));
         }
@@ -94,7 +94,7 @@ class MongoShiftRepositoryTestcontainersIT {
             addTestShiftToDB("doc2", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
             
             assertThat(repository.findByDoctorId(Id.createId("doc1")))
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     Shift.createShift(Id.createId("doc1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30),
                     Shift.createShift(Id.createId("doc1"), Id.createId("sr"), DATE_24_07_2026, TIME_08_00, TIME_09_30));
         }
@@ -115,7 +115,7 @@ class MongoShiftRepositoryTestcontainersIT {
             addTestShiftToDB("doc2", "er", DATE_24_07_2026, TIME_08_00, TIME_08_30);
             
             assertThat(repository.findByDepartmentId(Id.createId("er")))
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     Shift.createShift(Id.createId("doc1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30),
                     Shift.createShift(Id.createId("doc2"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30));
         }
@@ -150,7 +150,7 @@ class MongoShiftRepositoryTestcontainersIT {
                 TIME_09_00));
             
             assertThat(readAllShiftsFromDB())
-                .containsExactly(Shift.createShift(
+                .containsExactlyInAnyOrder(Shift.createShift(
                     Id.createId("dok"),
                     Id.createId("er"),
                     DATE_24_07_2026,

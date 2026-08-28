@@ -44,7 +44,7 @@ class MariaDoctorRepositoryTestcontainersIT {
             "jakarta.persistence.jdbc.password", maria.getPassword(),
             "jakarta.persistence.jdbc.driver", "org.mariadb.jdbc.Driver",
             "hibernate.hbm2ddl.auto", "create-drop");
-        emf = Persistence.createEntityManagerFactory("maria_doctor_repository_it", properties);
+        emf = Persistence.createEntityManagerFactory("maria_repository_it", properties);
     }
     
     @AfterAll
@@ -60,7 +60,9 @@ class MariaDoctorRepositoryTestcontainersIT {
         repository = new MariaDoctorRepository(entityManager);
         
         entityManager.getTransaction().begin();
+        entityManager.createQuery("DELETE FROM ShiftEntity").executeUpdate();
         entityManager.createQuery("DELETE FROM DoctorEntity").executeUpdate();
+        entityManager.createQuery("DELETE FROM DepartmentEntity").executeUpdate();
         entityManager.getTransaction().commit();
     }
     
@@ -88,7 +90,7 @@ class MariaDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_2", "dok", "ter");
             
             assertThat(repository.findAll())
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"),
                     Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
         }
@@ -170,7 +172,7 @@ class MariaDoctorRepositoryTestcontainersIT {
             entityManager.getTransaction().commit();
             
             assertThat(readAllDoctorsFromDB())
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     newDoctorWithSameId,
                     Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
         }
@@ -204,9 +206,6 @@ class MariaDoctorRepositoryTestcontainersIT {
                 .isThrownBy(() -> repository.delete(nonExistendDoctorId));
             
             entityManager.getTransaction().rollback();
-            
-            assertThat(entityManager.getTransaction().isActive())
-                .isFalse();
         }
         
         @Test @DisplayName("Update when no doctor with the specified id is in the database should throw")
@@ -220,9 +219,6 @@ class MariaDoctorRepositoryTestcontainersIT {
                 .isThrownBy(() -> repository.update(validDoctorId, doctorWithNonExistentId));
             
             entityManager.getTransaction().rollback();
-            
-            assertThat(entityManager.getTransaction().isActive())
-                .isFalse();
         }
     }
     

@@ -10,7 +10,7 @@ import org.duckdns.whocaresleft.model.Department;
 public interface DepartmentRepository {
     
     List<Department> findAll();
-    Department findById(Id departmentId);
+    Department findById(Id id);
     void save(Department department) throws DuplicateDepartmentException;
     void delete(Id departmentId) throws DepartmentNotFoundException;
     void update(Id departmentId, Department newDepartment) throws DepartmentNotFoundException;

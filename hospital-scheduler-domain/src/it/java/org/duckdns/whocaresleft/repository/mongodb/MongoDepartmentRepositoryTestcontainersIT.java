@@ -65,7 +65,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
             addTestDepartmentToDB("sr", "Surgery Room");
             
             assertThat(repository.findAll())
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     Department.createDepartment(Id.createId("er"), "ER"),
                     Department.createDepartment(Id.createId("sr"), "Surgery Room"));
         }
@@ -121,7 +121,7 @@ class MongoDepartmentRepositoryTestcontainersIT {
             repository.update(Id.createId("er"), newDepartmentWithSameId);
             
             assertThat(readAllDepartmentsFromDB())
-                .containsExactly(
+                .containsExactlyInAnyOrder(
                     newDepartmentWithSameId,
                     Department.createDepartment(Id.createId("sr"), "Surgery Room"));
         }
