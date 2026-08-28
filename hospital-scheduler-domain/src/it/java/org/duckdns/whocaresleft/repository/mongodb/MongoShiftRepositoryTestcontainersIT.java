@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -43,18 +44,24 @@ class MongoShiftRepositoryTestcontainersIT {
     private MongoClient client;
     private MongoShiftRepository repository;
     private MongoCollection<Document> shiftCollection;
+    private ClientSession session;
     
     @BeforeEach
     void setup() {
-        client = MongoClients.create(mongo.getConnectionString());
-        repository = new MongoShiftRepository(client);
+        client = MongoClients.create(mongo.getReplicaSetUrl());
         MongoDatabase database = client.getDatabase("hospital");
         database.drop();
         shiftCollection = database.getCollection("shift");
+        session = client.startSession();
+        
+        repository = new MongoShiftRepository(session, shiftCollection);
     }
     
     @AfterEach
     void teardown() {
+        if (session.hasActiveTransaction())
+            session.abortTransaction();
+        session.close();
         client.close();
     }
     
@@ -131,7 +138,9 @@ class MongoShiftRepositoryTestcontainersIT {
                     TIME_09_00
                 );
             
+            session.startTransaction();
             repository.save(toBeInserted);
+            session.commitTransaction();
             
             assertThat(readAllShiftsFromDB())
                 .containsExactly(toBeInserted);
@@ -142,12 +151,14 @@ class MongoShiftRepositoryTestcontainersIT {
             addTestShiftToDB("dok", "er", DATE_24_07_2026, TIME_09_00, TIME_09_30);
             addTestShiftToDB("doc", "sr", DATE_24_07_2026, TIME_08_30, TIME_09_00);
             
+            session.startTransaction();
             repository.delete(Shift.createShift(
                 Id.createId("doc"),
                 Id.createId("sr"),
                 DATE_24_07_2026,
                 TIME_08_30,
                 TIME_09_00));
+            session.commitTransaction();
             
             assertThat(readAllShiftsFromDB())
                 .containsExactlyInAnyOrder(Shift.createShift(
@@ -177,7 +188,9 @@ class MongoShiftRepositoryTestcontainersIT {
                     TIME_09_00,
                     TIME_09_30);
                 
+            session.startTransaction();
             repository.update(oldDocShift, newDocShift);
+            session.commitTransaction();
             
             assertThat(readAllShiftsFromDB())
                 .containsExactly(newDocShift);
@@ -200,8 +213,11 @@ class MongoShiftRepositoryTestcontainersIT {
                         TIME_09_00
                     );
                 
+            session.startTransaction();
             assertThatExceptionOfType(OverlappedShiftException.class)
                 .isThrownBy(() -> repository.save(alreadyInserted));
+            session.abortTransaction();
+            
             assertThat(readAllShiftsFromDB())
                 .contains(alreadyInserted);
         }
@@ -215,8 +231,10 @@ class MongoShiftRepositoryTestcontainersIT {
                 TIME_08_30,
                 TIME_09_00);
             
+            session.startTransaction();
             assertThatExceptionOfType(ShiftNotFoundException.class)
                 .isThrownBy(() -> repository.delete(notPresent));
+            session.abortTransaction();
         }
     }
     
@@ -235,7 +253,10 @@ class MongoShiftRepositoryTestcontainersIT {
             .append("date", date.toString())
             .append("startTime", startTime.toString())
             .append("endTime", endTime.toString());
+        
+        session.startTransaction();
         shiftCollection.insertOne(toInsert);
+        session.commitTransaction();
     }
     
     private List<Shift> readAllShiftsFromDB() {

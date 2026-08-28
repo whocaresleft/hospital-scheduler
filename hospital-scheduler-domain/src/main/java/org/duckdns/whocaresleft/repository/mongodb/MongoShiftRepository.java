@@ -13,7 +13,7 @@ import org.duckdns.whocaresleft.model.Shift;
 import org.duckdns.whocaresleft.repository.ShiftRepository;
 
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.MongoClient;
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
@@ -22,29 +22,32 @@ public class MongoShiftRepository implements ShiftRepository {
     
     private static final String DOCTOR_ID_FIELD_NAME = "doctorId";
     private static final String DEPARTMENT_ID_FIELD_NAME = "departmentId";
+    
+    private final ClientSession session;
     private final MongoCollection<Document> shiftCollection;
     
-    public MongoShiftRepository(MongoClient client) {
-        shiftCollection = client.getDatabase("hospital").getCollection("shift");
+    public MongoShiftRepository(ClientSession session, MongoCollection<Document> shiftCollection) {
+        this.session = session;
+        this.shiftCollection = shiftCollection;
     }
     
     @Override
     public List<Shift> findAll() {
-        return StreamSupport.stream(shiftCollection.find().spliterator(), false)
+        return StreamSupport.stream(shiftCollection.find(session).spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
     
     @Override
     public List<Shift> findByDoctorId(Id doctorId) {
-        return StreamSupport.stream(shiftCollection.find(Filters.eq(DOCTOR_ID_FIELD_NAME, doctorId.getValue())).spliterator(), false)
+        return StreamSupport.stream(shiftCollection.find(session, Filters.eq(DOCTOR_ID_FIELD_NAME, doctorId.getValue())).spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
     
     @Override
     public List<Shift> findByDepartmentId(Id departmentId) {
-        return StreamSupport.stream(shiftCollection.find(Filters.eq(DEPARTMENT_ID_FIELD_NAME, departmentId.getValue())).spliterator(), false)
+        return StreamSupport.stream(shiftCollection.find(session, Filters.eq(DEPARTMENT_ID_FIELD_NAME, departmentId.getValue())).spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
@@ -52,7 +55,7 @@ public class MongoShiftRepository implements ShiftRepository {
     @Override
     public void save(Shift shift) throws OverlappedShiftException {
         try {
-            shiftCollection.insertOne(toDocument(shift));
+            shiftCollection.insertOne(session, toDocument(shift));
         } catch (MongoWriteException e) {
             throw new OverlappedShiftException(shift, shift);
         }
@@ -60,7 +63,7 @@ public class MongoShiftRepository implements ShiftRepository {
     
     @Override
     public void delete(Shift shift) throws ShiftNotFoundException {
-        DeleteResult result = shiftCollection.deleteOne(Filters.eq("_id", generateDocumentId(shift)));
+        DeleteResult result = shiftCollection.deleteOne(session, Filters.eq("_id", generateDocumentId(shift)));
         if (result.getDeletedCount() == 0)
             throw new ShiftNotFoundException(shift);
     }

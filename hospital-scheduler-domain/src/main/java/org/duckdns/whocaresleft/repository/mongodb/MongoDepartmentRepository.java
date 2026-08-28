@@ -11,7 +11,7 @@ import org.duckdns.whocaresleft.model.Department;
 import org.duckdns.whocaresleft.repository.DepartmentRepository;
 
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.MongoClient;
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
@@ -19,22 +19,24 @@ import com.mongodb.client.result.UpdateResult;
 
 public class MongoDepartmentRepository implements DepartmentRepository {
     
+    private final ClientSession session;
     private final MongoCollection<Document> departmentCollection;
     
-    public MongoDepartmentRepository(MongoClient client) {
-        departmentCollection = client.getDatabase("hospital").getCollection("department");
+    public MongoDepartmentRepository(ClientSession session, MongoCollection<Document> departmentCollection) {
+        this.session = session;
+        this.departmentCollection = departmentCollection;
     }
     
     @Override
     public List<Department> findAll() {
-        return StreamSupport.stream(departmentCollection.find().spliterator(), false)
+        return StreamSupport.stream(departmentCollection.find(session).spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
     
     @Override
     public Department findById(Id departmentId) {
-        Document d = departmentCollection.find(Filters.eq("_id", departmentId.getValue())).first();
+        Document d = departmentCollection.find(session, Filters.eq("_id", departmentId.getValue())).first();
         if (d == null)
             return null;
         return fromDocument(d);
@@ -43,7 +45,7 @@ public class MongoDepartmentRepository implements DepartmentRepository {
     @Override
     public void save(Department department) throws DuplicateDepartmentException {
         try {
-            departmentCollection.insertOne(toDocument(department));
+            departmentCollection.insertOne(session, toDocument(department));
         } catch (MongoWriteException e) {
             throw new DuplicateDepartmentException(department);
         }
@@ -51,7 +53,7 @@ public class MongoDepartmentRepository implements DepartmentRepository {
     
     @Override
     public void delete(Id departmentId) throws DepartmentNotFoundException {
-        DeleteResult result = departmentCollection.deleteOne(Filters.eq("_id", departmentId.getValue()));
+        DeleteResult result = departmentCollection.deleteOne(session, Filters.eq("_id", departmentId.getValue()));
         if (result.getDeletedCount() == 0)
             throw new DepartmentNotFoundException(departmentId);
     }
@@ -59,6 +61,7 @@ public class MongoDepartmentRepository implements DepartmentRepository {
     @Override
     public void update(Id departmentId, Department newDepartment) throws DepartmentNotFoundException {
         UpdateResult result = departmentCollection.replaceOne(
+            session,
             Filters.eq("_id", departmentId.getValue()),
             toDocument(newDepartment));
         if (result.getMatchedCount() == 0)
