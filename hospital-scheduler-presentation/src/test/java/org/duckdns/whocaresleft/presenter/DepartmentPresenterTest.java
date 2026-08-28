@@ -33,7 +33,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @DisplayName("Unit tests for DepartmentPresenter")
-public class DepartmentPresenterTest {
+class DepartmentPresenterTest {
     
     private static final LocalDate DATE_24_07_2026 = LocalDate.of(2026, 7, 24);
     private static final LocalTime TIME_08_00 = LocalTime.of(8, 0);

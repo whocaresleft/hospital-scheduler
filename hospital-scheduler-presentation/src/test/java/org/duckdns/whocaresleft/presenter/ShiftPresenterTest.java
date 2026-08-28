@@ -172,19 +172,21 @@ class ShiftPresenterTest {
         Doctor doctor = Doctor.createDoctor(doctorId, "doc", "tor");
         Id departmentId = Id.createId("sur_1");
         Department department = Department.createDepartment(departmentId, "Surgery room");
-        Shift originalShift = Shift.createShift(doctorId, departmentId, DATE_24_07_2026, TIME_08_00, TIME_09_00);
-        Shift overlappingShift = Shift.createShift(doctorId, departmentId, DATE_24_07_2026, TIME_08_30, TIME_09_30);
+        
+        Shift originalConflictingShift = Shift.createShift(doctorId, departmentId, DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift nonConflictingShift = Shift.createShift(doctorId, departmentId, DATE_24_07_2026, TIME_09_00, TIME_09_30);
+        Shift overlappingShift = Shift.createShift(doctorId, departmentId, DATE_24_07_2026, TIME_08_30, TIME_09_00);
         
         when(doctorRepository.findById(doctorId))
             .thenReturn(doctor);
         when(departmentRepository.findById(departmentId))
             .thenReturn(department);
         when(shiftRepository.findByDoctorId(doctorId))
-            .thenReturn(Arrays.asList(originalShift));
+            .thenReturn(Arrays.asList(nonConflictingShift, originalConflictingShift));
         
         shiftPresenter.addShift(overlappingShift);
 
-        verify(shiftView).showErrorOverlappedShift(originalShift, overlappingShift);
+        verify(shiftView).showErrorOverlappedShift(originalConflictingShift, overlappingShift);
         verifyNoMoreInteractions(ignoreStubs(shiftRepository));
     }
     
@@ -197,19 +199,20 @@ class ShiftPresenterTest {
         Id overlappedDepartmentId = Id.createId("ER");
         Department overlappedDepartment = Department.createDepartment(overlappedDepartmentId, "er");
         
-        Shift originalShift = Shift.createShift(doctorId, originalDepartmentId, DATE_24_07_2026, TIME_08_00, TIME_09_00);
-        Shift overlappingShift = Shift.createShift(doctorId, overlappedDepartmentId, DATE_24_07_2026, TIME_08_30, TIME_09_30);
+        Shift conflictingShift = Shift.createShift(doctorId, originalDepartmentId, DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift nonConflictingShift = Shift.createShift(doctorId, originalDepartmentId, DATE_24_07_2026, TIME_09_00, TIME_09_30);
+        Shift overlappingShift = Shift.createShift(doctorId, overlappedDepartmentId, DATE_24_07_2026, TIME_08_30, TIME_09_00);
         
         when(doctorRepository.findById(doctorId))
             .thenReturn(doctor);
         when(departmentRepository.findById(overlappedDepartmentId))
             .thenReturn(overlappedDepartment);
         when(shiftRepository.findByDoctorId(doctorId))
-            .thenReturn(Arrays.asList(originalShift));
+            .thenReturn(Arrays.asList(conflictingShift, nonConflictingShift));
         
         shiftPresenter.addShift(overlappingShift);
 
-        verify(shiftView).showErrorOverlappedShift(originalShift, overlappingShift);
+        verify(shiftView).showErrorOverlappedShift(conflictingShift, overlappingShift);
         verifyNoMoreInteractions(ignoreStubs(shiftRepository));
     }
     
@@ -327,12 +330,12 @@ class ShiftPresenterTest {
         Id departmentId1 = Id.createId("department_1");
         Id departmentId2 = Id.createId("department_2");
         
-        Shift oldShift1 = Shift.createShift(
+        Shift originalShift = Shift.createShift(
                 doctorId, departmentId1, DATE_24_07_2026, TIME_08_00, TIME_08_30);
-        Shift oldShift2 = Shift.createShift(
+        Shift conflictingShift = Shift.createShift(
                 doctorId, departmentId2, DATE_24_07_2026, TIME_09_00, TIME_09_30);
         
-        Shift newShift1 = Shift.createShift(
+        Shift newShift = Shift.createShift(
                 doctorId, departmentId2, DATE_24_07_2026, TIME_08_30, TIME_09_30);
         
         when(doctorRepository.findById(doctorId))
@@ -341,11 +344,11 @@ class ShiftPresenterTest {
             .thenReturn(Department.createDepartment(departmentId2, "er"));
         
         when(shiftRepository.findByDoctorId(doctorId))
-            .thenReturn(Arrays.asList(oldShift2));
+            .thenReturn(Arrays.asList(originalShift, conflictingShift));
         
-        shiftPresenter.updateShift(oldShift1, newShift1);
+        shiftPresenter.updateShift(originalShift, newShift);
         
-        verify(shiftView).showErrorOverlappedShift(oldShift2, newShift1);
+        verify(shiftView).showErrorOverlappedShift(conflictingShift, newShift);
         verifyNoMoreInteractions(ignoreStubs(shiftRepository));
     }
     

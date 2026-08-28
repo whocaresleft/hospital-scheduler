@@ -61,6 +61,11 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven.surefire.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>**/learning/*.java</exclude>
+            </excludes>
+          </configuration>
         </plugin>
         
         <plugin>
