@@ -4,8 +4,8 @@ import org.duckdns.whocaresleft.model.Shift;
 
 public class OverlappedShiftException extends RuntimeException {
     
-    private transient final Shift conflicting;
-    private transient final Shift overlapped;
+    private final transient Shift conflicting;
+    private final transient Shift overlapped;
     
     public OverlappedShiftException(Shift original, Shift overlapped) {
         super("Shift " + overlapped + " overlaps with " + original);

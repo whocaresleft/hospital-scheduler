@@ -4,7 +4,7 @@ import org.duckdns.whocaresleft.model.Doctor;
 
 public class DuplicateDoctorException extends RuntimeException {
     
-    private transient final Doctor doctor;
+    private final transient Doctor doctor;
     
     public DuplicateDoctorException(Doctor doctor) {
         super("A doctor with id " + doctor.getId() + " already exists");

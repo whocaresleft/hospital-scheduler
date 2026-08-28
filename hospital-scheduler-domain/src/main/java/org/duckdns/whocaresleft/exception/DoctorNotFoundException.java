@@ -4,7 +4,7 @@ import org.duckdns.whocaresleft.core.Id;
 
 public class DoctorNotFoundException extends RuntimeException {
     
-    private transient final Id doctorId;
+    private final transient Id doctorId;
     
     public DoctorNotFoundException(Id doctorId) {
         super("No doctor with id " + doctorId + " was found");

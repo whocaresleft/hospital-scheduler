@@ -4,7 +4,7 @@ import org.duckdns.whocaresleft.model.Department;
 
 public class DuplicateDepartmentException extends RuntimeException {
     
-    private transient final Department department;
+    private final transient Department department;
     
     public DuplicateDepartmentException(Department department) {
         super("A department with id " + department.getId() + " already exists");
