@@ -150,6 +150,8 @@
               <exclude>**/org/duckdns/whocaresleft/model/Department*</exclude>
               <exclude>**/org/duckdns/whocaresleft/learning/*</exclude>
               <exclude>**/org/duckdns/whocaresleft/repository/mariadb/entity/*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/repository/mariadb/*RepositoryProvider*</exclude>
+              <exclude>**/org/duckdns/whocaresleft/repository/mongodb/*RepositoryProvider*</exclude>
             </excludes>
           </configuration>
           <executions>
@@ -173,6 +175,8 @@
                     <excludes> <!--Excluding concrete repositories that ONLY have integration tests from unit test code coverage-->
                       <exclude>org.duckdns.whocaresleft.repository.mongo*</exclude>
                       <exclude>org.duckdns.whocaresleft.repository.maria*</exclude>
+                      <exclude>org.duckdns.whocaresleft.transaction.mongo*</exclude>
+                      <exclude>org.duckdns.whocaresleft.transaction.maria*</exclude>
                     </excludes>
                     <limits>
                       <limit>
@@ -251,6 +255,8 @@
             </targetClasses>
             <excludedClasses>
               <param>org.duckdns.whocaresleft.repository.mariadb.entity.*</param>
+              <param>org.duckdns.whocaresleft.repository.mariadb.*RepositoryProvider*</param>
+              <param>org.duckdns.whocaresleft.repository.mongodb.*RepositoryProvider*</param>
             </excludedClasses>
             <targetTests>
               <param>org.duckdns.whocaresleft.core.Id*</param>
