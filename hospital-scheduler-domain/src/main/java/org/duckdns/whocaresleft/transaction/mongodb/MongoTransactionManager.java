@@ -23,7 +23,7 @@ public class MongoTransactionManager implements TransactionManager {
     public <T> T doInTransaction(TransactionCode<T> code) {
         ClientSession session = client.startSession();
         RepositoryProvider provider = new MongoRepositoryProvider(session, database);
-        return session.withTransaction(() -> { return code.apply(provider); });
+        return session.withTransaction(() ->  code.apply(provider) );
     }
 
 }
