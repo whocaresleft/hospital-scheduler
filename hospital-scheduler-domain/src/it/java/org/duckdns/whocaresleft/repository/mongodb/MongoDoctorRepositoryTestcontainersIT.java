@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -36,18 +37,24 @@ class MongoDoctorRepositoryTestcontainersIT {
     private MongoClient client;
     private MongoDoctorRepository repository;
     private MongoCollection<Document> doctorCollection;
+    private ClientSession session;
     
     @BeforeEach
     void setup() {
-        client = MongoClients.create(mongo.getConnectionString());
-        repository = new MongoDoctorRepository(client);
+        client = MongoClients.create(mongo.getReplicaSetUrl());
         MongoDatabase database = client.getDatabase("hospital");
         database.drop();
         doctorCollection = database.getCollection("doctor");
+        session = client.startSession();
+        
+        repository = new MongoDoctorRepository(session, doctorCollection);
     }
     
     @AfterEach
     void teardown() {
+        if (session.hasActiveTransaction())
+            session.abortTransaction();
+        session.close();
         client.close();
     }
     
@@ -75,7 +82,10 @@ class MongoDoctorRepositoryTestcontainersIT {
         @Test
         void testSaveWhenNoDoctorWithSameIdIsAlreadyInDatabaseShouldAdd() {
             Doctor toBeInserted = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+            
+            session.startTransaction();
             repository.save(toBeInserted);
+            session.commitTransaction();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(toBeInserted);
@@ -85,7 +95,9 @@ class MongoDoctorRepositoryTestcontainersIT {
         void testDeleteWhenDoctorIsPresentInDatabaseShouldDeleteExistingDoctor() {
             addTestDoctorToDB("doctor_id", "doc", "tor");
             
+            session.startTransaction();
             repository.delete(Id.createId("doctor_id"));
+            session.commitTransaction();
             
             assertThat(readAllDoctorsFromDB())
                 .isEmpty();
@@ -96,7 +108,9 @@ class MongoDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_id", "doc", "tor");
             addTestDoctorToDB("doctor_id2", "dok", "ter");
             
+            session.startTransaction();
             repository.delete(Id.createId("doctor_id"));
+            session.commitTransaction();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(Doctor.createDoctor(Id.createId("doctor_id2"), "dok", "ter"));
@@ -107,7 +121,9 @@ class MongoDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
             
+            session.startTransaction();
             repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
+            session.commitTransaction();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactly(newDoctorWithSameId);
@@ -119,7 +135,9 @@ class MongoDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_id2", "dok", "ter");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
             
+            session.startTransaction();
             repository.update(Id.createId("doctor_id"), newDoctorWithSameId);
+            session.commitTransaction();
             
             assertThat(readAllDoctorsFromDB())
                 .containsExactlyInAnyOrder(
@@ -151,8 +169,11 @@ class MongoDoctorRepositoryTestcontainersIT {
             addTestDoctorToDB("doctor_id", "original", "doctor");
             Doctor newDoctorWithSameId = Doctor.createDoctor(Id.createId("doctor_id"), "a new", "doctor");
             
+            session.startTransaction();
             assertThatExceptionOfType(DuplicateDoctorException.class)
                 .isThrownBy(() -> repository.save(newDoctorWithSameId));
+            session.abortTransaction();
+            
             assertThat(readAllDoctorsFromDB())
                 .doesNotContain(newDoctorWithSameId);
         }
@@ -160,8 +181,11 @@ class MongoDoctorRepositoryTestcontainersIT {
         @Test
         void testDeleteWhenDoctorIsNotPresentInDatabaseShouldThrow() {
             Id validDoctorId = Id.createId("doctor_id");
+            
+            session.startTransaction();
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.delete(validDoctorId));
+            session.abortTransaction();
         }
         
         @Test
@@ -169,8 +193,10 @@ class MongoDoctorRepositoryTestcontainersIT {
             Id validDoctorId = Id.createId("doctor_id");
             Doctor doctorWithNonExistentId = Doctor.createDoctor(Id.createId("doctor_id"), "a", "doctor");
             
+            session.startTransaction();
             assertThatExceptionOfType(DoctorNotFoundException.class)
                 .isThrownBy(() -> repository.update(validDoctorId, doctorWithNonExistentId));
+            session.abortTransaction();
         }
     }
     
@@ -180,7 +206,10 @@ class MongoDoctorRepositoryTestcontainersIT {
             .append("_id", id)
             .append("firstName", firstName)
             .append("lastName", lastName);
+        
+        session.startTransaction();
         doctorCollection.insertOne(toInsert);
+        session.commitTransaction();
     }
     
     private List<Doctor> readAllDoctorsFromDB() {

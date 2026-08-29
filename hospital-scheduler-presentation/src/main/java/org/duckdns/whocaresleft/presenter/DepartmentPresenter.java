@@ -9,7 +9,7 @@ import org.duckdns.whocaresleft.exception.DuplicateDepartmentException;
 import org.duckdns.whocaresleft.model.Department;
 import org.duckdns.whocaresleft.repository.DepartmentRepository;
 import org.duckdns.whocaresleft.repository.ShiftRepository;
-import org.duckdns.whocaresleft.transactions.TransactionManager;
+import org.duckdns.whocaresleft.transaction.TransactionManager;
 import org.duckdns.whocaresleft.view.DepartmentView;
 
 public class DepartmentPresenter {

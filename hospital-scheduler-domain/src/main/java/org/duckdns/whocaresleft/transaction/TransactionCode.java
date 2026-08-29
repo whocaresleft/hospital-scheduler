@@ -1,4 +1,4 @@
-package org.duckdns.whocaresleft.transactions;
+package org.duckdns.whocaresleft.transaction;
 
 import java.util.function.Function;
 

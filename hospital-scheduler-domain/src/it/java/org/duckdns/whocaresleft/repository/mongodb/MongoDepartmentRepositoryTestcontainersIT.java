@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -35,18 +36,24 @@ class MongoDepartmentRepositoryTestcontainersIT {
     private MongoClient client;
     private MongoDepartmentRepository repository;
     private MongoCollection<Document> departmentCollection;
+    private ClientSession session;
     
     @BeforeEach
     void setup() {
-        client = MongoClients.create(mongo.getConnectionString());
-        repository = new MongoDepartmentRepository(client);
+        client = MongoClients.create(mongo.getReplicaSetUrl());
         MongoDatabase database = client.getDatabase("hospital");
         database.drop();
         departmentCollection = database.getCollection("department");
+        session = client.startSession();
+        
+        repository = new MongoDepartmentRepository(session, departmentCollection);
     }
     
     @AfterEach
     void teardown() {
+        if (session.hasActiveTransaction())
+            session.abortTransaction();
+        session.close();
         client.close();
     }
     
@@ -74,7 +81,9 @@ class MongoDepartmentRepositoryTestcontainersIT {
         void testSaveWhenNoDepartmentWithSameIdIsAlreadyInDatabaseShouldAdd() {
             Department toBeInserted = Department.createDepartment(Id.createId("er"), "ER");
             
+            session.startTransaction();
             repository.save(toBeInserted);
+            session.commitTransaction();
             
             assertThat(readAllDepartmentsFromDB())
                 .containsExactly(toBeInserted);
@@ -84,7 +93,9 @@ class MongoDepartmentRepositoryTestcontainersIT {
         void testDeleteWhenDepartmentIsPresentInDatabaseShouldDeleteExistingDepartment() {
             addTestDepartmentToDB("er", "ER");
             
+            session.startTransaction();
             repository.delete(Id.createId("er"));
+            session.commitTransaction();
             
             assertThat(readAllDepartmentsFromDB())
                 .isEmpty();
@@ -95,7 +106,9 @@ class MongoDepartmentRepositoryTestcontainersIT {
             addTestDepartmentToDB("er", "ER");
             addTestDepartmentToDB("sr", "Surgery Room");
             
+            session.startTransaction();
             repository.delete(Id.createId("er"));
+            session.commitTransaction();
             
             assertThat(readAllDepartmentsFromDB())
                 .containsExactly(Department.createDepartment(Id.createId("sr"), "Surgery Room"));
@@ -106,7 +119,9 @@ class MongoDepartmentRepositoryTestcontainersIT {
             addTestDepartmentToDB("er", "ER");
             Department newDepartmentWithSameId = Department.createDepartment(Id.createId("er"), "Newly Improved ER");
             
+            session.startTransaction();
             repository.update(Id.createId("er"), newDepartmentWithSameId);
+            session.commitTransaction();
             
             assertThat(readAllDepartmentsFromDB())
                 .containsExactly(newDepartmentWithSameId);
@@ -117,8 +132,10 @@ class MongoDepartmentRepositoryTestcontainersIT {
             addTestDepartmentToDB("er", "ER");
             addTestDepartmentToDB("sr", "Surgery Room");
             Department newDepartmentWithSameId = Department.createDepartment(Id.createId("er"), "Newly Improved ER");
-
+            
+            session.startTransaction();
             repository.update(Id.createId("er"), newDepartmentWithSameId);
+            session.commitTransaction();
             
             assertThat(readAllDepartmentsFromDB())
                 .containsExactlyInAnyOrder(
@@ -150,8 +167,11 @@ class MongoDepartmentRepositoryTestcontainersIT {
             addTestDepartmentToDB("er", "ER");
             Department newDepartmentWithSameId = Department.createDepartment(Id.createId("er"), "Newly Improved ER");
             
+            session.startTransaction();
             assertThatExceptionOfType(DuplicateDepartmentException.class)
                 .isThrownBy(() -> repository.save(newDepartmentWithSameId));
+            session.abortTransaction();
+            
             assertThat(readAllDepartmentsFromDB())
                 .doesNotContain(newDepartmentWithSameId);
         }
@@ -160,8 +180,10 @@ class MongoDepartmentRepositoryTestcontainersIT {
         void testDeleteWhenDepartmentIsNotPresentInDatabaseShouldThrow() {
             Id nonExistentDepartmentId = Id.createId("er");
             
+            session.startTransaction();
             assertThatExceptionOfType(DepartmentNotFoundException.class)
                 .isThrownBy(() -> repository.delete(nonExistentDepartmentId));
+            session.abortTransaction();
         }
         
         @Test
@@ -169,8 +191,10 @@ class MongoDepartmentRepositoryTestcontainersIT {
             Id nonExistentDepartmentId = Id.createId("er");
             Department departmentWithNonExistentId = Department.createDepartment(nonExistentDepartmentId, "New ER");
             
+            session.startTransaction();
             assertThatExceptionOfType(DepartmentNotFoundException.class)
                 .isThrownBy(() -> repository.update(nonExistentDepartmentId, departmentWithNonExistentId));
+            session.abortTransaction();
         }
     }
     
@@ -178,7 +202,10 @@ class MongoDepartmentRepositoryTestcontainersIT {
         Document toInsert = new Document()
             .append("_id", id)
             .append("name", name);
+        
+        session.startTransaction();
         departmentCollection.insertOne(toInsert);
+        session.commitTransaction();
     }
     
     private List<Department> readAllDepartmentsFromDB() {

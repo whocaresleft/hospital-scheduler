@@ -9,7 +9,7 @@ import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 import org.duckdns.whocaresleft.repository.ShiftRepository;
-import org.duckdns.whocaresleft.transactions.TransactionManager;
+import org.duckdns.whocaresleft.transaction.TransactionManager;
 import org.duckdns.whocaresleft.view.DoctorView;
 
 public class DoctorPresenter {

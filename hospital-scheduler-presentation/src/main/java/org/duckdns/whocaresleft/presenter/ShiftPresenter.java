@@ -11,7 +11,7 @@ import org.duckdns.whocaresleft.exception.OverlappedShiftException;
 import org.duckdns.whocaresleft.exception.ShiftNotFoundException;
 import org.duckdns.whocaresleft.model.Shift;
 import org.duckdns.whocaresleft.repository.ShiftRepository;
-import org.duckdns.whocaresleft.transactions.TransactionManager;
+import org.duckdns.whocaresleft.transaction.TransactionManager;
 import org.duckdns.whocaresleft.view.ShiftView;
 
 public class ShiftPresenter {

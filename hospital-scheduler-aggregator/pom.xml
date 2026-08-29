@@ -24,7 +24,8 @@
       **/model/Department.*,
       **/exception/*.*,
       **/learning/*.*,
-      **/repository/**/*Entity*
+      **/repository/**/*Entity*,
+      **/repository/**/*RepositoryProvider*
     </sonar.coverage.exclusions>
     <sonar.organization>whocaresleft</sonar.organization>
   </properties>

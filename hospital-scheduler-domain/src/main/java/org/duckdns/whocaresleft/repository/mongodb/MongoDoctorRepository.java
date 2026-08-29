@@ -11,7 +11,7 @@ import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 
 import com.mongodb.MongoWriteException;
-import com.mongodb.client.MongoClient;
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
@@ -19,22 +19,24 @@ import com.mongodb.client.result.UpdateResult;
 
 public class MongoDoctorRepository implements DoctorRepository {
     
+    private final ClientSession session;
     private final MongoCollection<Document> doctorCollection;
     
-    public MongoDoctorRepository(MongoClient client) {
-        doctorCollection = client.getDatabase("hospital").getCollection("doctor");
+    public MongoDoctorRepository(ClientSession session, MongoCollection<Document> doctorCollection) {
+        this.session = session;
+        this.doctorCollection = doctorCollection;
     }
     
     @Override
     public List<Doctor> findAll() {
-        return StreamSupport.stream(doctorCollection.find().spliterator(), false)
+        return StreamSupport.stream(doctorCollection.find(session).spliterator(), false)
             .map(this::fromDocument)
             .toList();
     }
     
     @Override
     public Doctor findById(Id doctorId) {
-        Document d = doctorCollection.find(Filters.eq("_id", doctorId.getValue())).first();
+        Document d = doctorCollection.find(session, Filters.eq("_id", doctorId.getValue())).first();
         if (d == null)
             return null;
         return fromDocument(d);
@@ -43,7 +45,7 @@ public class MongoDoctorRepository implements DoctorRepository {
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
         try {
-            doctorCollection.insertOne(toDocument(doctor));
+            doctorCollection.insertOne(session, toDocument(doctor));
         } catch (MongoWriteException e) {
             throw new DuplicateDoctorException(doctor);
         }
@@ -51,7 +53,7 @@ public class MongoDoctorRepository implements DoctorRepository {
     
     @Override
     public void delete(Id doctorId) throws DoctorNotFoundException {
-        DeleteResult result = doctorCollection.deleteOne(Filters.eq("_id", doctorId.getValue()));
+        DeleteResult result = doctorCollection.deleteOne(session, Filters.eq("_id", doctorId.getValue()));
         if (result.getDeletedCount() == 0)
             throw new DoctorNotFoundException(doctorId);
     }
@@ -59,6 +61,7 @@ public class MongoDoctorRepository implements DoctorRepository {
     @Override
     public void update(Id doctorId, Doctor newDoctor) throws DoctorNotFoundException {
         UpdateResult result = doctorCollection.replaceOne(
+            session,
             Filters.eq("_id", doctorId.getValue()),
             toDocument(newDoctor));
         if (result.getMatchedCount() == 0)
