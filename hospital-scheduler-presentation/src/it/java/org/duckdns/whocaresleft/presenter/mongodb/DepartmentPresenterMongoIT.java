@@ -4,12 +4,12 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import org.duckdns.whocaresleft.core.Id;
-import org.duckdns.whocaresleft.model.Doctor;
-import org.duckdns.whocaresleft.presenter.DoctorPresenter;
-import org.duckdns.whocaresleft.repository.DoctorRepository;
+import org.duckdns.whocaresleft.model.Department;
+import org.duckdns.whocaresleft.presenter.DepartmentPresenter;
+import org.duckdns.whocaresleft.repository.DepartmentRepository;
 import org.duckdns.whocaresleft.transaction.TransactionManager;
 import org.duckdns.whocaresleft.transaction.mongodb.MongoTransactionManager;
-import org.duckdns.whocaresleft.view.DoctorView;
+import org.duckdns.whocaresleft.view.DepartmentView;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,17 +24,17 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 
-@Testcontainers @DisplayName("Integration tests for DoctorPresenter with MongoTransactionManager")
-class DoctorPresenterMongoIT {
+@Testcontainers @DisplayName("Integration tests for DepartmentPresenter with MongoTransactionManager")
+class DepartmentPresenterMongoIT {
     
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
     
     @Mock
-    private DoctorView view;
+    private DepartmentView view;
     
     private TransactionManager transactionManager;
-    private DoctorPresenter presenter;
+    private DepartmentPresenter presenter;
     
     private MongoClient client;
     private AutoCloseable closeable;
@@ -47,15 +47,15 @@ class DoctorPresenterMongoIT {
         
         transactionManager = new MongoTransactionManager(client, db);
         transactionManager.doInTransaction(provider -> {
-            DoctorRepository repository = provider.getDoctorRepository();
+            DepartmentRepository repository = provider.getDepartmentRepository();
             
-            for (Doctor d : repository.findAll())
+            for (Department d : repository.findAll())
                 repository.delete(d.getId());
             
             return null;
         });
         
-        presenter = new DoctorPresenter(transactionManager, view);
+        presenter = new DepartmentPresenter(transactionManager, view);
     }
     
     @AfterEach
@@ -65,60 +65,59 @@ class DoctorPresenterMongoIT {
     }
     
     @Test
-    void testAllDoctors() {
-        Doctor d1 = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
-        Doctor d2 = Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter");
+    void testAllDepartments() {
+        Department d1 = Department.createDepartment(Id.createId("e_r"), "Emergency Room");
+        Department d2 = Department.createDepartment(Id.createId("s_r"), "Surgery Room");
         
         transactionManager.doInTransaction(provider -> {
-            DoctorRepository repository = provider.getDoctorRepository();
+            DepartmentRepository repository = provider.getDepartmentRepository();
             repository.save(d1);
             repository.save(d2);
             return null;
         });
         
-        presenter.allDoctors();
+        presenter.allDepartments();
         
         verify(view)
-            .showAllDoctors(Arrays.asList(d1, d2));
+            .showAllDepartments(Arrays.asList(d1, d2));
     }
     
     @Test
-    void testAddDoctor() {
-        Doctor toAdd = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+    void testAddDepartment() {
+        Department toAdd = Department.createDepartment(Id.createId("er"), "Emergency room");
         
-        presenter.addDoctor(toAdd);
+        presenter.addDepartment(toAdd);
         
         verify(view)
-            .doctorAdded(toAdd);
+            .departmentAdded(toAdd);
     }
     
     @Test
-    void testRemoveDoctor() {
-        Doctor toRemove = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+    void testRemoveDepartment() {
+        Department toRemove = Department.createDepartment(Id.createId("er"), "Emergency Room");
         transactionManager.doInTransaction(provider -> {
-            provider.getDoctorRepository().save(toRemove);
+            provider.getDepartmentRepository().save(toRemove);
             return null;
         });
         
-        presenter.removeDoctor(toRemove);
+        presenter.removeDepartment(toRemove);
         
         verify(view)
-            .doctorRemoved(toRemove);
+            .departmentRemoved(toRemove);
     }
     
     @Test
-    void testUpdateDoctor() {
-        Doctor toUpdate = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+    void testUpdateDepartment() {
+        Department toUpdate = Department.createDepartment(Id.createId("er"), "Old Emergency Room");
         transactionManager.doInTransaction(provider -> {
-            provider.getDoctorRepository().save(toUpdate);
+            provider.getDepartmentRepository().save(toUpdate);
             return null;
         });
+        Department updated = Department.createDepartment(Id.createId("er"), "New Emergency Room");
         
-        Doctor updated = Doctor.createDoctor(Id.createId("doctor_id"), "dock", "thor");
-        
-        presenter.updateDoctor(toUpdate, updated);
+        presenter.updateDepartment(toUpdate, updated);
         
         verify(view)
-            .doctorUpdated(toUpdate, updated);
+            .departmentUpdated(toUpdate, updated);
     }
 }
