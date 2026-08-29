@@ -65,6 +65,7 @@
             <excludes>
               <exclude>**/learning/*.java</exclude>
             </excludes>
+            <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
           </configuration>
         </plugin>
         
