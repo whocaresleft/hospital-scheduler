@@ -17,7 +17,7 @@ public class MongoRepositoryProvider implements RepositoryProvider {
     private final ClientSession mongoClientSession;
     private final MongoDatabase database;
     
-    private MongoRepositoryProvider(ClientSession mongoClientSession, MongoDatabase database) {
+    public MongoRepositoryProvider(ClientSession mongoClientSession, MongoDatabase database) {
         this.mongoClientSession = mongoClientSession;
         this.database = database;
     }
