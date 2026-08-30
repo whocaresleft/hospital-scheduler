@@ -23,7 +23,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 @Testcontainers @DisplayName("Learning tests for Hibernate API")
-class HibernateTestcontainersLearningTest {
+class HibernateTestcontainersLearning {
     
     @Container
     private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.3.39");

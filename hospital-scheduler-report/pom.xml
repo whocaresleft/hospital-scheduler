@@ -35,11 +35,17 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>report-aggregate</id>
+                <id>report-total-aggregate</id>
                 <phase>verify</phase>
                 <goals>
                   <goal>report-aggregate</goal>
                 </goals>
+                <configuration>
+                  <dataFileIncludes>
+                    <dataFileInclude>**/jacoco-merged.exec</dataFileInclude>
+                    <dataFileInclude>**/jacoco.exec</dataFileInclude>
+                  </dataFileIncludes>
+                </configuration>
               </execution>
             </executions>
           </plugin>
