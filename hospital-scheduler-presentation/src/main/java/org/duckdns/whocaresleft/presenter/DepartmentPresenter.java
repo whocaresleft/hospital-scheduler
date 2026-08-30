@@ -44,7 +44,7 @@ public class DepartmentPresenter {
             view.departmentAdded(department);
         } catch (DuplicateDepartmentException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showDuplicateDepartmentError(department.getId());
+            view.showErrorDuplicateDepartment(e.getFoundDepartment());
         }
     }
     
@@ -64,7 +64,7 @@ public class DepartmentPresenter {
             view.departmentRemoved(department);
         } catch (DepartmentNotFoundException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showDepartmentNotFoundError(department.getId());
+            view.showErrorDepartmentNotFound(department);
         }
     }
     
@@ -79,7 +79,7 @@ public class DepartmentPresenter {
             view.departmentUpdated(oldDepartment, newDepartment);
         } catch (DepartmentNotFoundException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showDepartmentNotFoundError(oldDepartment.getId());
+            view.showErrorDepartmentNotFound(oldDepartment);
         }
     }
 }

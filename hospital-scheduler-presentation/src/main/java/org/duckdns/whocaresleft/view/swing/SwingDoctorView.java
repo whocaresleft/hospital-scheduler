@@ -366,7 +366,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             
             new Thread(() -> presenter.updateDoctor(current, updated)).start();
             
-            editDoctor.setEnabled(false);
+            editDoctor.setSelected(false);
             showInfoMessage("Updating Doctor...");
         });
     }

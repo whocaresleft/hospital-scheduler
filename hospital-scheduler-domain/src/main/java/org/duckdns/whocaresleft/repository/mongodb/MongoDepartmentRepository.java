@@ -10,7 +10,6 @@ import org.duckdns.whocaresleft.exception.DuplicateDepartmentException;
 import org.duckdns.whocaresleft.model.Department;
 import org.duckdns.whocaresleft.repository.DepartmentRepository;
 
-import com.mongodb.MongoWriteException;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -44,11 +43,10 @@ public class MongoDepartmentRepository implements DepartmentRepository {
     
     @Override
     public void save(Department department) throws DuplicateDepartmentException {
-        try {
-            departmentCollection.insertOne(session, toDocument(department));
-        } catch (MongoWriteException e) {
-            throw new DuplicateDepartmentException(department);
-        }
+        Department found = findById(department.getId());
+        if (found != null)
+            throw new DuplicateDepartmentException(found);
+        departmentCollection.insertOne(session, toDocument(department));
     }
     
     @Override

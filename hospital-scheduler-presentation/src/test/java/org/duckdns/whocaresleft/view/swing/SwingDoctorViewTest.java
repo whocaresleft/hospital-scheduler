@@ -294,7 +294,9 @@ class SwingDoctorViewTest {
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
         window.list("doctorList").selectItem(0);
+        window.checkBox("editDoctor").click();
 
+        window.checkBox("editDoctor").requireSelected();
         window.textBox("selectedFirstNameTextBox").enterText("extension");
         window.button("updateButton").click();
         window.checkBox("editDoctor").requireNotSelected();

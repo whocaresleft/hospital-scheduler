@@ -113,7 +113,7 @@ class DepartmentPresenterTest {
         
         InOrder inOrder = inOrder(departmentRepository, departmentView);
         inOrder.verify(departmentRepository).save(alreadyExisting);
-        inOrder.verify(departmentView).showDuplicateDepartmentError(alreadyExisting.getId());
+        inOrder.verify(departmentView).showErrorDuplicateDepartment(alreadyExisting);
     }
     
     @Test
@@ -141,7 +141,7 @@ class DepartmentPresenterTest {
         
         InOrder inOrder = inOrder(departmentRepository, departmentView);
         inOrder.verify(departmentRepository).delete(nonExistingDepartmentId);
-        inOrder.verify(departmentView).showDepartmentNotFoundError(nonExistingDepartmentId);
+        inOrder.verify(departmentView).showErrorDepartmentNotFound(nonExistingDepartment);
     }
     
     @Test
@@ -171,7 +171,7 @@ class DepartmentPresenterTest {
         
         InOrder inOrder = inOrder(departmentRepository, departmentView);
         inOrder.verify(departmentRepository).update(nonAlreadyExistingDeparmentId, newDepartment);
-        inOrder.verify(departmentView).showDepartmentNotFoundError(nonAlreadyExistingDeparmentId);
+        inOrder.verify(departmentView).showErrorDepartmentNotFound(nonExistingOldDepartment);
     }
     
     @Test
