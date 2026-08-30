@@ -26,8 +26,8 @@ import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JCheckBox;
 import javax.swing.JSeparator;
-import javax.swing.JScrollBar;
 import java.awt.Color;
+import javax.swing.JScrollPane;
 
 public class SwingDoctorView extends JPanel implements DoctorView {
     
@@ -44,14 +44,14 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     private JLabel infoLabel;
     private JLabel errorLabel;
     
-    private DoctorPresenter presenter;
+    private transient DoctorPresenter presenter;
     
     public SwingDoctorView() {
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
         gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gridBagLayout.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
-        gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+        gridBagLayout.columnWeights = new double[]{1.0, 1.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
+        gridBagLayout.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
         setLayout(gridBagLayout);
         
         JLabel idLabel = new JLabel("Id");
@@ -124,16 +124,19 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_addButton.gridy = 4;
         add(addButton, gbc_addButton);
         
+        JScrollPane scrollPane = new JScrollPane();
+        GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+        gbc_scrollPane.gridwidth = 4;
+        gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
+        gbc_scrollPane.fill = GridBagConstraints.BOTH;
+        gbc_scrollPane.gridx = 1;
+        gbc_scrollPane.gridy = 5;
+        add(scrollPane, gbc_scrollPane);
+        
         doctorListModel = new DefaultListModel<>();
         doctorList = new JList<>(doctorListModel);
+        scrollPane.setViewportView(doctorList);
         doctorList.setName("doctorList");
-        GridBagConstraints gbc_doctorList = new GridBagConstraints();
-        gbc_doctorList.gridwidth = 4;
-        gbc_doctorList.insets = new Insets(0, 0, 5, 0);
-        gbc_doctorList.fill = GridBagConstraints.BOTH;
-        gbc_doctorList.gridx = 1;
-        gbc_doctorList.gridy = 5;
-        add(doctorList, gbc_doctorList);
         
         JSeparator separator = new JSeparator();
         GridBagConstraints gbc_separator = new GridBagConstraints();
@@ -249,7 +252,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         infoLabel.setName("infoLabel");
         GridBagConstraints gbc_infoLabel = new GridBagConstraints();
         gbc_infoLabel.gridwidth = 4;
-        gbc_infoLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_infoLabel.insets = new Insets(0, 0, 5, 0);
         gbc_infoLabel.gridx = 1;
         gbc_infoLabel.gridy = 12;
         add(infoLabel, gbc_infoLabel);
@@ -259,7 +262,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         errorLabel.setName("errorLabel");
         GridBagConstraints gbc_errorLabel = new GridBagConstraints();
         gbc_errorLabel.gridwidth = 4;
-        gbc_errorLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_errorLabel.insets = new Insets(0, 0, 5, 0);
         gbc_errorLabel.gridx = 1;
         gbc_errorLabel.gridy = 13;
         add(errorLabel, gbc_errorLabel);
@@ -286,26 +289,22 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             showInfoMessage("Adding Doctor...");
         });
         
-        doctorList.addListSelectionListener(new ListSelectionListener() {
-            
-            @Override
-            public void valueChanged(ListSelectionEvent arg) {
-                boolean isDoctorSelected = !doctorList.isSelectionEmpty();
+        doctorList.addListSelectionListener(e -> {
+            boolean isDoctorSelected = !doctorList.isSelectionEmpty();
+        
+            if (isDoctorSelected) {
+                deleteButton.setEnabled(true);
+                editDoctor.setEnabled(true);
+                editDoctor.setSelected(false);
                 
-                if (isDoctorSelected) {
-                    deleteButton.setEnabled(true);
-                    editDoctor.setEnabled(true);
-                    editDoctor.setSelected(false);
-                    
-                    Doctor d = doctorList.getSelectedValue();
-                    
-                    selectedIdTextBox.setText(d.getId().getValue());
-                    selectedFirstNameTextBox.setText(d.getFirstName());
-                    selectedLastNameTextBox.setText(d.getLastName());
-                } else {
-                    deleteButton.setEnabled(false);
-                    editDoctor.setEnabled(false);
-                }
+                Doctor d = doctorList.getSelectedValue();
+                
+                selectedIdTextBox.setText(d.getId().getValue());
+                selectedFirstNameTextBox.setText(d.getFirstName());
+                selectedLastNameTextBox.setText(d.getLastName());
+            } else {
+                deleteButton.setEnabled(false);
+                editDoctor.setEnabled(false);
             }
         });
         
@@ -320,18 +319,14 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             showInfoMessage("Deleting Doctor...");
         });
         
-        editDoctor.addChangeListener(new ChangeListener() {
+        editDoctor.addChangeListener(e -> {
+            boolean ticked = editDoctor.isSelected();
+            deleteButton.setEnabled(!ticked);
             
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                boolean ticked = editDoctor.isSelected();
-                deleteButton.setEnabled(!ticked);
-                
-                selectedFirstNameTextBox.setEditable(ticked);
-                selectedLastNameTextBox.setEditable(ticked);
-                
-                if (!ticked) updateButton.setEnabled(false);
-            }
+            selectedFirstNameTextBox.setEditable(ticked);
+            selectedLastNameTextBox.setEditable(ticked);
+            
+            if (!ticked) updateButton.setEnabled(false);
         });
         
         KeyAdapter updateButtonEnabler = new KeyAdapter() {

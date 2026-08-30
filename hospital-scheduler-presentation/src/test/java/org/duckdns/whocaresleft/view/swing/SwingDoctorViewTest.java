@@ -1,8 +1,6 @@
 package org.duckdns.whocaresleft.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.Arrays;
 
@@ -14,8 +12,6 @@ import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.Containers;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JButtonFixture;
-import org.assertj.swing.fixture.JCheckBoxFixture;
-import org.assertj.swing.fixture.JComponentFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
 import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.model.Doctor;

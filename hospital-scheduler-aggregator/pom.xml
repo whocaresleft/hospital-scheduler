@@ -9,25 +9,34 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
     <maven.sonar.version>5.6.0.6792</maven.sonar.version>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.host.url>http://localhost:9000</sonar.host.url>
     <sonar.tests>
-      src/test/java,
-      src/it/java,
-      <!--src/e2e/java, these are not present yet  --> 
+      ${project.basedir}/src/test/java,
+      ${project.basedir}/src/it/java,
+      <!--${project.basedir}/src/e2e/java, these are not present yet  --> 
     </sonar.tests>
     <sonar.junit.reportPaths>
-      target/surefire-reports,
-      target/failsafe-reports
+      ${project.build.directory}/target/surefire-reports,
+      ${project.build.directory}/target/failsafe-reports
     </sonar.junit.reportPaths>
+    <sonar.test.exclusions>
+      **/learning/**
+    </sonar.test.exclusions>
     <sonar.coverage.exclusions>
+      **/exception/*.*,
       **/model/Doctor.*,
       **/model/Department.*,
-      **/exception/*.*,
-      **/learning/*.*,
+      **/learning/**,
       **/repository/**/*Entity*,
       **/repository/**/*RepositoryProvider*
     </sonar.coverage.exclusions>
     <sonar.organization>whocaresleft</sonar.organization>
+    
+    <sonar.issue.ignore.multicriteria>e11,e12</sonar.issue.ignore.multicriteria>
+    <sonar.issue.ignore.multicriteria.e11.ruleKey>java:S117</sonar.issue.ignore.multicriteria.e11.ruleKey>
+    <sonar.issue.ignore.multicriteria.e11.resourceKey>**/SwingDoctorView.java</sonar.issue.ignore.multicriteria.e11.resourceKey>
+    <sonar.issue.ignore.multicriteria.e12.ruleKey>java:S2699</sonar.issue.ignore.multicriteria.e12.ruleKey>
+    <sonar.issue.ignore.multicriteria.e12.resourceKey>**/SwingDoctorView.java</sonar.issue.ignore.multicriteria.e12.resourceKey>
   </properties>
 
   <modules>

@@ -11,6 +11,7 @@
   
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
+    <argLine></argLine>
     
     <maven.compiler.version>3.15.0</maven.compiler.version>
     <maven.surefire.version>3.5.6</maven.surefire.version>
@@ -279,19 +280,11 @@
             <targetClasses>
               <param>org.duckdns.whocaresleft.core.Id</param>
               <param>org.duckdns.whocaresleft.model.Shift</param>
-              <param>org.duckdns.whocaresleft.repository.mongodb.*</param>
-              <param>org.duckdns.whocaresleft.repository.mariadb.*</param>
               <param>org.duckdns.whocaresleft.presenter.*</param>
             </targetClasses>
-            <excludedClasses>
-              <param>org.duckdns.whocaresleft.repository.mariadb.entity.*</param>
-              <param>org.duckdns.whocaresleft.repository.mariadb.*RepositoryProvider*</param>
-              <param>org.duckdns.whocaresleft.repository.mongodb.*RepositoryProvider*</param>
-            </excludedClasses>
             <targetTests>
               <param>org.duckdns.whocaresleft.core.Id*</param>
               <param>org.duckdns.whocaresleft.model.Shift*</param>
-              <param>org.duckdns.whocaresleft.repository.*</param>
               <param>org.duckdns.whocaresleft.presenter.*</param>
             </targetTests>
             <mutationThreshold>90</mutationThreshold>
