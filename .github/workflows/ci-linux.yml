@@ -44,7 +44,7 @@ jobs:
       - name: Pre-pull testcontainers Docker images
         run: |
           docker pull mariadb:10.3.39
-          docker pull mongo:5.10.0
+          docker pull mongo:5
           docker pull testcontainers/ryuk:0.12.0
 
       - name: Setup sonarcloud eventual goal
