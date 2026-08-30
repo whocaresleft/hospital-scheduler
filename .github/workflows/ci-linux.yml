@@ -41,6 +41,12 @@ jobs:
           echo "CODE_COVERAGE_ADDITIONAL_OPTIONS=-Pcoveralls" >> $GITHUB_ENV
         if: ${{ env.COVERALLS_REPO_TOKEN != '' && matrix.java == 17 }}
 
+      - name: Pre-pull testcontainers Docker images
+        run: |
+          docker pull mariadb:10.3.39
+          docker pull mongo:5.10.0
+        docker pull testcontainers/ryuk:0.12.0
+
       - name: Setup sonarcloud eventual goal
         run: |
           echo "SONARGOAL=org.sonarsource.scanner.maven:sonar-maven-plugin:sonar" >> $GITHUB_ENV
@@ -48,7 +54,7 @@ jobs:
 
       - name: Build with Maven and SonarCloud
         run: >
-          xvfb-run mvn verify $CODE_COVERAGE_ADDITIONAL_OPTIONS $SONARGOAL
+          xvfb-run mvn -a verify $CODE_COVERAGE_ADDITIONAL_OPTIONS $SONARGOAL
           -Dsonar.organization=whocaresleft
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.projectKey=whocaresleft_hospital-scheduler

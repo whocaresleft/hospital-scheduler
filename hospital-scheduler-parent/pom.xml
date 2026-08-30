@@ -66,6 +66,8 @@
               <exclude>**/learning/*.java</exclude>
             </excludes>
             <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+            <argLine>--add-opens java.desktop/java.awt=ALL-UNNAMED</argLine>
+            <argLine>--add-opens java.desktop/sun.util=ALL-UNNAMED</argLine>
           </configuration>
         </plugin>
         
