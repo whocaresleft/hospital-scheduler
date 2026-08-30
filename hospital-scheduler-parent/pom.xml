@@ -11,6 +11,7 @@
   
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
+    <argLine></argLine>
     
     <maven.compiler.version>3.15.0</maven.compiler.version>
     <maven.surefire.version>3.5.6</maven.surefire.version>
@@ -66,7 +67,7 @@
               <exclude>**/learning/*.java</exclude>
             </excludes>
               <argLine>
-                @{argLine}
+                ${argLine}
                 --add-opens java.base/java.util=ALL-UNNAMED
                 --add-opens java.desktop/java.awt=ALL-UNNAMED
               </argLine>
