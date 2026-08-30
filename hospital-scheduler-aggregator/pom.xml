@@ -32,11 +32,11 @@
     </sonar.coverage.exclusions>
     <sonar.organization>whocaresleft</sonar.organization>
     
-    <sonar.issue.ignore.multicriteria>e11,e12</sonar.issue.ignore.multicriteria>
-    <sonar.issue.ignore.multicriteria.e11.ruleKey>java:S117</sonar.issue.ignore.multicriteria.e11.ruleKey>
-    <sonar.issue.ignore.multicriteria.e11.resourceKey>**/SwingDoctorView.java</sonar.issue.ignore.multicriteria.e11.resourceKey>
-    <sonar.issue.ignore.multicriteria.e12.ruleKey>java:S2699</sonar.issue.ignore.multicriteria.e12.ruleKey>
-    <sonar.issue.ignore.multicriteria.e12.resourceKey>**/SwingDoctorView.java</sonar.issue.ignore.multicriteria.e12.resourceKey>
+    <sonar.issue.ignore.multicriteria>e1,e1</sonar.issue.ignore.multicriteria>
+    <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S117</sonar.issue.ignore.multicriteria.e1.ruleKey>
+    <sonar.issue.ignore.multicriteria.e1.resourceKey>**/SwingDoctorView.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
+    <sonar.issue.ignore.multicriteria.e2.ruleKey>java:S2699</sonar.issue.ignore.multicriteria.e2.ruleKey>
+    <sonar.issue.ignore.multicriteria.e2.resourceKey>**/SwingDoctorViewTest.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
   </properties>
 
   <modules>

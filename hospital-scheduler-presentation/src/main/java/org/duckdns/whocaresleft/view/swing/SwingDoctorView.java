@@ -12,11 +12,6 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -364,7 +359,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
-        doctors.stream().forEach(doctorListModel::addElement);
+        doctors.forEach(doctorListModel::addElement);
     }
     
     @Override
