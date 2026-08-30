@@ -344,4 +344,89 @@ class SwingDoctorViewTest {
         
         window.label("infoLabel").requireText("Updating Doctor...");
     }
+    
+    @Test @GUITest
+    void testShowAllDoctorsShouldAddEachDoctorsDescriptionToTheList() {
+        Doctor d1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doctor", "One");
+        Doctor d2 = Doctor.createDoctor(Id.createId("doctor_2"), "Doktor", "Two");
+        
+        GuiActionRunner.execute(() ->
+            view.showAllDoctors(Arrays.asList(d1, d2)));
+        
+        String[] listContents = window.list("doctorList").contents();
+        assertThat(listContents)
+            .containsExactlyInAnyOrder(d1.toString(), d2.toString());
+    }
+    
+    @Test @GUITest
+    void testShowErrorDuplicateDoctorShouldShowMessageInErrorLabel() {
+        Id duplicatedDoctorId = Id.createId("doctor_id");
+        
+        GuiActionRunner.execute(
+            () -> view.showErrorDuplicateDoctor(duplicatedDoctorId));
+        
+        window.label("errorLabel").requireText("A Doctor with id doctor_id already exists");
+    }
+    
+    @Test @GUITest
+    void testShowErrorDoctorNotFoundShouldShowMessageInErrorLabel() {
+        Id doctorNotFoundId = Id.createId("doctor_id");
+        
+        GuiActionRunner.execute(
+            () -> view.showErrorDoctorNotFound(doctorNotFoundId));
+        
+        window.label("errorLabel").requireText("No Doctor with id doctor_id was found");
+    }
+    
+    @Test @GUITest
+    void testDoctorAddedShouldAddTheDoctorToTheListShowInfoMessageAndResetErrorLabel() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor");
+        
+        GuiActionRunner.execute(() -> 
+            view.doctorAdded(Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor")));
+        
+        assertThat(window.list("doctorList").contents())
+            .containsExactly(doctor.toString());
+        window.label("infoLabel").requireText("Doctor added!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testDoctorRemovedShouldRemoveTheDoctorToTheListShowInfoMessageAndResetErrorLabel() {
+        Doctor doctor1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doc", "Tor");
+        Doctor doctor2 = Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter");
+        
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Doctor> dlm = view.getDoctorListModel();
+            dlm.addElement(doctor1);
+            dlm.addElement(doctor2);
+        });
+        
+        GuiActionRunner.execute(() ->
+            view.doctorRemoved(Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter")));
+        
+        assertThat(window.list("doctorList").contents())
+            .containsExactly(doctor1.toString());
+        window.label("infoLabel").requireText("Doctor removed!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testDoctorUpdateShouldUpdateTheDoctorInTheListShowInfoMessageAndResetErrorLabel() {
+        Doctor oldDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "Old", "Doctor");
+        Doctor newDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor");
+        
+        GuiActionRunner.execute(() -> 
+            view.getDoctorListModel().addElement(oldDoctor));
+        
+        GuiActionRunner.execute(() ->
+            view.doctorUpdated(
+                Doctor.createDoctor(Id.createId("doctor_id"), "Old", "Doctor"),
+                Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor")));
+        
+        assertThat(window.list("doctorList").contents())
+            .containsExactly(newDoctor.toString());
+        window.label("infoLabel").requireText("Doctor updated!");
+        window.label("errorLabel").requireText(" ");
+    }
 }

@@ -361,34 +361,43 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     private void showInfoMessage(String message) { infoLabel.setText(message); }
     
+    private void clearErrorLabel() { errorLabel.setText(" "); }
+    
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
-        
+        doctors.stream().forEach(doctorListModel::addElement);
     }
     
     @Override
     public void doctorAdded(Doctor doctor) {
-        
+        doctorListModel.addElement(doctor);
+        infoLabel.setText("Doctor added!");
+        clearErrorLabel();
     }
     
     @Override
     public void doctorRemoved(Doctor doctor) {
-        
+        doctorListModel.removeElement(doctor);
+        infoLabel.setText("Doctor removed!");
+        clearErrorLabel();
     }
     
     @Override
     public void doctorUpdated(Doctor oldDoctor, Doctor newDoctor) {
-        
+        int oldDoctorIndex = doctorListModel.indexOf(oldDoctor);
+        doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
+        infoLabel.setText("Doctor updated!");
+        clearErrorLabel();
     }
     
     @Override
     public void showErrorDuplicateDoctor(Id duplicated) {
-        
+        errorLabel.setText("A Doctor with id " + duplicated.getValue() + " already exists");
     }
     
     @Override
     public void showErrorDoctorNotFound(Id notFound) {
-        
+        errorLabel.setText("No Doctor with id " + notFound.getValue() + " was found");
     }
     
 }
