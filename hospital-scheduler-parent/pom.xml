@@ -64,7 +64,8 @@
           <version>${maven.surefire.version}</version>
           <configuration>
             <excludes>
-              <exclude>**/learning/*.java</exclude>
+              <exclude>**/learning/**</exclude>
+              <exclude>**/*Learning*</exclude>
             </excludes>
               <argLine>
                 ${argLine}
