@@ -381,26 +381,19 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     private void showErrorMessage(String message) { errorLabel.setText(message); }
     private void clearErrorLabel() { showErrorMessage(" "); }
     
-    private void removeDoctorVisually(Id doctorId) {
-        int size = doctorListModel.getSize();
-        for (int i = 0; i < size; i++) {
-            if (doctorListModel.elementAt(i).getId().equals(doctorId)) {
-                doctorListModel.remove(i);
-                return;
-            }
-        }
-    }
+    private void addToList(Doctor toAdd) { doctorListModel.addElement(toAdd); }
+    private void removeFromList(Doctor toRemove) { doctorListModel.removeElement(toRemove); }
     
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
         SwingUtilities.invokeLater(() -> 
-            doctors.forEach(doctorListModel::addElement));
+            doctors.forEach(this::addToList));
     }
     
     @Override
     public void doctorAdded(Doctor doctor) {
         SwingUtilities.invokeLater(() -> {
-            doctorListModel.addElement(doctor);
+            addToList(doctor);
             showInfoMessage("Doctor added!");
             clearErrorLabel();
         });
@@ -409,7 +402,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     @Override
     public void doctorRemoved(Doctor doctor) {
         SwingUtilities.invokeLater(() -> {
-            doctorListModel.removeElement(doctor);
+            removeFromList(doctor);
             showInfoMessage("Doctor removed!");
             clearErrorLabel();
         });
@@ -426,19 +419,20 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     }
     
     @Override
-    public void showErrorDuplicateDoctor(Id duplicated) {
+    public void showErrorDuplicateDoctor(Doctor found) {
         SwingUtilities.invokeLater(() -> {
+            addToList(found);
             clearInfoLabel();
-            showErrorMessage("A Doctor with id " + duplicated.getValue() + " already exists");
+            showErrorMessage("A Doctor with id " + found.getId().getValue() + " already exists");
         });
     }
     
     @Override
-    public void showErrorDoctorNotFound(Id notFound) {
+    public void showErrorDoctorNotFound(Doctor notFound) {
         SwingUtilities.invokeLater(() -> {
-            removeDoctorVisually(notFound);
+            removeFromList(notFound);
             clearInfoLabel();
-            showErrorMessage("No Doctor with id " + notFound.getValue() + " was found");
+            showErrorMessage("No Doctor with id " + notFound.getId().getValue() + " was found");
         });
     }
     

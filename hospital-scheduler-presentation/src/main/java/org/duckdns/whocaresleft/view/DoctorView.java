@@ -2,7 +2,6 @@ package org.duckdns.whocaresleft.view;
 
 import java.util.List;
 
-import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.model.Doctor;
 
 public interface DoctorView {
@@ -12,6 +11,6 @@ public interface DoctorView {
     void doctorRemoved(Doctor doctor);
     void doctorUpdated(Doctor oldDoctor, Doctor newDoctor);
     
-    void showErrorDuplicateDoctor(Id duplicated);
-    void showErrorDoctorNotFound(Id notFound);
+    void showErrorDuplicateDoctor(Doctor found);
+    void showErrorDoctorNotFound(Doctor notFound);
 }

@@ -117,17 +117,18 @@ class SwingDoctorViewMongoIT {
     @Test @GUITest
     void testAddButtonError() {
         transactionManager.doInTransaction(provider -> {
-            provider.getDoctorRepository().save(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+            provider.getDoctorRepository().save(Doctor.createDoctor(Id.createId("doctor_id"), "ORIGINAL", "DOCTOR"));
             return null;
         });
         window.textBox("idTextBox").enterText("doctor_id");
-        window.textBox("firstNameTextBox").enterText("doc");
-        window.textBox("lastNameTextBox").enterText("tor");
+        window.textBox("firstNameTextBox").enterText("DUPLICATED");
+        window.textBox("lastNameTextBox").enterText("ONE");
         
         window.button("addButton").click();
         
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertThat(window.list("doctorList").contents()).isEmpty();
+            assertThat(window.list("doctorList").contents())
+                .containsExactly(Doctor.createDoctor(Id.createId("doctor_id"), "ORIGINAL", "DOCTOR").toString());
             
             window.label("infoLabel").requireText(" ");
             window.label("errorLabel").requireText("A Doctor with id doctor_id already exists");

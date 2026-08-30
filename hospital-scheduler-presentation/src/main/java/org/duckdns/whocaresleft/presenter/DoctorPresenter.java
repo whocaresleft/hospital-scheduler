@@ -44,7 +44,7 @@ public class DoctorPresenter {
             view.doctorAdded(doctor);
         } catch (DuplicateDoctorException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showErrorDuplicateDoctor(doctor.getId());
+            view.showErrorDuplicateDoctor(e.getFoundDoctor());
         }
     }
     
@@ -64,7 +64,7 @@ public class DoctorPresenter {
             view.doctorRemoved(doctor);
         } catch (DoctorNotFoundException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showErrorDoctorNotFound(doctor.getId());
+            view.showErrorDoctorNotFound(doctor);
         }
     }
     
@@ -79,7 +79,7 @@ public class DoctorPresenter {
             view.doctorUpdated(oldDoctor, newDoctor);
         } catch (DoctorNotFoundException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showErrorDoctorNotFound(oldDoctor.getId());
+            view.showErrorDoctorNotFound(oldDoctor);
         }
     }
 }

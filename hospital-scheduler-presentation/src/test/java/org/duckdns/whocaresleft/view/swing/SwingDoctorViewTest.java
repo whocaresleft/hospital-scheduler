@@ -381,18 +381,18 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testShowErrorDuplicateDoctorShouldShowMessageInErrorLabel() {
-        Id duplicatedDoctorId = Id.createId("doctor_id");
+        Doctor duplicatedDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "duplicated", "doctor");
         
-        view.showErrorDuplicateDoctor(duplicatedDoctorId);
+        view.showErrorDuplicateDoctor(duplicatedDoctor);
         
         window.label("errorLabel").requireText("A Doctor with id doctor_id already exists");
     }
     
     @Test @GUITest
     void testShowErrorDoctorNotFoundShouldShowMessageInErrorLabel() {
-        Id doctorNotFoundId = Id.createId("doctor_id");
+        Doctor notFound = Doctor.createDoctor(Id.createId("doctor_id"), "not", "found");
         
-        view.showErrorDoctorNotFound(doctorNotFoundId);
+        view.showErrorDoctorNotFound(notFound);
         
         window.label("errorLabel").requireText("No Doctor with id doctor_id was found");
     }

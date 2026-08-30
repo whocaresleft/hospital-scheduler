@@ -5,7 +5,6 @@ import static org.awaitility.Awaitility.await;
 
 import java.util.concurrent.TimeUnit;
 
-import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.Containers;
