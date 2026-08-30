@@ -63,15 +63,11 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven.surefire.version}</version>
           <configuration>
-            <excludes>
-              <exclude>**/learning/**</exclude>
-              <exclude>**/*Learning*</exclude>
-            </excludes>
-              <argLine>
-                ${argLine}
-                --add-opens java.base/java.util=ALL-UNNAMED
-                --add-opens java.desktop/java.awt=ALL-UNNAMED
-              </argLine>
+            <argLine>
+              ${argLine}
+              --add-opens java.base/java.util=ALL-UNNAMED
+              --add-opens java.desktop/java.awt=ALL-UNNAMED
+            </argLine>
           </configuration>
         </plugin>
         
