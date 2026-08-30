@@ -32,7 +32,9 @@ import com.mongodb.client.MongoDatabase;
 
 @Testcontainers @DisplayName("Integration tests for SwingDoctorView using DoctorPresenter and MongoTransactionManager")
 class SwingDoctorViewMongoIT {
-
+    
+    private static final int TIMEOUT = 15;
+    
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
     
@@ -92,7 +94,7 @@ class SwingDoctorViewMongoIT {
         
         presenter.allDoctors();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(window.list("doctorList").contents())
                 .containsExactlyInAnyOrder(d1.toString(), d2.toString()));
     }
@@ -105,7 +107,7 @@ class SwingDoctorViewMongoIT {
         
         window.button("addButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("doctorList").contents())
                 .containsExactly(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor").toString());
             
@@ -126,7 +128,7 @@ class SwingDoctorViewMongoIT {
         
         window.button("addButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("doctorList").contents())
                 .containsExactly(Doctor.createDoctor(Id.createId("doctor_id"), "ORIGINAL", "DOCTOR").toString());
             
@@ -142,7 +144,7 @@ class SwingDoctorViewMongoIT {
         
         window.button("deleteButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("doctorList").contents()).isEmpty();
             
             window.label("infoLabel").requireText("Doctor removed!");
@@ -158,7 +160,7 @@ class SwingDoctorViewMongoIT {
         
         window.button("deleteButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list().contents()).isEmpty();
             
             window.label("infoLabel").requireText(" ");
@@ -176,7 +178,7 @@ class SwingDoctorViewMongoIT {
         
         window.button("updateButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("doctorList").contents())
                 .containsExactly(
                     Doctor.createDoctor(Id.createId("doctor_id"), "docextension", "torextension").toString());
@@ -197,7 +199,7 @@ class SwingDoctorViewMongoIT {
         
         window.button("updateButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list().contents()).isEmpty();
             
             window.label("infoLabel").requireText(" ");

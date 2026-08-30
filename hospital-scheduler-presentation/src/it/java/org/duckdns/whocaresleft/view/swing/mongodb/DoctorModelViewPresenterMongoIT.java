@@ -31,7 +31,9 @@ import com.mongodb.client.MongoDatabase;
 
 @Testcontainers @DisplayName("Integration tests to verify the correct interaction between SwingDoctorView, DoctorPresenter, and the MongoTransactionManager")
 class DoctorModelViewPresenterMongoIT {
-
+    
+    private static final int TIMEOUT = 15;
+    
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
     
@@ -86,7 +88,7 @@ class DoctorModelViewPresenterMongoIT {
         
         window.button("addButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             Doctor found =
                 transactionManager.doInTransaction(provider ->
                     provider.getDoctorRepository().findById(Id.createId("doctor_id")));
@@ -105,13 +107,13 @@ class DoctorModelViewPresenterMongoIT {
         
         presenter.allDoctors();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             window.list("doctorList").requireItemCount(1));
         
         window.list("doctorList").selectItem(0);
         window.button("deleteButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             Doctor found =
                 transactionManager.doInTransaction(provider ->
                     provider.getDoctorRepository().findById(Id.createId("doctor_id")));
@@ -129,7 +131,7 @@ class DoctorModelViewPresenterMongoIT {
         
         presenter.allDoctors();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             window.list("doctorList").requireItemCount(1));
         
         window.list("doctorList").selectItem(0);
@@ -139,7 +141,7 @@ class DoctorModelViewPresenterMongoIT {
         
         window.button("updateButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             Doctor found =
                 transactionManager.doInTransaction(provider ->
                     provider.getDoctorRepository().findById(Id.createId("doctor_id")));

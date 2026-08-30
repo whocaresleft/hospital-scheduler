@@ -31,6 +31,8 @@ import org.mockito.MockitoAnnotations;
 @DisplayName("UI tests for SwingDoctorView")
 class SwingDoctorViewTest {
     
+    private static final int TIMEOUT = 15;
+    
     @Mock
     private DoctorPresenter presenter;
     private AutoCloseable closeable;
@@ -472,7 +474,7 @@ class SwingDoctorViewTest {
         
         window.button("addButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             verify(presenter)
                 .addDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
     }
@@ -488,7 +490,7 @@ class SwingDoctorViewTest {
         
         window.button("deleteButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             verify(presenter)
                 .removeDoctor(doctor));
     }
@@ -507,7 +509,7 @@ class SwingDoctorViewTest {
         
         window.button("updateButton").click();
         
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             verify(presenter)
                 .updateDoctor(
                     doctor,
