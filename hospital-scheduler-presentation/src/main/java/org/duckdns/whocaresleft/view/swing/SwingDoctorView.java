@@ -248,9 +248,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         infoLabel = new JLabel(" ");
         infoLabel.setName("infoLabel");
         GridBagConstraints gbc_infoLabel = new GridBagConstraints();
-        gbc_infoLabel.gridwidth = 4;
+        gbc_infoLabel.gridwidth = 5;
         gbc_infoLabel.insets = new Insets(0, 0, 5, 0);
-        gbc_infoLabel.gridx = 1;
+        gbc_infoLabel.gridx = 0;
         gbc_infoLabel.gridy = 12;
         add(infoLabel, gbc_infoLabel);
         
@@ -258,9 +258,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         errorLabel.setForeground(new Color(237, 51, 59));
         errorLabel.setName("errorLabel");
         GridBagConstraints gbc_errorLabel = new GridBagConstraints();
-        gbc_errorLabel.gridwidth = 4;
+        gbc_errorLabel.gridwidth = 5;
         gbc_errorLabel.insets = new Insets(0, 0, 5, 0);
-        gbc_errorLabel.gridx = 1;
+        gbc_errorLabel.gridx = 0;
         gbc_errorLabel.gridy = 13;
         add(errorLabel, gbc_errorLabel);
         
@@ -373,13 +373,23 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     public void setPresenter(DoctorPresenter presenter) { this.presenter = presenter; }
     
-    DefaultListModel<Doctor> getDoctorListModel() { return doctorListModel; }
+    public DefaultListModel<Doctor> getDoctorListModel() { return doctorListModel; }
     
     private void showInfoMessage(String message) { infoLabel.setText(message); }
+    private void clearInfoLabel() { showInfoMessage(" "); }
     
     private void showErrorMessage(String message) { errorLabel.setText(message); }
+    private void clearErrorLabel() { showErrorMessage(" "); }
     
-    private void clearErrorLabel() { showErrorMessage(" "); }   
+    private void removeDoctorVisually(Id doctorId) {
+        int size = doctorListModel.getSize();
+        for (int i = 0; i < size; i++) {
+            if (doctorListModel.elementAt(i).getId().equals(doctorId)) {
+                doctorListModel.remove(i);
+                return;
+            }
+        }
+    }
     
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
@@ -417,14 +427,19 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     @Override
     public void showErrorDuplicateDoctor(Id duplicated) {
-        SwingUtilities.invokeLater(() ->
-            showErrorMessage("A Doctor with id " + duplicated.getValue() + " already exists"));
+        SwingUtilities.invokeLater(() -> {
+            clearInfoLabel();
+            showErrorMessage("A Doctor with id " + duplicated.getValue() + " already exists");
+        });
     }
     
     @Override
     public void showErrorDoctorNotFound(Id notFound) {
-        SwingUtilities.invokeLater(() ->
-            showErrorMessage("No Doctor with id " + notFound.getValue() + " was found"));
+        SwingUtilities.invokeLater(() -> {
+            removeDoctorVisually(notFound);
+            clearInfoLabel();
+            showErrorMessage("No Doctor with id " + notFound.getValue() + " was found");
+        });
     }
     
 }
