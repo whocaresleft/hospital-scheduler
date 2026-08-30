@@ -54,7 +54,7 @@ jobs:
 
       - name: Build with Maven and SonarCloud
         run: >
-          xvfb-run mvn -a verify $CODE_COVERAGE_ADDITIONAL_OPTIONS $SONARGOAL
+          xvfb-run -a mvn verify $CODE_COVERAGE_ADDITIONAL_OPTIONS $SONARGOAL
           -Dsonar.organization=whocaresleft
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.projectKey=whocaresleft_hospital-scheduler
