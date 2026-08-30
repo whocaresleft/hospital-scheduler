@@ -1,6 +1,8 @@
 package org.duckdns.whocaresleft.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.Arrays;
 
@@ -347,6 +349,23 @@ class SwingDoctorViewTest {
     }
     
     @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenItShouldKeepUpdatedInfoInSelectedTextBoxesAndDoctorSelectedInTheList() {
+        GuiActionRunner.execute(() -> 
+            view.getDoctorListModel()
+                .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
+        window.list("doctorList").selectItem(0);
+        window.checkBox("editDoctor").click();
+        window.textBox("selectedFirstNameTextBox").enterText("extension");
+        
+        window.button("updateButton").click();
+        
+        window.list("doctorList").requireSelection(0);
+        window.textBox("selectedIdTextBox").requireText("doctor_id");
+        window.textBox("selectedFirstNameTextBox").requireText("docextension");
+        window.textBox("selectedLastNameTextBox").requireText("tor");
+    }
+    
+    @Test @GUITest
     void testShowAllDoctorsShouldAddEachDoctorsDescriptionToTheList() {
         Doctor d1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doctor", "One");
         Doctor d2 = Doctor.createDoctor(Id.createId("doctor_2"), "Doktor", "Two");
@@ -447,5 +466,64 @@ class SwingDoctorViewTest {
         
         window.checkBox("editDoctor").requireEnabled().requireNotSelected();
         window.button("deleteButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenItShouldDelegateToPresenterAddDoctor() {
+        window.textBox("idTextBox").enterText("doctor_id");
+        window.textBox("firstNameTextBox").enterText("doc");
+        window.textBox("lastNameTextBox").enterText("tor");
+        
+        window.button("addButton").click();
+        
+        verify(presenter)
+            .addDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedThenItShouldDelegateToPresenterRemoveDoctor() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> {
+            view.getDoctorListModel()
+                .addElement(doctor);
+        });
+        window.list("doctorList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        verify(presenter)
+            .removeDoctor(doctor);
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenItShouldDelegateToPresenterUpdateDoctor() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> {
+            view.getDoctorListModel()
+                .addElement(doctor);
+        });
+        window.list("doctorList").selectItem(0);
+        window.checkBox("editDoctor").click();
+        window.textBox("selectedFirstNameTextBox").enterText(" exte");
+        window.textBox("selectedLastNameTextBox").enterText(" nsion");
+        
+        window.button("updateButton").click();
+        
+        verify(presenter)
+            .updateDoctor(
+                doctor,
+                Doctor.createDoctor(Id.createId("doctor_1"), "doc exte", "tor nsion"));
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedAndIdCreationFailsThenItDoesNotDelegateToPresenterAndAnErrorMessageIsShown() {
+        window.textBox("idTextBox").enterText("invalid-id");
+        window.textBox("firstNameTextBox").enterText("doc");
+        window.textBox("lastNameTextBox").enterText("tor");
+        
+        window.button("addButton").click();
+        
+        window.label("errorLabel").requireText("Id contains invalid value: Letters, digits, and underscores only");
+        verifyNoInteractions(presenter);
     }
 }

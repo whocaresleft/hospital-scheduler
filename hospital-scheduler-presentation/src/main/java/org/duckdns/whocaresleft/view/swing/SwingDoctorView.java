@@ -277,11 +277,20 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         lastNameTextBox.addKeyListener(addButtonEnabler);
         
         addButton.addActionListener(e -> {
-            idTextBox.setText("");
-            firstNameTextBox.setText("");
-            lastNameTextBox.setText("");
-            addButton.setEnabled(false);
-            showInfoMessage("Adding Doctor...");
+            try {
+                presenter.addDoctor(Doctor.createDoctor(
+                    Id.createId(idTextBox.getText()),
+                    firstNameTextBox.getText(),
+                    lastNameTextBox.getText()));
+                
+                idTextBox.setText("");
+                firstNameTextBox.setText("");
+                lastNameTextBox.setText("");
+                addButton.setEnabled(false);
+                showInfoMessage("Adding Doctor...");
+            } catch (IllegalArgumentException iae) {
+                showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
+            }
         });
         
         doctorList.addListSelectionListener(e -> {
@@ -304,6 +313,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         });
         
         deleteButton.addActionListener(e -> {
+            Doctor d = doctorList.getSelectedValue();
+            presenter.removeDoctor(d);
+            
             doctorList.clearSelection();
             
             selectedIdTextBox.setText("");
@@ -342,7 +354,12 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         selectedLastNameTextBox.addKeyListener(updateButtonEnabler);
         
         updateButton.addActionListener(e -> {
-            doctorList.clearSelection();
+            Doctor current = doctorList.getSelectedValue();
+            Doctor updated = Doctor.createDoctor(
+                current.getId(),
+                selectedFirstNameTextBox.getText(),
+                selectedLastNameTextBox.getText());
+            presenter.updateDoctor(current, updated);
             
             editDoctor.setEnabled(false);
             showInfoMessage("Updating Doctor...");
@@ -355,7 +372,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     private void showInfoMessage(String message) { infoLabel.setText(message); }
     
-    private void clearErrorLabel() { errorLabel.setText(" "); }
+    private void showErrorMessage(String message) { errorLabel.setText(message); }
+    
+    private void clearErrorLabel() { showErrorMessage(" "); }
     
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
@@ -365,14 +384,14 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     @Override
     public void doctorAdded(Doctor doctor) {
         doctorListModel.addElement(doctor);
-        infoLabel.setText("Doctor added!");
+        showInfoMessage("Doctor added!");
         clearErrorLabel();
     }
     
     @Override
     public void doctorRemoved(Doctor doctor) {
         doctorListModel.removeElement(doctor);
-        infoLabel.setText("Doctor removed!");
+        showInfoMessage("Doctor removed!");
         clearErrorLabel();
     }
     
@@ -380,18 +399,18 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     public void doctorUpdated(Doctor oldDoctor, Doctor newDoctor) {
         int oldDoctorIndex = doctorListModel.indexOf(oldDoctor);
         doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
-        infoLabel.setText("Doctor updated!");
+        showInfoMessage("Doctor updated!");
         clearErrorLabel();
     }
     
     @Override
     public void showErrorDuplicateDoctor(Id duplicated) {
-        errorLabel.setText("A Doctor with id " + duplicated.getValue() + " already exists");
+        showErrorMessage("A Doctor with id " + duplicated.getValue() + " already exists");
     }
     
     @Override
     public void showErrorDoctorNotFound(Id notFound) {
-        errorLabel.setText("No Doctor with id " + notFound.getValue() + " was found");
+        showErrorMessage("No Doctor with id " + notFound.getValue() + " was found");
     }
     
 }
