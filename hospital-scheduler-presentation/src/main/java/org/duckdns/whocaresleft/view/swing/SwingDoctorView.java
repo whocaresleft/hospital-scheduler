@@ -12,6 +12,8 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -246,9 +248,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         infoLabel = new JLabel(" ");
         infoLabel.setName("infoLabel");
         GridBagConstraints gbc_infoLabel = new GridBagConstraints();
-        gbc_infoLabel.gridwidth = 4;
+        gbc_infoLabel.gridwidth = 5;
         gbc_infoLabel.insets = new Insets(0, 0, 5, 0);
-        gbc_infoLabel.gridx = 1;
+        gbc_infoLabel.gridx = 0;
         gbc_infoLabel.gridy = 12;
         add(infoLabel, gbc_infoLabel);
         
@@ -256,9 +258,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         errorLabel.setForeground(new Color(237, 51, 59));
         errorLabel.setName("errorLabel");
         GridBagConstraints gbc_errorLabel = new GridBagConstraints();
-        gbc_errorLabel.gridwidth = 4;
+        gbc_errorLabel.gridwidth = 5;
         gbc_errorLabel.insets = new Insets(0, 0, 5, 0);
-        gbc_errorLabel.gridx = 1;
+        gbc_errorLabel.gridx = 0;
         gbc_errorLabel.gridy = 13;
         add(errorLabel, gbc_errorLabel);
         
@@ -277,11 +279,21 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         lastNameTextBox.addKeyListener(addButtonEnabler);
         
         addButton.addActionListener(e -> {
-            idTextBox.setText("");
-            firstNameTextBox.setText("");
-            lastNameTextBox.setText("");
-            addButton.setEnabled(false);
-            showInfoMessage("Adding Doctor...");
+            try {
+                Doctor doctor = Doctor.createDoctor(
+                    Id.createId(idTextBox.getText()),
+                    firstNameTextBox.getText(), lastNameTextBox.getText());
+                
+                new Thread(() -> presenter.addDoctor(doctor)).start();
+                
+                idTextBox.setText("");
+                firstNameTextBox.setText("");
+                lastNameTextBox.setText("");
+                addButton.setEnabled(false);
+                showInfoMessage("Adding Doctor...");
+            } catch (IllegalArgumentException iae) {
+                showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
+            }
         });
         
         doctorList.addListSelectionListener(e -> {
@@ -304,6 +316,10 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         });
         
         deleteButton.addActionListener(e -> {
+            Doctor d = doctorList.getSelectedValue();
+            
+            new Thread(() -> presenter.removeDoctor(d)).start();
+            
             doctorList.clearSelection();
             
             selectedIdTextBox.setText("");
@@ -342,7 +358,13 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         selectedLastNameTextBox.addKeyListener(updateButtonEnabler);
         
         updateButton.addActionListener(e -> {
-            doctorList.clearSelection();
+            Doctor current = doctorList.getSelectedValue();
+            Doctor updated = Doctor.createDoctor(
+                current.getId(),
+                selectedFirstNameTextBox.getText(),
+                selectedLastNameTextBox.getText());
+            
+            new Thread(() -> presenter.updateDoctor(current, updated)).start();
             
             editDoctor.setEnabled(false);
             showInfoMessage("Updating Doctor...");
@@ -351,47 +373,67 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     public void setPresenter(DoctorPresenter presenter) { this.presenter = presenter; }
     
-    DefaultListModel<Doctor> getDoctorListModel() { return doctorListModel; }
+    public DefaultListModel<Doctor> getDoctorListModel() { return doctorListModel; }
     
     private void showInfoMessage(String message) { infoLabel.setText(message); }
+    private void clearInfoLabel() { showInfoMessage(" "); }
     
-    private void clearErrorLabel() { errorLabel.setText(" "); }
+    private void showErrorMessage(String message) { errorLabel.setText(message); }
+    private void clearErrorLabel() { showErrorMessage(" "); }
+    
+    private void addToList(Doctor toAdd) { doctorListModel.addElement(toAdd); }
+    private void removeFromList(Doctor toRemove) { doctorListModel.removeElement(toRemove); }
     
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
-        doctors.forEach(doctorListModel::addElement);
+        SwingUtilities.invokeLater(() -> 
+            doctors.forEach(this::addToList));
     }
     
     @Override
     public void doctorAdded(Doctor doctor) {
-        doctorListModel.addElement(doctor);
-        infoLabel.setText("Doctor added!");
-        clearErrorLabel();
+        SwingUtilities.invokeLater(() -> {
+            addToList(doctor);
+            showInfoMessage("Doctor added!");
+            clearErrorLabel();
+        });
     }
     
     @Override
     public void doctorRemoved(Doctor doctor) {
-        doctorListModel.removeElement(doctor);
-        infoLabel.setText("Doctor removed!");
-        clearErrorLabel();
+        SwingUtilities.invokeLater(() -> {
+            removeFromList(doctor);
+            showInfoMessage("Doctor removed!");
+            clearErrorLabel();
+        });
     }
     
     @Override
     public void doctorUpdated(Doctor oldDoctor, Doctor newDoctor) {
-        int oldDoctorIndex = doctorListModel.indexOf(oldDoctor);
-        doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
-        infoLabel.setText("Doctor updated!");
-        clearErrorLabel();
+        SwingUtilities.invokeLater(() -> {
+            int oldDoctorIndex = doctorListModel.indexOf(oldDoctor);
+            doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
+            showInfoMessage("Doctor updated!");
+            clearErrorLabel();
+        });
     }
     
     @Override
-    public void showErrorDuplicateDoctor(Id duplicated) {
-        errorLabel.setText("A Doctor with id " + duplicated.getValue() + " already exists");
+    public void showErrorDuplicateDoctor(Doctor found) {
+        SwingUtilities.invokeLater(() -> {
+            addToList(found);
+            clearInfoLabel();
+            showErrorMessage("A Doctor with id " + found.getId().getValue() + " already exists");
+        });
     }
     
     @Override
-    public void showErrorDoctorNotFound(Id notFound) {
-        errorLabel.setText("No Doctor with id " + notFound.getValue() + " was found");
+    public void showErrorDoctorNotFound(Doctor notFound) {
+        SwingUtilities.invokeLater(() -> {
+            removeFromList(notFound);
+            clearInfoLabel();
+            showErrorMessage("No Doctor with id " + notFound.getId().getValue() + " was found");
+        });
     }
     
 }

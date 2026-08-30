@@ -37,8 +37,9 @@ public class MariaDoctorRepository implements DoctorRepository {
 
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
-        if (findById(doctor.getId()) != null) {
-            throw new DuplicateDoctorException(doctor);
+        Doctor found = findById(doctor.getId());
+        if (found != null) {
+            throw new DuplicateDoctorException(found);
         }
         entityManager.persist(DoctorEntity.fromDoctor(doctor));
     }

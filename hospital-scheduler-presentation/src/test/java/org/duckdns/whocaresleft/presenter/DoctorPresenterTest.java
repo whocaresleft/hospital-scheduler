@@ -116,7 +116,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).save(existingDoctor);
         inOrder.verify(doctorView)
-            .showErrorDuplicateDoctor(existingDoctor.getId());
+            .showErrorDuplicateDoctor(existingDoctor);
     }
     
     @Test
@@ -145,7 +145,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).delete(nonExistingDoctorId);
         inOrder.verify(doctorView)
-            .showErrorDoctorNotFound(nonExistingDoctorId);
+            .showErrorDoctorNotFound(nonExistingDoctor);
     }
     
     @Test
@@ -176,7 +176,7 @@ class DoctorPresenterTest {
         InOrder inOrder = inOrder(doctorRepository, doctorView);
         inOrder.verify(doctorRepository).update(nonExistingDoctorId, newDoctor);
         inOrder.verify(doctorView)
-            .showErrorDoctorNotFound(nonExistingDoctorId);
+            .showErrorDoctorNotFound(nonExistingOldDoctor);
     }
     
     @Test

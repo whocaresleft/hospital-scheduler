@@ -24,7 +24,7 @@ public class DoctorPresenter {
         this.view = view;
     }
     
-    public void allDoctors() {
+    public synchronized void allDoctors() {
         List<Doctor> doctors = transactionManager.doInTransaction(repositoryProvider -> {
             DoctorRepository repository = repositoryProvider.getDoctorRepository();
             return repository.findAll();
@@ -33,7 +33,7 @@ public class DoctorPresenter {
         view.showAllDoctors(doctors);
     }
     
-    public void addDoctor(Doctor doctor) {
+    public synchronized void addDoctor(Doctor doctor) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DoctorRepository repository = repositoryProvider.getDoctorRepository();
@@ -44,11 +44,11 @@ public class DoctorPresenter {
             view.doctorAdded(doctor);
         } catch (DuplicateDoctorException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showErrorDuplicateDoctor(doctor.getId());
+            view.showErrorDuplicateDoctor(e.getFoundDoctor());
         }
     }
     
-    public void removeDoctor(Doctor doctor) {
+    public synchronized void removeDoctor(Doctor doctor) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DoctorRepository doctorRepository = repositoryProvider.getDoctorRepository();
@@ -64,11 +64,11 @@ public class DoctorPresenter {
             view.doctorRemoved(doctor);
         } catch (DoctorNotFoundException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showErrorDoctorNotFound(doctor.getId());
+            view.showErrorDoctorNotFound(doctor);
         }
     }
     
-    public void updateDoctor(Doctor oldDoctor, Doctor newDoctor) {
+    public synchronized void updateDoctor(Doctor oldDoctor, Doctor newDoctor) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DoctorRepository repository = repositoryProvider.getDoctorRepository();
@@ -79,7 +79,7 @@ public class DoctorPresenter {
             view.doctorUpdated(oldDoctor, newDoctor);
         } catch (DoctorNotFoundException e) {
             LOGGER.warn("{}", e.getMessage());
-            view.showErrorDoctorNotFound(oldDoctor.getId());
+            view.showErrorDoctorNotFound(oldDoctor);
         }
     }
 }

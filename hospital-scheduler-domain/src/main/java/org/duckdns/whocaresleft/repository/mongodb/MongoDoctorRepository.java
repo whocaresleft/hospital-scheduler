@@ -10,7 +10,6 @@ import org.duckdns.whocaresleft.exception.DuplicateDoctorException;
 import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 
-import com.mongodb.MongoWriteException;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -44,11 +43,11 @@ public class MongoDoctorRepository implements DoctorRepository {
     
     @Override
     public void save(Doctor doctor) throws DuplicateDoctorException {
-        try {
-            doctorCollection.insertOne(session, toDocument(doctor));
-        } catch (MongoWriteException e) {
-            throw new DuplicateDoctorException(doctor);
+        Doctor found = findById(doctor.getId());
+        if (found != null) {
+            throw new DuplicateDoctorException(found);
         }
+        doctorCollection.insertOne(session, toDocument(doctor));
     }
     
     @Override

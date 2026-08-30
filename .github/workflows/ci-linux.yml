@@ -52,12 +52,18 @@ jobs:
           echo "SONARGOAL=org.sonarsource.scanner.maven:sonar-maven-plugin:sonar" >> $GITHUB_ENV
         if: ${{ env.SONAR_TOKEN != '' && matrix.java == 17 }}
 
+      - name: Install Xvfb and OpenBox
+        run: |
+          sudo apt-get update && sudo apt-get install -y openbox xvfb
+
       - name: Build with Maven and SonarCloud
-        run: >
-          xvfb-run -a mvn verify $CODE_COVERAGE_ADDITIONAL_OPTIONS $SONARGOAL
-          -Dsonar.organization=whocaresleft
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.projectKey=whocaresleft_hospital-scheduler
+        run: |
+          xvfb-run -a -s "-screen 0 1920x1080x24" bash -c "
+          openbox &
+          mvn verify $CODE_COVERAGE_ADDITIONAL_OPTIONS $SONARGOAL \
+          -Dsonar.organization=whocaresleft \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.projectKey=whocaresleft_hospital-scheduler"
         working-directory: ${{ env.workdir }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
