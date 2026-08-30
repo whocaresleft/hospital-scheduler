@@ -291,16 +291,20 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             @Override
             public void valueChanged(ListSelectionEvent arg) {
                 boolean isDoctorSelected = !doctorList.isSelectionEmpty();
-
-                editDoctor.setEnabled(isDoctorSelected);
-                deleteButton.setEnabled(isDoctorSelected && !editDoctor.isSelected());
                 
                 if (isDoctorSelected) {
+                    deleteButton.setEnabled(true);
+                    editDoctor.setEnabled(true);
+                    editDoctor.setSelected(false);
+                    
                     Doctor d = doctorList.getSelectedValue();
                     
                     selectedIdTextBox.setText(d.getId().getValue());
                     selectedFirstNameTextBox.setText(d.getFirstName());
                     selectedLastNameTextBox.setText(d.getLastName());
+                } else {
+                    deleteButton.setEnabled(false);
+                    editDoctor.setEnabled(false);
                 }
             }
         });

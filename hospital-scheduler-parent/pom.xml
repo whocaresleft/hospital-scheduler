@@ -65,9 +65,11 @@
             <excludes>
               <exclude>**/learning/*.java</exclude>
             </excludes>
-            <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
-            <argLine>--add-opens java.desktop/java.awt=ALL-UNNAMED</argLine>
-            <argLine>--add-opens java.desktop/sun.util=ALL-UNNAMED</argLine>
+              <argLine>
+                @{argLine}
+                --add-opens java.base/java.util=ALL-UNNAMED
+                --add-opens java.desktop/java.awt=ALL-UNNAMED
+              </argLine>
           </configuration>
         </plugin>
         
@@ -166,6 +168,14 @@
             </execution>
             
             <execution>
+              <id>jacoco-ut-report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+            
+            <execution>
               <id>jacoco-ut-check</id>
               <phase>test</phase>
               <goals>
@@ -198,9 +208,36 @@
               <goals>
                 <goal>prepare-agent-integration</goal>
               </goals>
+            </execution>
+            
+            <execution>
+              <id>merge-ut-it</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>merge</goal>
+              </goals>
               <configuration>
-                <destFile>${project.build.directory}/jacoco.exec</destFile>
-                <append>true</append>
+                <fileSets>
+                  <fileSet>
+                    <directory>${project.build.directory}</directory>
+                    <includes>
+                      <include>jacoco.exec</include>
+                      <include>jacoco-it.exec</include>
+                    </includes>
+                  </fileSet>
+                </fileSets>
+                <destFile>${project.build.directory}/jacoco-merged.exec</destFile>
+              </configuration>
+            </execution>
+            
+            <execution>
+              <id>jacoco-report</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <dataFile>${project.build.directory}/jacoco-merged.exec</dataFile>
               </configuration>
             </execution>
             
@@ -211,6 +248,7 @@
                 <goal>check</goal>
               </goals>
               <configuration>
+                <dataFile>${project.build.directory}/jacoco-merged.exec</dataFile>
                 <rules>
                   <rule>
                     <element>PACKAGE</element>
@@ -224,14 +262,6 @@
                   </rule>
                 </rules>
               </configuration>
-            </execution>
-            
-            <execution>
-              <id>jacoco-report</id>
-              <phase>verify</phase>
-              <goals>
-                <goal>report</goal>
-              </goals>
             </execution>
           </executions>
         </plugin>

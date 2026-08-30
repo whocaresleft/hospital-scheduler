@@ -238,21 +238,26 @@ class SwingDoctorViewTest {
         
         window.textBox("selectedFirstNameTextBox").setText("");
         window.textBox("selectedLastNameTextBox").setText("");
-        
         window.textBox("selectedFirstNameTextBox").enterText("Another");
         window.textBox("selectedLastNameTextBox").enterText(" ");
         window.button("updateButton").requireDisabled();
         
         window.textBox("selectedFirstNameTextBox").setText("");
         window.textBox("selectedLastNameTextBox").setText("");
-        
         window.textBox("selectedFirstNameTextBox").enterText(" ");
         window.textBox("selectedLastNameTextBox").enterText("Name");
         window.button("updateButton").requireDisabled();
         
-        window.textBox("selectedFirstNameTextBox").setText("doc");
-        window.textBox("selectedLastNameTextBox").setText("tor");
+        window.textBox("selectedFirstNameTextBox").setText("");
+        window.textBox("selectedLastNameTextBox").setText("");
+        window.textBox("selectedFirstNameTextBox").enterText("DOCK");
+        window.textBox("selectedLastNameTextBox").enterText("tor");
+        window.button("updateButton").requireEnabled();
         
+        window.textBox("selectedFirstNameTextBox").setText("");
+        window.textBox("selectedLastNameTextBox").setText("");
+        window.textBox("selectedFirstNameTextBox").enterText("doc");
+        window.textBox("selectedLastNameTextBox").enterText("tor");
         window.button("updateButton").requireDisabled();
     }
     
@@ -428,5 +433,23 @@ class SwingDoctorViewTest {
             .containsExactly(newDoctor.toString());
         window.label("infoLabel").requireText("Doctor updated!");
         window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testWhenDoctorIsSelectedAndEditIsTickedThenChangingSelectionShouldRemoveTheTickAndReenableDeleteButton() {
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Doctor> listModel = view.getDoctorListModel();
+            listModel.addElement(Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"));
+            listModel.addElement(Doctor.createDoctor(Id.createId("doctor_2"), "dok", "ter"));
+        });
+        window.list("doctorList").selectItem(0);
+        
+        window.checkBox("editDoctor").click();
+        window.button("deleteButton").requireDisabled();
+
+        window.list("doctorList").selectItem(1);
+        
+        window.checkBox("editDoctor").requireEnabled().requireNotSelected();
+        window.button("deleteButton").requireEnabled();
     }
 }
