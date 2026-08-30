@@ -54,7 +54,7 @@ jobs:
 
       - name: Install Xvfb and OpenBox
         run: |
-          sudo apt-get update && sudo apt-get install -y openbox xvbf
+          sudo apt-get update && sudo apt-get install -y openbox xvfb
 
       - name: Build with Maven and SonarCloud
         run: |
