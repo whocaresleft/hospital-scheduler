@@ -45,7 +45,7 @@ jobs:
         run: |
           docker pull mariadb:10.3.39
           docker pull mongo:5.10.0
-        docker pull testcontainers/ryuk:0.12.0
+          docker pull testcontainers/ryuk:0.12.0
 
       - name: Setup sonarcloud eventual goal
         run: |
