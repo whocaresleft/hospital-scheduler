@@ -5,9 +5,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultListModel;
 
+import static org.awaitility.Awaitility.await;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.edt.GuiActionRunner;
@@ -370,8 +372,7 @@ class SwingDoctorViewTest {
         Doctor d1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doctor", "One");
         Doctor d2 = Doctor.createDoctor(Id.createId("doctor_2"), "Doktor", "Two");
         
-        GuiActionRunner.execute(() ->
-            view.showAllDoctors(Arrays.asList(d1, d2)));
+        view.showAllDoctors(Arrays.asList(d1, d2));
         
         String[] listContents = window.list("doctorList").contents();
         assertThat(listContents)
@@ -382,8 +383,7 @@ class SwingDoctorViewTest {
     void testShowErrorDuplicateDoctorShouldShowMessageInErrorLabel() {
         Id duplicatedDoctorId = Id.createId("doctor_id");
         
-        GuiActionRunner.execute(
-            () -> view.showErrorDuplicateDoctor(duplicatedDoctorId));
+        view.showErrorDuplicateDoctor(duplicatedDoctorId);
         
         window.label("errorLabel").requireText("A Doctor with id doctor_id already exists");
     }
@@ -392,8 +392,7 @@ class SwingDoctorViewTest {
     void testShowErrorDoctorNotFoundShouldShowMessageInErrorLabel() {
         Id doctorNotFoundId = Id.createId("doctor_id");
         
-        GuiActionRunner.execute(
-            () -> view.showErrorDoctorNotFound(doctorNotFoundId));
+        view.showErrorDoctorNotFound(doctorNotFoundId);
         
         window.label("errorLabel").requireText("No Doctor with id doctor_id was found");
     }
@@ -402,8 +401,7 @@ class SwingDoctorViewTest {
     void testDoctorAddedShouldAddTheDoctorToTheListShowInfoMessageAndResetErrorLabel() {
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor");
         
-        GuiActionRunner.execute(() -> 
-            view.doctorAdded(Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor")));
+        view.doctorAdded(Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor"));
         
         assertThat(window.list("doctorList").contents())
             .containsExactly(doctor.toString());
@@ -422,8 +420,7 @@ class SwingDoctorViewTest {
             dlm.addElement(doctor2);
         });
         
-        GuiActionRunner.execute(() ->
-            view.doctorRemoved(Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter")));
+        view.doctorRemoved(Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter"));
         
         assertThat(window.list("doctorList").contents())
             .containsExactly(doctor1.toString());
@@ -439,10 +436,9 @@ class SwingDoctorViewTest {
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel().addElement(oldDoctor));
         
-        GuiActionRunner.execute(() ->
-            view.doctorUpdated(
+        view.doctorUpdated(
                 Doctor.createDoctor(Id.createId("doctor_id"), "Old", "Doctor"),
-                Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor")));
+                Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor"));
         
         assertThat(window.list("doctorList").contents())
             .containsExactly(newDoctor.toString());
@@ -476,8 +472,9 @@ class SwingDoctorViewTest {
         
         window.button("addButton").click();
         
-        verify(presenter)
-            .addDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .addDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
     }
     
     @Test @GUITest
@@ -491,8 +488,9 @@ class SwingDoctorViewTest {
         
         window.button("deleteButton").click();
         
-        verify(presenter)
-            .removeDoctor(doctor);
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .removeDoctor(doctor));
     }
     
     @Test @GUITest
@@ -509,10 +507,11 @@ class SwingDoctorViewTest {
         
         window.button("updateButton").click();
         
-        verify(presenter)
-            .updateDoctor(
-                doctor,
-                Doctor.createDoctor(Id.createId("doctor_1"), "doc exte", "tor nsion"));
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .updateDoctor(
+                    doctor,
+                    Doctor.createDoctor(Id.createId("doctor_1"), "doc exte", "tor nsion")));
     }
     
     @Test @GUITest

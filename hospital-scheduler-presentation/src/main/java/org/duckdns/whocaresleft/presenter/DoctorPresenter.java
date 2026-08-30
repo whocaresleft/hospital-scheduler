@@ -24,7 +24,7 @@ public class DoctorPresenter {
         this.view = view;
     }
     
-    public void allDoctors() {
+    public synchronized void allDoctors() {
         List<Doctor> doctors = transactionManager.doInTransaction(repositoryProvider -> {
             DoctorRepository repository = repositoryProvider.getDoctorRepository();
             return repository.findAll();
@@ -33,7 +33,7 @@ public class DoctorPresenter {
         view.showAllDoctors(doctors);
     }
     
-    public void addDoctor(Doctor doctor) {
+    public synchronized void addDoctor(Doctor doctor) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DoctorRepository repository = repositoryProvider.getDoctorRepository();
@@ -48,7 +48,7 @@ public class DoctorPresenter {
         }
     }
     
-    public void removeDoctor(Doctor doctor) {
+    public synchronized void removeDoctor(Doctor doctor) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DoctorRepository doctorRepository = repositoryProvider.getDoctorRepository();
@@ -68,7 +68,7 @@ public class DoctorPresenter {
         }
     }
     
-    public void updateDoctor(Doctor oldDoctor, Doctor newDoctor) {
+    public synchronized void updateDoctor(Doctor oldDoctor, Doctor newDoctor) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DoctorRepository repository = repositoryProvider.getDoctorRepository();

@@ -12,6 +12,8 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -278,10 +280,11 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         
         addButton.addActionListener(e -> {
             try {
-                presenter.addDoctor(Doctor.createDoctor(
+                Doctor doctor = Doctor.createDoctor(
                     Id.createId(idTextBox.getText()),
-                    firstNameTextBox.getText(),
-                    lastNameTextBox.getText()));
+                    firstNameTextBox.getText(), lastNameTextBox.getText());
+                
+                new Thread(() -> presenter.addDoctor(doctor)).start();
                 
                 idTextBox.setText("");
                 firstNameTextBox.setText("");
@@ -314,7 +317,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         
         deleteButton.addActionListener(e -> {
             Doctor d = doctorList.getSelectedValue();
-            presenter.removeDoctor(d);
+            
+            new Thread(() -> presenter.removeDoctor(d)).start();
             
             doctorList.clearSelection();
             
@@ -359,7 +363,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
                 current.getId(),
                 selectedFirstNameTextBox.getText(),
                 selectedLastNameTextBox.getText());
-            presenter.updateDoctor(current, updated);
+            
+            new Thread(() -> presenter.updateDoctor(current, updated)).start();
             
             editDoctor.setEnabled(false);
             showInfoMessage("Updating Doctor...");
@@ -374,43 +379,52 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     
     private void showErrorMessage(String message) { errorLabel.setText(message); }
     
-    private void clearErrorLabel() { showErrorMessage(" "); }
+    private void clearErrorLabel() { showErrorMessage(" "); }   
     
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
-        doctors.forEach(doctorListModel::addElement);
+        SwingUtilities.invokeLater(() -> 
+            doctors.forEach(doctorListModel::addElement));
     }
     
     @Override
     public void doctorAdded(Doctor doctor) {
-        doctorListModel.addElement(doctor);
-        showInfoMessage("Doctor added!");
-        clearErrorLabel();
+        SwingUtilities.invokeLater(() -> {
+            doctorListModel.addElement(doctor);
+            showInfoMessage("Doctor added!");
+            clearErrorLabel();
+        });
     }
     
     @Override
     public void doctorRemoved(Doctor doctor) {
-        doctorListModel.removeElement(doctor);
-        showInfoMessage("Doctor removed!");
-        clearErrorLabel();
+        SwingUtilities.invokeLater(() -> {
+            doctorListModel.removeElement(doctor);
+            showInfoMessage("Doctor removed!");
+            clearErrorLabel();
+        });
     }
     
     @Override
     public void doctorUpdated(Doctor oldDoctor, Doctor newDoctor) {
-        int oldDoctorIndex = doctorListModel.indexOf(oldDoctor);
-        doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
-        showInfoMessage("Doctor updated!");
-        clearErrorLabel();
+        SwingUtilities.invokeLater(() -> {
+            int oldDoctorIndex = doctorListModel.indexOf(oldDoctor);
+            doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
+            showInfoMessage("Doctor updated!");
+            clearErrorLabel();
+        });
     }
     
     @Override
     public void showErrorDuplicateDoctor(Id duplicated) {
-        showErrorMessage("A Doctor with id " + duplicated.getValue() + " already exists");
+        SwingUtilities.invokeLater(() ->
+            showErrorMessage("A Doctor with id " + duplicated.getValue() + " already exists"));
     }
     
     @Override
     public void showErrorDoctorNotFound(Id notFound) {
-        showErrorMessage("No Doctor with id " + notFound.getValue() + " was found");
+        SwingUtilities.invokeLater(() ->
+            showErrorMessage("No Doctor with id " + notFound.getValue() + " was found"));
     }
     
 }
