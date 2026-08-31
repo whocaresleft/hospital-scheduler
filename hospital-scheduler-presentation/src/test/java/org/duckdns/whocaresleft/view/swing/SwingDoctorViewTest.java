@@ -73,7 +73,7 @@ class SwingDoctorViewTest {
         window.textBox("lastNameTextBox").requireEnabled().requireNotEditable();
         window.button("addButton");
         
-        window.list("doctorList");
+        window.list("doctorList").requireDisabled();
         
         window.label("selectedDoctorLabel");
         window.checkBox("editDoctor").requireDisabled();

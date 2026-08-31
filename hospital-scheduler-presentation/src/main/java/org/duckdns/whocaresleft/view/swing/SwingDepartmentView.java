@@ -62,6 +62,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         add(idLabel, gbc_idLabel);
         
         idTextBox = new JTextField();
+        idTextBox.setEditable(false);
         idTextBox.setName("idTextBox");
         GridBagConstraints gbc_idTextBox = new GridBagConstraints();
         gbc_idTextBox.gridwidth = 3;
@@ -82,6 +83,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         add(nameLabel, gbc_nameLabel);
         
         nameTextBox = new JTextField();
+        nameTextBox.setEditable(false);
         nameTextBox.setName("nameTextBox");
         GridBagConstraints gbc_nameTextBox = new GridBagConstraints();
         gbc_nameTextBox.insets = new Insets(0, 0, 5, 0);
@@ -114,6 +116,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         
         departmentListModel = new DefaultListModel<>();
         departmentList = new JList<>(departmentListModel);
+        departmentList.setEnabled(false);
         departmentList.setName("departmentList");
         scrollPane.setViewportView(departmentList);
         
@@ -328,18 +331,20 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         addButton.setEnabled(false);
         departmentList.setEnabled(false);
         editDepartment.setEnabled(false);
+        selectedIdTextBox.setEditable(false);
         selectedNameTextBox.setEditable(false);
         deleteButton.setEnabled(false);
         updateButton.setEnabled(false);
     }
     
-    private void enableUI() {
+    void enableUI() {
         idTextBox.setEditable(true);
         nameTextBox.setEditable(true);
         addButton.setEnabled(false);
         departmentList.clearSelection();
         departmentList.setEnabled(true);
         editDepartment.setEnabled(false);
+        selectedIdTextBox.setEditable(false);
         selectedNameTextBox.setEditable(false);
         deleteButton.setEnabled(false);
         updateButton.setEnabled(false);
