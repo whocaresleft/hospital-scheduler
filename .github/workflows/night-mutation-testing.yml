@@ -42,7 +42,7 @@ jobs:
         run: |
           xvfb-run -a -s "-screen 0 1920x1080x24" bash -c "
           openbox &
-          mvn verify -Pmutation-testing-full
+          mvn verify -Pmutation-testing-full"
         working-directory: ${{ env.workdir }}
 
       - name: Upload Pitest reports
