@@ -8,14 +8,22 @@
     <File name="DepartmentFileAppender" filename="logs/DepartmentPresenter.log" append="true">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </File>
+    
+    <File name="ShiftFileAppender" filename="logs/ShiftPresenter.log" append="true">
+      <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
+    </File>
   </Appenders>
   <Loggers>
-    <Logger name="org.duckdns.whocaresleft.presentation.DoctorPresenter" level="INFO" additivity="false">
+    <Logger name="org.duckdns.whocaresleft.presenter.DoctorPresenter" level="INFO" additivity="false">
       <AppenderRef ref="DoctorFileAppender"/>
     </Logger>
     
-    <Logger name="org.duckdns.whocaresleft.presentation.DepartmentPresenter" level="INFO" additivity="false">
+    <Logger name="org.duckdns.whocaresleft.presenter.DepartmentPresenter" level="INFO" additivity="false">
       <AppenderRef ref="DepartmentFileAppender"/>
+    </Logger>
+    
+    <Logger name="org.duckdns.whocaresleft.presenter.ShiftPresenter" level="INFO" additivity="false">
+      <AppenderRef ref="ShiftFileAppender"/>
     </Logger>
     <Root level="INFO">
     </Root>
