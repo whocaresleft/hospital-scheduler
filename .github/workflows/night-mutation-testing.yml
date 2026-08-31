@@ -28,8 +28,21 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
           restore-keys: ${{ runner.os }}-m2-pitest
 
+      - name: Pre-pull testcontainers Docker images
+        run: |
+          docker pull mariadb:10.3.39
+          docker pull mongo:5
+          docker pull testcontainers/ryuk:0.12.0
+
+      - name: Install Xvfb and OpenBox
+        run: |
+          sudo apt-get update && sudo apt-get install -y openbox xvfb
+
       - name: Run Mutation testing with Pitest
-        run: mvn clean verify -Pmutation-testing
+        run: |
+          xvfb-run -a -s "-screen 0 1920x1080x24" bash -c "
+          openbox &
+          mvn verify -Pmutation-testing-full
         working-directory: ${{ env.workdir }}
 
       - name: Upload Pitest reports
