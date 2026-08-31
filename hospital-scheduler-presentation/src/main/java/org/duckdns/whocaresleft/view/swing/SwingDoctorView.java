@@ -38,6 +38,10 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     private JTextField selectedLastNameTextBox;
     private JList<Doctor> doctorList;
     private DefaultListModel<Doctor> doctorListModel;
+    private JButton addButton;
+    private JCheckBox editDoctor;
+    private JButton deleteButton;
+    private JButton updateButton;
     private JLabel infoLabel;
     private JLabel errorLabel;
     
@@ -61,6 +65,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         add(idLabel, gbc_idLabel);
         
         idTextBox = new JTextField();
+        idTextBox.setEditable(false);
         idTextBox.setName("idTextBox");
         GridBagConstraints gbc_idTextBox = new GridBagConstraints();
         gbc_idTextBox.gridwidth = 3;
@@ -81,6 +86,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         add(firstNameLabel, gbc_firstNameLabel);
         
         firstNameTextBox = new JTextField();
+        firstNameTextBox.setEditable(false);
         firstNameTextBox.setName("firstNameTextBox");
         GridBagConstraints gbc_firstNameTextBox = new GridBagConstraints();
         gbc_firstNameTextBox.gridwidth = 3;
@@ -101,6 +107,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         add(lastNameLabel, gbc_lastNameLabel);
         
         lastNameTextBox = new JTextField();
+        lastNameTextBox.setEditable(false);
         lastNameTextBox.setName("lastNameTextBox");
         GridBagConstraints gbc_lastNameTextBox = new GridBagConstraints();
         gbc_lastNameTextBox.gridwidth = 3;
@@ -111,7 +118,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         add(lastNameTextBox, gbc_lastNameTextBox);
         lastNameTextBox.setColumns(10);
         
-        JButton addButton = new JButton("Add");
+        addButton = new JButton("Add");
         addButton.setName("addButton");
         addButton.setEnabled(false);
         GridBagConstraints gbc_addButton = new GridBagConstraints();
@@ -132,6 +139,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         
         doctorListModel = new DefaultListModel<>();
         doctorList = new JList<>(doctorListModel);
+        doctorList.setEnabled(false);
         scrollPane.setViewportView(doctorList);
         doctorList.setName("doctorList");
         
@@ -152,7 +160,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_selectedDoctorLabel.gridy = 7;
         add(selectedDoctorLabel, gbc_selectedDoctorLabel);
         
-        JCheckBox editDoctor = new JCheckBox("Edit");
+        editDoctor = new JCheckBox("Edit");
         editDoctor.setName("editDoctor");
         editDoctor.setEnabled(false);
         GridBagConstraints gbc_editDoctor = new GridBagConstraints();
@@ -225,7 +233,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         add(selectedLastNameTextBox, gbc_selectedLastNameTextBox);
         selectedLastNameTextBox.setColumns(10);
         
-        JButton deleteButton = new JButton("Delete selected");
+        deleteButton = new JButton("Delete selected");
         deleteButton.setEnabled(false);
         deleteButton.setName("deleteButton");
         GridBagConstraints gbc_deleteButton = new GridBagConstraints();
@@ -235,7 +243,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_deleteButton.gridy = 11;
         add(deleteButton, gbc_deleteButton);
         
-        JButton updateButton = new JButton("Update selected");
+        updateButton = new JButton("Update selected");
         updateButton.setEnabled(false);
         updateButton.setName("updateButton");
         GridBagConstraints gbc_updateButton = new GridBagConstraints();
@@ -284,12 +292,12 @@ public class SwingDoctorView extends JPanel implements DoctorView {
                     Id.createId(idTextBox.getText()),
                     firstNameTextBox.getText(), lastNameTextBox.getText());
                 
+                disableUI();
                 new Thread(() -> presenter.addDoctor(doctor)).start();
                 
                 idTextBox.setText("");
                 firstNameTextBox.setText("");
                 lastNameTextBox.setText("");
-                addButton.setEnabled(false);
                 showInfoMessage("Adding Doctor...");
             } catch (IllegalArgumentException iae) {
                 showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
@@ -318,15 +326,14 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         deleteButton.addActionListener(e -> {
             Doctor d = doctorList.getSelectedValue();
             
+            disableUI();
             new Thread(() -> presenter.removeDoctor(d)).start();
-            
+
             doctorList.clearSelection();
             
             selectedIdTextBox.setText("");
             selectedFirstNameTextBox.setText("");
             selectedLastNameTextBox.setText("");
-            
-            editDoctor.setEnabled(false);
             showInfoMessage("Deleting Doctor...");
         });
         
@@ -356,10 +363,10 @@ public class SwingDoctorView extends JPanel implements DoctorView {
                 current.getId(),
                 selectedFirstNameTextBox.getText(),
                 selectedLastNameTextBox.getText());
-            
-            new Thread(() -> presenter.updateDoctor(current, updated)).start();
-            
+
             editDoctor.setSelected(false);
+            disableUI();
+            new Thread(() -> presenter.updateDoctor(current, updated)).start();
             showInfoMessage("Updating Doctor...");
         });
     }
@@ -387,16 +394,63 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     private void addToList(Doctor toAdd) { doctorListModel.addElement(toAdd); }
     private void removeFromList(Doctor toRemove) { doctorListModel.removeElement(toRemove); }
     
+    private void disableUI() {
+        idTextBox.setEditable(false);
+        firstNameTextBox.setEditable(false);
+        lastNameTextBox.setEditable(false);
+        addButton.setEnabled(false);
+        doctorList.setEnabled(false);
+        editDoctor.setEnabled(false);
+        selectedIdTextBox.setEditable(false);
+        selectedFirstNameTextBox.setEditable(false);
+        selectedLastNameTextBox.setEditable(false);
+        deleteButton.setEnabled(false);
+        updateButton.setEnabled(false);
+    }
+    
+    void enableUI() {
+        idTextBox.setEditable(true);
+        firstNameTextBox.setEditable(true);
+        lastNameTextBox.setEditable(true);
+        addButton.setEnabled(false);
+        doctorList.clearSelection();
+        doctorList.setEnabled(true);
+        editDoctor.setEnabled(false);
+        selectedIdTextBox.setEditable(false);
+        selectedFirstNameTextBox.setEditable(false);
+        selectedLastNameTextBox.setEditable(false);
+        deleteButton.setEnabled(false);
+        updateButton.setEnabled(false);
+    }
+    
+    private void restoreUpdateUI() {
+        idTextBox.setEditable(true);
+        firstNameTextBox.setEditable(true);
+        lastNameTextBox.setEditable(true);
+        addButton.setEnabled(false);
+        doctorList.setEnabled(true);
+        editDoctor.setEnabled(true);
+        editDoctor.setSelected(false);
+        selectedIdTextBox.setEditable(false);
+        selectedFirstNameTextBox.setEditable(false);
+        selectedLastNameTextBox.setEditable(false);
+        deleteButton.setEnabled(true);
+        updateButton.setEnabled(false);
+    }
+    
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
-        SwingUtilities.invokeLater(() -> 
-            doctors.forEach(this::addToList));
+        SwingUtilities.invokeLater(() -> {
+            doctors.forEach(this::addToList);
+            enableUI();
+        });
     }
     
     @Override
     public void doctorAdded(Doctor doctor) {
         SwingUtilities.invokeLater(() -> {
             addToList(doctor);
+            enableUI();
             showInfoMessage("Doctor added!");
             clearErrorLabel();
         });
@@ -406,6 +460,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     public void doctorRemoved(Doctor doctor) {
         SwingUtilities.invokeLater(() -> {
             removeFromList(doctor);
+            enableUI();
             showInfoMessage("Doctor removed!");
             clearErrorLabel();
         });
@@ -416,6 +471,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         SwingUtilities.invokeLater(() -> {
             int oldDoctorIndex = doctorListModel.indexOf(oldDoctor);
             doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
+            restoreUpdateUI();
             showInfoMessage("Doctor updated!");
             clearErrorLabel();
         });
@@ -425,6 +481,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     public void showErrorDuplicateDoctor(Doctor found) {
         SwingUtilities.invokeLater(() -> {
             addToList(found);
+            enableUI();
             clearInfoLabel();
             showErrorMessage("A Doctor with id " + found.getId().getValue() + " already exists");
         });
@@ -434,6 +491,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     public void showErrorDoctorNotFound(Doctor notFound) {
         SwingUtilities.invokeLater(() -> {
             removeFromList(notFound);
+            enableUI();
             clearInfoLabel();
             showErrorMessage("No Doctor with id " + notFound.getId().getValue() + " was found");
         });

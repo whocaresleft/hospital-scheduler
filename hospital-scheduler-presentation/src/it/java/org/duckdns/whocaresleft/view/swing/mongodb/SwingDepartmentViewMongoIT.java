@@ -12,12 +12,12 @@ import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.Containers;
 import org.assertj.swing.fixture.FrameFixture;
 import org.duckdns.whocaresleft.core.Id;
-import org.duckdns.whocaresleft.model.Doctor;
-import org.duckdns.whocaresleft.presenter.DoctorPresenter;
-import org.duckdns.whocaresleft.repository.DoctorRepository;
+import org.duckdns.whocaresleft.model.Department;
+import org.duckdns.whocaresleft.presenter.DepartmentPresenter;
+import org.duckdns.whocaresleft.repository.DepartmentRepository;
 import org.duckdns.whocaresleft.transaction.TransactionManager;
 import org.duckdns.whocaresleft.transaction.mongodb.MongoTransactionManager;
-import org.duckdns.whocaresleft.view.swing.SwingDoctorView;
+import org.duckdns.whocaresleft.view.swing.SwingDepartmentView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,17 +31,17 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 
-@Testcontainers @DisplayName("Integration tests between SwingDoctorView, DoctorPresenter, and MongoTransactionManager")
-class SwingDoctorViewMongoIT {
+@Testcontainers @DisplayName("Integration tests between SwingDepartmentView, DepartmentPresenter, and MongoTransactionManager")
+class SwingDepartmentViewMongoIT {
     
     private static final int TIMEOUT = 15;
     
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
     
-    private SwingDoctorView view;
+    private SwingDepartmentView view;
     private TransactionManager transactionManager;
-    private DoctorPresenter presenter;
+    private DepartmentPresenter presenter;
     
     private MongoClient client;
     private FrameFixture window;
@@ -58,19 +58,19 @@ class SwingDoctorViewMongoIT {
         
         transactionManager = new MongoTransactionManager(client, db);
         transactionManager.doInTransaction(provider -> {
-            DoctorRepository repository = provider.getDoctorRepository();
+            DepartmentRepository repository = provider.getDepartmentRepository();
             
-            for (Doctor d : repository.findAll())
+            for (Department d : repository.findAll())
                 repository.delete(d.getId());
             
             return null;
         });
         
         GuiActionRunner.execute(() -> {
-            view = new SwingDoctorView();
-            presenter = new DoctorPresenter(transactionManager, view);
+            view = new SwingDepartmentView();
+            presenter = new DepartmentPresenter(transactionManager, view);
             view.setPresenter(presenter);
-            view.showAllDoctors(Arrays.asList());
+            view.showAllDepartments(Arrays.asList());
             return view;
         });
         window = Containers.showInFrame(view);
@@ -84,36 +84,35 @@ class SwingDoctorViewMongoIT {
     }
         
     @Test @GUITest
-    void testAllDoctors() {
-        Doctor d1 = Doctor.createDoctor(Id.createId("doc1"), "doc", "one");
-        Doctor d2 = Doctor.createDoctor(Id.createId("doc2"), "dok", "two");
+    void testAllDepartments() {
+        Department d1 = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        Department d2 = Department.createDepartment(Id.createId("sr"), "Surgery Room");
         transactionManager.doInTransaction(provider -> {
-            DoctorRepository repository = provider.getDoctorRepository();
+            DepartmentRepository repository = provider.getDepartmentRepository();
             repository.save(d1);
             repository.save(d2);
             return null;
         });
         
-        presenter.allDoctors();
+        presenter.allDepartments();
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
-            assertThat(window.list("doctorList").contents())
+            assertThat(window.list("departmentList").contents())
                 .containsExactlyInAnyOrder(d1.toString(), d2.toString()));
     }
     
     @Test @GUITest
     void testAddButtonSuccess() {
-        window.textBox("idTextBox").enterText("doctor_id");
-        window.textBox("firstNameTextBox").enterText("doc");
-        window.textBox("lastNameTextBox").enterText("tor");
+        window.textBox("idTextBox").enterText("er");
+        window.textBox("nameTextBox").enterText("Emergency Room");
         
         window.button("addButton").click();
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertThat(window.list("doctorList").contents())
-                .containsExactly(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor").toString());
+            assertThat(window.list("departmentList").contents())
+                .containsExactly(Department.createDepartment(Id.createId("er"), "Emergency Room").toString());
             
-            window.label("infoLabel").requireText("Doctor added!");
+            window.label("infoLabel").requireText("Department added!");
         });
         
     }
@@ -121,44 +120,43 @@ class SwingDoctorViewMongoIT {
     @Test @GUITest
     void testAddButtonError() {
         transactionManager.doInTransaction(provider -> {
-            provider.getDoctorRepository().save(Doctor.createDoctor(Id.createId("doctor_id"), "ORIGINAL", "DOCTOR"));
+            provider.getDepartmentRepository().save(Department.createDepartment(Id.createId("er"), "Original Emergency Room"));
             return null;
         });
-        window.textBox("idTextBox").enterText("doctor_id");
-        window.textBox("firstNameTextBox").enterText("DUPLICATED");
-        window.textBox("lastNameTextBox").enterText("ONE");
+        window.textBox("idTextBox").enterText("er");
+        window.textBox("nameTextBox").enterText("Duplicated Emergency Room");
         
         window.button("addButton").click();
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertThat(window.list("doctorList").contents())
-                .containsExactly(Doctor.createDoctor(Id.createId("doctor_id"), "ORIGINAL", "DOCTOR").toString());
+            assertThat(window.list("departmentList").contents())
+                .containsExactly(Department.createDepartment(Id.createId("er"), "Original Emergency Room").toString());
             
             window.label("infoLabel").requireText(" ");
-            window.label("errorLabel").requireText("A Doctor with id doctor_id already exists");
+            window.label("errorLabel").requireText("A Department with id er already exists");
         });
     }
     
     @Test @GUITest
     void testDeleteButtonSuccess() {
-        presenter.addDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
-        window.list("doctorList").selectItem(0);
+        presenter.addDepartment(Department.createDepartment(Id.createId("er"), "Emergency Room"));
+        window.list("departmentList").selectItem(0);
         
         window.button("deleteButton").click();
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertThat(window.list("doctorList").contents()).isEmpty();
+            assertThat(window.list("departmentList").contents()).isEmpty();
             
-            window.label("infoLabel").requireText("Doctor removed!");
+            window.label("infoLabel").requireText("Department removed!");
         });
     }
     
     @Test @GUITest
     void testDeleteButtonError() {
-        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
         
-        GuiActionRunner.execute(() -> view.getDoctorListModel().addElement(doctor));
-        window.list("doctorList").selectItem(0);
+        GuiActionRunner.execute(() -> view.getDepartmentListModel().addElement(department));
+        window.list("departmentList").selectItem(0);
         
         window.button("deleteButton").click();
         
@@ -166,38 +164,36 @@ class SwingDoctorViewMongoIT {
             assertThat(window.list().contents()).isEmpty();
             
             window.label("infoLabel").requireText(" ");
-            window.label("errorLabel").requireText("No Doctor with id doctor_id was found");
+            window.label("errorLabel").requireText("No Department with id er was found");
         });
     }
     
     @Test @GUITest
     void testUpdateButtonSuccess() {
-        presenter.addDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
-        window.list("doctorList").selectItem(0);
-        window.checkBox("editDoctor").click();
-        window.textBox("selectedFirstNameTextBox").enterText("extension");
-        window.textBox("selectedLastNameTextBox").enterText("extension");
+        presenter.addDepartment(Department.createDepartment(Id.createId("er"), "Emergency Room"));
+        window.list("departmentList").selectItem(0);
+        window.checkBox("editDepartment").click();
+        window.textBox("selectedNameTextBox").enterText("-new");
         
         window.button("updateButton").click();
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertThat(window.list("doctorList").contents())
+            assertThat(window.list("departmentList").contents())
                 .containsExactly(
-                    Doctor.createDoctor(Id.createId("doctor_id"), "docextension", "torextension").toString());
+                    Department.createDepartment(Id.createId("er"), "Emergency Room-new").toString());
             
-            window.label("infoLabel").requireText("Doctor updated!");
+            window.label("infoLabel").requireText("Department updated!");
         });
     }
     
     @Test @GUITest
     void testUpdateButtonError() {
-        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor");
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
         
-        GuiActionRunner.execute(() -> view.getDoctorListModel().addElement(doctor));
-        window.list("doctorList").selectItem(0);
-        window.checkBox("editDoctor").click();
-        window.textBox("selectedFirstNameTextBox").enterText("extension");
-        window.textBox("selectedLastNameTextBox").enterText("extension");
+        GuiActionRunner.execute(() -> view.getDepartmentListModel().addElement(department));
+        window.list("departmentList").selectItem(0);
+        window.checkBox("editDepartment").click();
+        window.textBox("selectedNameTextBox").enterText("-new");
         
         window.button("updateButton").click();
         
@@ -205,7 +201,7 @@ class SwingDoctorViewMongoIT {
             assertThat(window.list().contents()).isEmpty();
             
             window.label("infoLabel").requireText(" ");
-            window.label("errorLabel").requireText("No Doctor with id doctor_id was found");
+            window.label("errorLabel").requireText("No Department with id er was found");
         });
     }
 }
