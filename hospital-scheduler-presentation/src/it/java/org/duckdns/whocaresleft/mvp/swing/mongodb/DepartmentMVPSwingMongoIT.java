@@ -138,7 +138,7 @@ public class DepartmentMVPSwingMongoIT {
             window.list("departmentList").requireItemCount(1));
         
         window.list("departmentList").selectItem(0);
-        window.checkBox("editDoctor").click();
+        window.checkBox("editDepartment").click();
         window.textBox("selectedNameTextBox").enterText("-new");
         
         window.button("updateButton").click();

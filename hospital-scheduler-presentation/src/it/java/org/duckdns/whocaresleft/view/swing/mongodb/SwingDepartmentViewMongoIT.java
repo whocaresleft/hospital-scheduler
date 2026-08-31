@@ -193,8 +193,7 @@ class SwingDepartmentViewMongoIT {
         GuiActionRunner.execute(() -> view.getDepartmentListModel().addElement(department));
         window.list("departmentList").selectItem(0);
         window.checkBox("editDepartment").click();
-        window.textBox("selectedFirstNameTextBox").enterText("extension");
-        window.textBox("selectedLastNameTextBox").enterText("extension");
+        window.textBox("selectedNameTextBox").enterText("-new");
         
         window.button("updateButton").click();
         
