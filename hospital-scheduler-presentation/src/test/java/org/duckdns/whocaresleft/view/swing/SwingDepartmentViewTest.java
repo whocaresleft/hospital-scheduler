@@ -19,7 +19,6 @@ import org.assertj.swing.fixture.JButtonFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
 import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.model.Department;
-import org.duckdns.whocaresleft.model.Doctor;
 import org.duckdns.whocaresleft.presenter.DepartmentPresenter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -349,5 +348,161 @@ class SwingDepartmentViewTest {
         Department duplicated = Department.createDepartment(Id.createId("er"), "Old ER");
         
         view.showErrorDuplicateDepartment(duplicated);
+        
+        window.label("errorLabel").requireText("A Department with id er already exists");
+    }
+    
+    @Test @GUITest
+    void testShowErrorDepartmentNotFoundShouldShowMessageInErrorLabel() {
+        Department notFound = Department.createDepartment(Id.createId("er"), "Not Found");
+        
+        view.showErrorDepartmentNotFound(notFound);
+        
+        window.label("errorLabel").requireText("No Department with id er was found");
+    }
+    
+    @Test @GUITest
+    void testDepartmentAddedShouldAddTheDepartmentToTheListShowInfoMessageAndClearErrorLabel() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency room");
+        
+        view.departmentAdded(department);
+        
+        assertThat(window.list("departmentList").contents())
+            .containsExactly(department.toString());
+        window.label("infoLabel").requireText("Department added!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testDepartmentRemovedShouldRemoveTheDepartmentFromTheListShowInfoMessageAndClearErrorLabel() {
+        Department d1 = Department.createDepartment(Id.createId("er"), "Emergency room");
+        Department d2 = Department.createDepartment(Id.createId("sr"), "Surgery room");
+        
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Department> dlm = view.getDepartmentListModel();
+            dlm.addElement(d1);
+            dlm.addElement(d2);
+        });
+        
+        view.departmentRemoved(Department.createDepartment(Id.createId("sr"), "Surgery room"));
+        
+        assertThat(window.list("departmentList").contents())
+            .containsExactly(d1.toString());
+        window.label("infoLabel").requireText("Department removed!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testDepartmentUpdatedShouldRemoveTheDepartmentInTheListShowInfoMessageAndClearErrorLabel() {
+        Department oldDepartment = Department.createDepartment(Id.createId("er"), "Emergency room");
+        Department newDepartment = Department.createDepartment(Id.createId("er"), "New Emergency room");
+        
+        GuiActionRunner.execute(() -> {
+            view.getDepartmentListModel().addElement(oldDepartment);
+        });
+        
+        view.departmentUpdated(
+            Department.createDepartment(Id.createId("er"), "Emergency room"),
+            Department.createDepartment(Id.createId("er"), "New Emergency room"));
+        
+        assertThat(window.list("departmentList").contents())
+            .containsExactly(newDepartment.toString());
+        window.label("infoLabel").requireText("Department updated!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testWhenDepartmentIsSelectedAndEditIsTickedThenChangingSelectionShouldRemoveTheTickAndReEnableDeleteButton() {
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Department> listModel = view.getDepartmentListModel();
+            listModel.addElement(Department.createDepartment(Id.createId("er"), "Emergency Room"));
+            listModel.addElement(Department.createDepartment(Id.createId("sr"), "Surgery Room"));
+        });
+        window.list("departmentList").selectItem(0);
+        
+        window.checkBox("editDepartment").click();
+        window.button("deleteButton").requireDisabled();
+
+        window.list("departmentList").selectItem(1);
+        
+        window.checkBox("editDepartment").requireEnabled().requireNotSelected();
+        window.button("deleteButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenItShouldDelegateToPresenterAddDepartment() {
+        window.textBox("idTextBox").enterText("er");
+        window.textBox("nameTextBox").enterText("Emergency Room");
+        
+        window.button("addButton").click();
+        
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .addDepartment(Department.createDepartment(Id.createId("er"), "Emergency Room")));
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedItShouldDelegateToPresenterRemoveDepartment() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> {
+            view.getDepartmentListModel()
+                .addElement(department);
+        });
+        window.list("departmentList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .removeDepartment(department));
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedItShouldDelegateToPresenterUpdateDepartment() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> {
+            view.getDepartmentListModel()
+                .addElement(department);
+        });
+        window.list("departmentList").selectItem(0);
+        window.checkBox("editDepartment").click();
+        window.textBox("selectedNameTextBox").enterText(" new");
+        
+        window.button("updateButton").click();
+        
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .updateDepartment(
+                    department,
+                    Department.createDepartment(Id.createId("er"), "Emergency Room new")));
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsEnabledAndEditIsFirstDeselectedAndReselectedThenUpdateShouldBeEnableAgain() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> {
+            view.getDepartmentListModel()
+                .addElement(department);
+        });
+        window.list("departmentList").selectItem(0);
+        window.checkBox("editDepartment").click();
+        window.textBox("selectedNameTextBox").enterText(" new");
+        
+        window.button("updateButton").requireEnabled();
+        window.checkBox("editDepartment").click();
+        window.button("updateButton").requireDisabled();
+        window.checkBox("editDepartment").click();
+        window.button("updateButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedAndIdCreationFailsThenItDoesNotDelegateToPresenterAddDepartment() {
+        window.textBox("idTextBox").enterText("invalid-id");
+        window.textBox("nameTextBox").enterText("Emergency Room");
+        
+        window.button("addButton").click();
+        
+        window.label("errorLabel").requireText("Id contains invalid value: Letters, digits, and underscores only");
+        verifyNoInteractions(presenter);
     }
 }

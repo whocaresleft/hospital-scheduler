@@ -24,7 +24,7 @@ public class DepartmentPresenter {
         this.view = view;
     }
     
-    public void allDepartments() {
+    public synchronized void allDepartments() {
         List<Department> departments = transactionManager.doInTransaction(repositoryProvider -> {
             DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
             return repository.findAll();
@@ -33,7 +33,7 @@ public class DepartmentPresenter {
         view.showAllDepartments(departments);
     }
     
-    public void addDepartment(Department department) {
+    public synchronized void addDepartment(Department department) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
@@ -48,7 +48,7 @@ public class DepartmentPresenter {
         }
     }
     
-    public void removeDepartment(Department department) {
+    public synchronized void removeDepartment(Department department) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
@@ -68,7 +68,7 @@ public class DepartmentPresenter {
         }
     }
     
-    public void updateDepartment(Department oldDepartment, Department newDepartment) {
+    public synchronized void updateDepartment(Department oldDepartment, Department newDepartment) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 DepartmentRepository repository = repositoryProvider.getDepartmentRepository();
