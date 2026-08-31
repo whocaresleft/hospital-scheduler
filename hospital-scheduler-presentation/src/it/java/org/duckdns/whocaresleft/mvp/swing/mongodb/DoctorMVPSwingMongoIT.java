@@ -32,7 +32,7 @@ import com.mongodb.client.MongoDatabase;
 
 @Testcontainers @DisplayName("Integration tests between SwingDoctorView, DoctorPresenter,"
     + "and MongoTransactionManager, with the goal of verifying the MVP architecture interaction")
-public class DoctorMVPSwingMongoIT {
+class DoctorMVPSwingMongoIT {
     
     private static final int TIMEOUT = 15;
     
