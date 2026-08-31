@@ -400,11 +400,14 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         addButton.setEnabled(false);
         doctorList.setEnabled(false);
         editDoctor.setEnabled(false);
+        selectedIdTextBox.setEditable(false);
+        selectedFirstNameTextBox.setEditable(false);
+        selectedLastNameTextBox.setEditable(false);
         deleteButton.setEnabled(false);
         updateButton.setEnabled(false);
     }
     
-    private void enableUI() {
+    void enableUI() {
         idTextBox.setEditable(true);
         firstNameTextBox.setEditable(true);
         lastNameTextBox.setEditable(true);
@@ -412,6 +415,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         doctorList.clearSelection();
         doctorList.setEnabled(true);
         editDoctor.setEnabled(false);
+        selectedIdTextBox.setEditable(false);
+        selectedFirstNameTextBox.setEditable(false);
+        selectedLastNameTextBox.setEditable(false);
         deleteButton.setEnabled(false);
         updateButton.setEnabled(false);
     }
@@ -424,14 +430,19 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         doctorList.setEnabled(true);
         editDoctor.setEnabled(true);
         editDoctor.setSelected(false);
+        selectedIdTextBox.setEditable(false);
+        selectedFirstNameTextBox.setEditable(false);
+        selectedLastNameTextBox.setEditable(false);
         deleteButton.setEnabled(true);
         updateButton.setEnabled(false);
     }
     
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
-        SwingUtilities.invokeLater(() -> 
-            doctors.forEach(this::addToList));
+        SwingUtilities.invokeLater(() -> {
+            doctors.forEach(this::addToList);
+            enableUI();
+        });
     }
     
     @Override

@@ -265,7 +265,7 @@ class SwingDepartmentViewTest {
     }
     
     @Test @GUITest
-    void testWhenEditDoctorIsDeselectedWhileUpdateIsEnabledThenUpdateShouldBeDisabled() {
+    void testWhenEditDepartmentIsDeselectedWhileUpdateIsEnabledThenUpdateShouldBeDisabled() {
         GuiActionRunner.execute(() -> 
             view.getDepartmentListModel()
                 .addElement(Department.createDepartment(Id.createId("er"), "Emergency Room")));
@@ -504,5 +504,173 @@ class SwingDepartmentViewTest {
         
         window.label("errorLabel").requireText("Id contains invalid value: Letters, digits, and underscores only");
         verifyNoInteractions(presenter);
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenUIIsDisabled() {
+        window.textBox("idTextBox").enterText("er");
+        window.textBox("nameTextBox").enterText("Emergency Room");
+        
+        window.button("addButton").click();
+        
+        window.textBox("idTextBox").requireNotEditable();
+        window.textBox("nameTextBox").requireNotEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireDisabled();
+        window.checkBox("editDepartment").requireDisabled();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDepartmentAddedIsCalledThenUIIsEnabledAgain() {
+        window.textBox("idTextBox").enterText("er");
+        window.textBox("nameTextBox").enterText("Emergency Room");
+        
+        window.button("addButton").click();
+        
+        view.departmentAdded(Department.createDepartment(Id.createId("er"), "Emergency Room"));
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("nameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireEnabled();
+        window.checkBox("editDepartment").requireDisabled();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorDuplicateDepartmentIsCalledThenItShouldReEnableTheUI() {
+        window.textBox("idTextBox").enterText("er");
+        window.textBox("nameTextBox").enterText("Emergency Room");
+        
+        window.button("addButton").click();
+        
+        view.showErrorDuplicateDepartment(Department.createDepartment(Id.createId("er"), "Emergency Room"));
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("nameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireEnabled();
+        window.checkBox("editDepartment").requireDisabled();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedThenUIIsDisabled() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> 
+            view.getDepartmentListModel()
+                .addElement(department));
+        
+        window.list("departmentList").selectItem(0);
+        window.button("deleteButton").click();
+        
+        window.textBox("idTextBox").requireNotEditable();
+        window.textBox("nameTextBox").requireNotEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireDisabled();
+        window.checkBox("editDepartment").requireDisabled();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDepartmentRemovedIsCalledThenUIIsEnabledAgain() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> 
+            view.getDepartmentListModel()
+                .addElement(department));
+        
+        window.list("departmentList").selectItem(0);
+        window.button("deleteButton").click();
+        
+        view.departmentRemoved(department);
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("nameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireEnabled();
+        window.checkBox("editDepartment").requireDisabled();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorDepartmentNotFoundIsCalledThenItShouldReEnableTheUI() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> 
+            view.getDepartmentListModel()
+                .addElement(department));
+        
+        window.list("departmentList").selectItem(0);
+        window.button("deleteButton").click();
+        
+        view.showErrorDepartmentNotFound(department);
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("nameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireEnabled();
+        window.checkBox("editDepartment").requireDisabled();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenUIIsDisabled() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> 
+            view.getDepartmentListModel()
+                .addElement(department));
+        
+        window.list("departmentList").selectItem(0);
+        window.checkBox("editDepartment").click();
+        window.textBox("selectedNameTextBox").enterText("-new");
+        
+        window.button("updateButton").click();
+        
+        window.textBox("idTextBox").requireNotEditable();
+        window.textBox("nameTextBox").requireNotEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireDisabled();
+        window.checkBox("editDepartment").requireDisabled();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDepartmentUpdatedIsCalledThenUIIsEnabledAgain() {
+        Department department = Department.createDepartment(Id.createId("er"), "Emergency Room");
+        GuiActionRunner.execute(() -> 
+            view.getDepartmentListModel()
+                .addElement(department));
+        
+        window.list("departmentList").selectItem(0);
+        window.textBox("selectedNameTextBox").enterText("-new");
+        
+        window.button("updateButton").click();
+        
+        view.departmentUpdated(
+            department,
+            Department.createDepartment(Id.createId("er"), "Emergency Room-new"));
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("nameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("departmentList").requireEnabled();
+        window.checkBox("editDepartment").requireEnabled().requireNotSelected();
+        window.textBox("selectedNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireEnabled();
+        window.button("updateButton").requireDisabled();
     }
 }

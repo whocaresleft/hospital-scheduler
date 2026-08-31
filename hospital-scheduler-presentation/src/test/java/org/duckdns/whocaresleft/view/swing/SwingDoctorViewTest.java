@@ -64,13 +64,13 @@ class SwingDoctorViewTest {
     }
     
     @Test @GUITest
-    void testInitialSetup() {
+    void testInitialSetupUIIsDisabled() {
         window.label("idLabel");
-        window.textBox("idTextBox").requireEnabled();
+        window.textBox("idTextBox").requireEnabled().requireNotEditable();
         window.label("firstNameLabel");
-        window.textBox("firstNameTextBox").requireEnabled();
+        window.textBox("firstNameTextBox").requireEnabled().requireNotEditable();
         window.label("lastNameLabel");
-        window.textBox("lastNameTextBox").requireEnabled();
+        window.textBox("lastNameTextBox").requireEnabled().requireNotEditable();
         window.button("addButton");
         
         window.list("doctorList");
@@ -94,6 +94,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenIdFirstNameAndLastNameAreNotEmptyThenAddButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         window.textBox("idTextBox").enterText("doctor_id");
         window.textBox("firstNameTextBox").enterText("doc");
         window.textBox("lastNameTextBox").enterText("tor");
@@ -102,6 +103,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenEitherIdFirstNameOrLastNameAreEmptyThenAddButtonShouldBeDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         JTextComponentFixture idTextBox = window.textBox("idTextBox");
         JTextComponentFixture firstNameTextBox = window.textBox("firstNameTextBox");
         JTextComponentFixture lastNameTextBox = window.textBox("lastNameTextBox");
@@ -133,6 +135,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenAddButtonIsPressedTheTextFieldsShouldBeClearedAndAddButtonDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         JTextComponentFixture idTextBox = window.textBox("idTextBox");
         JTextComponentFixture firstNameTextBox = window.textBox("firstNameTextBox");
         JTextComponentFixture lastNameTextBox = window.textBox("lastNameTextBox");
@@ -153,6 +156,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDoctorIsSelectedThenTheSelectedDoctorTextFieldsShouldContainSuchValues() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -165,6 +169,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDoctorIsSelectedThenTheDeleteButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -176,6 +181,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDoctorIsSelectedThenTheEditCheckBoxShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -187,6 +193,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenEditDoctorCheckBoxIsTickedTheDeleteButtonShouldBeDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -198,6 +205,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenEditDoctorCheckBoxIsTickedThenTheFirstAndLastNameTextBoxesShouldBeEditable() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -211,6 +219,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenSelectedDoctorFirstAndLastNameTextBoxesAreModifiedThenTheUpdateSelectedButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -230,6 +239,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenSelectedDoctorFirstAndLastNameTextBoxesAreEmptyOrEqualToTheCurrentDoctorsValuesThenUpdateButtonShouldBeDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -265,6 +275,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDeleteButtonIsPressedThenTheSelectedDoctorShouldBeDeselected() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -276,6 +287,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDeleteButtonIsPressedThenTheSelectedDoctorsInfoShouldBeCleared() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -290,6 +302,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenUpdateButtonIsPressedThenTheEditDoctorCheckBoxShouldBeDeselected() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -304,6 +317,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenEditDoctorIsDeselectedWhileUpdateIsEnabledThenUpdateShouldBeDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -319,6 +333,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenAddButtonIsPressedThenInfoLabelShouldShowActionMessage() {
+        GuiActionRunner.execute(() -> view.enableUI());
         window.textBox("idTextBox").enterText("doctor_id");
         window.textBox("firstNameTextBox").enterText("doc");
         window.textBox("lastNameTextBox").enterText("tor");
@@ -330,6 +345,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDeleteButtonIsPressedThenInfoLabelShouldShowActionMessage() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -342,6 +358,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenUpdateButtonIsPressedThenInfoLabelShouldShowActionMessage() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -356,6 +373,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenUpdateButtonIsPressedThenItShouldKeepUpdatedInfoInSelectedTextBoxesAndDoctorSelectedInTheList() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
@@ -384,7 +402,28 @@ class SwingDoctorViewTest {
     }
     
     @Test @GUITest
+    void testShowAllDoctorsShoudEnableUI() {
+        Doctor d1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doctor", "One");
+        Doctor d2 = Doctor.createDoctor(Id.createId("doctor_2"), "Doktor", "Two");
+        
+        view.showAllDoctors(Arrays.asList(d1, d2));
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("firstNameTextBox").requireEditable();
+        window.textBox("lastNameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireEnabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
     void testShowErrorDuplicateDoctorShouldShowMessageInErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor duplicatedDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "duplicated", "doctor");
         
         view.showErrorDuplicateDoctor(duplicatedDoctor);
@@ -394,6 +433,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testShowErrorDoctorNotFoundShouldShowMessageInErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor notFound = Doctor.createDoctor(Id.createId("doctor_id"), "not", "found");
         
         view.showErrorDoctorNotFound(notFound);
@@ -403,6 +443,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testDoctorAddedShouldAddTheDoctorToTheListShowInfoMessageAndResetErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor");
         
         view.doctorAdded(Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor"));
@@ -415,6 +456,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testDoctorRemovedShouldRemoveTheDoctorFromTheListShowInfoMessageAndResetErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doc", "Tor");
         Doctor doctor2 = Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter");
         
@@ -434,6 +476,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testDoctorUpdatedShouldUpdateTheDoctorInTheListShowInfoMessageAndResetErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor oldDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "Old", "Doctor");
         Doctor newDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor");
         
@@ -452,6 +495,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDoctorIsSelectedAndEditIsTickedThenChangingSelectionShouldRemoveTheTickAndReenableDeleteButton() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() -> {
             DefaultListModel<Doctor> listModel = view.getDoctorListModel();
             listModel.addElement(Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor"));
@@ -470,6 +514,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenAddButtonIsPressedThenItShouldDelegateToPresenterAddDoctor() {
+        GuiActionRunner.execute(() -> view.enableUI());
         window.textBox("idTextBox").enterText("doctor_id");
         window.textBox("firstNameTextBox").enterText("doc");
         window.textBox("lastNameTextBox").enterText("tor");
@@ -499,6 +544,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenUpdateButtonIsPressedThenItShouldDelegateToPresenterUpdateDoctor() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> {
             view.getDoctorListModel()
@@ -520,6 +566,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenUpdateButtonIsEnabledAndEditIsFirstDeselectedAndReselectedThenUpdateShouldBeEnableAgain() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> {
             view.getDoctorListModel()
@@ -538,6 +585,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenAddButtonIsPressedAndIdCreationFailsThenItDoesNotDelegateToPresenterAndAnErrorMessageIsShown() {
+        GuiActionRunner.execute(() -> view.enableUI());
         window.textBox("idTextBox").enterText("invalid-id");
         window.textBox("firstNameTextBox").enterText("doc");
         window.textBox("lastNameTextBox").enterText("tor");
@@ -550,6 +598,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenAddButtonIsPressedThenUIIsDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         window.textBox("idTextBox").enterText("doctor_id");
         window.textBox("firstNameTextBox").enterText("doc");
         window.textBox("lastNameTextBox").enterText("tor");
@@ -562,12 +611,16 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireDisabled();
         window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireDisabled();
         window.button("updateButton").requireDisabled();
     }
     
     @Test @GUITest
     void testWhenDoctorAddedIsCalledThenUIIsEnabledAgain() {
+        GuiActionRunner.execute(() -> view.enableUI());
         window.textBox("idTextBox").enterText("doctor_id");
         window.textBox("firstNameTextBox").enterText("doc");
         window.textBox("lastNameTextBox").enterText("tor");
@@ -582,12 +635,16 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireEnabled();
         window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireDisabled();
         window.button("updateButton").requireDisabled();
     }
     
     @Test @GUITest
     void testWhenShowErrorDuplicateDoctorIsCalledThenItShouldReEnableTheUI() {
+        GuiActionRunner.execute(() -> view.enableUI());
         window.textBox("idTextBox").enterText("doctor_id");
         window.textBox("firstNameTextBox").enterText("doc");
         window.textBox("lastNameTextBox").enterText("tor");
@@ -602,12 +659,16 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireEnabled();
         window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireDisabled();
         window.button("updateButton").requireDisabled();
     }
     
     @Test @GUITest
     void testWhenDeleteButtonIsPressedThenUIIsDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
@@ -622,12 +683,16 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireDisabled();
         window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireDisabled();
         window.button("updateButton").requireDisabled();
     }
     
     @Test @GUITest
     void testWhenDoctorRemovedIsCalledThenUIIsEnabledAgain() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
@@ -644,12 +709,16 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireEnabled();
         window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireDisabled();
         window.button("updateButton").requireDisabled();
     }
     
     @Test @GUITest
     void testWhenShowErrorDoctorNotFoundIsCalledThenItShouldReEnableTheUI() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
@@ -666,12 +735,16 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireEnabled();
         window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireDisabled();
         window.button("updateButton").requireDisabled();
     }
     
     @Test @GUITest
     void testWhenUpdateButtonIsPressedThenUIIsDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
@@ -690,12 +763,16 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireDisabled();
         window.checkBox("editDoctor").requireDisabled();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireDisabled();
         window.button("updateButton").requireDisabled();
     }
     
     @Test @GUITest
     void testWhenDoctorUpdatedIsCalledThenUIIsEnabledAgain() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> 
             view.getDoctorListModel()
@@ -717,6 +794,9 @@ class SwingDoctorViewTest {
         window.button("addButton").requireDisabled();
         window.list("doctorList").requireEnabled();
         window.checkBox("editDoctor").requireEnabled().requireNotSelected();
+        window.textBox("selectedIdTextBox").requireNotEditable();
+        window.textBox("selectedFirstNameTextBox").requireNotEditable();
+        window.textBox("selectedLastNameTextBox").requireNotEditable();
         window.button("deleteButton").requireEnabled();
         window.button("updateButton").requireDisabled();
     }

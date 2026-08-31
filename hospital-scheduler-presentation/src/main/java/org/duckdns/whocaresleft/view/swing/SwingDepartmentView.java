@@ -35,6 +35,10 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
     private JTextField selectedNameTextBox;
     private JList<Department> departmentList;
     private DefaultListModel<Department> departmentListModel;
+    private JButton addButton;
+    private JButton deleteButton;
+    private JButton updateButton;
+    private JCheckBox editDepartment;
     private JLabel infoLabel;
     private JLabel errorLabel;
     
@@ -88,7 +92,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         add(nameTextBox, gbc_nameTextBox);
         nameTextBox.setColumns(10);
         
-        JButton addButton = new JButton("Add");
+        addButton = new JButton("Add");
         addButton.setName("addButton");
         addButton.setEnabled(false);
         GridBagConstraints gbc_addButton = new GridBagConstraints();
@@ -122,7 +126,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         gbc_selectedDepartmentLabel.gridy = 6;
         add(selectedDepartmentLabel, gbc_selectedDepartmentLabel);
         
-        JCheckBox editDepartment = new JCheckBox("Edit");
+        editDepartment = new JCheckBox("Edit");
         editDepartment.setName("editDepartment");
         editDepartment.setEnabled(false);
         GridBagConstraints gbc_editDepartment = new GridBagConstraints();
@@ -174,7 +178,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         add(selectedNameTextBox, gbc_selectednameTextBox);
         selectedNameTextBox.setColumns(10);
         
-        JButton deleteButton = new JButton("Delete selected");
+        deleteButton = new JButton("Delete selected");
         deleteButton.setName("deleteButton");
         deleteButton.setEnabled(false);
         GridBagConstraints gbc_deleteButton = new GridBagConstraints();
@@ -184,7 +188,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         gbc_deleteButton.gridy = 9;
         add(deleteButton, gbc_deleteButton);
         
-        JButton updateButton = new JButton("Update selected");
+        updateButton = new JButton("Update selected");
         updateButton.setName("updateButton");
         updateButton.setEnabled(false);
         GridBagConstraints gbc_updateButton = new GridBagConstraints();
@@ -229,11 +233,11 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
                     Id.createId(idTextBox.getText()),
                     nameTextBox.getText());
                 
+                disableUI();
                 new Thread(() -> presenter.addDepartment(department)).start();
                 
                 idTextBox.setText("");
                 nameTextBox.setText("");
-                addButton.setEnabled(false);
                 showInfoMessage("Adding Department...");
             } catch (IllegalArgumentException iae) {
                 showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
@@ -276,14 +280,13 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         deleteButton.addActionListener(e -> {
             Department d = departmentList.getSelectedValue();
             
+            disableUI();
             new Thread(() -> presenter.removeDepartment(d)).start();
             
             departmentList.clearSelection();
             
             selectedIdTextBox.setText("");
             selectedNameTextBox.setText("");
-            
-            editDepartment.setEnabled(false);
             showInfoMessage("Deleting Department...");
         });
         
@@ -291,10 +294,10 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
             Department current = departmentList.getSelectedValue();
             Department updated = Department.createDepartment(
                 current.getId(), selectedNameTextBox.getText());
-            
-            new Thread(() -> presenter.updateDepartment(current, updated)).start();
-            
+
             editDepartment.setSelected(false);
+            disableUI();
+            new Thread(() -> presenter.updateDepartment(current, updated)).start();
             showInfoMessage("Updating Department...");
         });
     }
@@ -319,6 +322,41 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
     private void addToList(Department toAdd) { departmentListModel.addElement(toAdd); }
     private void removeFromList(Department toRemove) { departmentListModel.removeElement(toRemove); }
     
+    private void disableUI() {
+        idTextBox.setEditable(false);
+        nameTextBox.setEditable(false);
+        addButton.setEnabled(false);
+        departmentList.setEnabled(false);
+        editDepartment.setEnabled(false);
+        selectedNameTextBox.setEditable(false);
+        deleteButton.setEnabled(false);
+        updateButton.setEnabled(false);
+    }
+    
+    private void enableUI() {
+        idTextBox.setEditable(true);
+        nameTextBox.setEditable(true);
+        addButton.setEnabled(false);
+        departmentList.clearSelection();
+        departmentList.setEnabled(true);
+        editDepartment.setEnabled(false);
+        selectedNameTextBox.setEditable(false);
+        deleteButton.setEnabled(false);
+        updateButton.setEnabled(false);
+    }
+    
+    private void restoreUpdateUI() {
+        idTextBox.setEditable(true);
+        nameTextBox.setEditable(true);
+        addButton.setEnabled(false);
+        departmentList.setEnabled(true);
+        editDepartment.setEnabled(true);
+        editDepartment.setSelected(false);
+        selectedNameTextBox.setEditable(false);
+        deleteButton.setEnabled(true);
+        updateButton.setEnabled(false);
+    }
+    
     @Override
     public void showAllDepartments(List<Department> departments) {
         SwingUtilities.invokeLater(() ->
@@ -329,6 +367,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
     public void departmentAdded(Department department) {
         SwingUtilities.invokeLater(() -> {
             addToList(department);
+            enableUI();
             showInfoMessage("Department added!");
             clearErrorLabel();
         });
@@ -338,6 +377,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
     public void departmentRemoved(Department department) {
         SwingUtilities.invokeLater(() -> {
             removeFromList(department);
+            enableUI();
             showInfoMessage("Department removed!");
             clearErrorLabel();
         });
@@ -348,6 +388,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         SwingUtilities.invokeLater(() -> {
             int oldDepartmentIndex = departmentListModel.indexOf(oldDepartment);
             departmentListModel.setElementAt(newDepartment, oldDepartmentIndex);
+            restoreUpdateUI();
             showInfoMessage("Department updated!");
             clearErrorLabel();
         });
@@ -356,6 +397,8 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
     @Override
     public void showErrorDuplicateDepartment(Department found) {
         SwingUtilities.invokeLater(() -> {
+            addToList(found);
+            enableUI();
             clearInfoLabel();
             showErrorMessage("A Department with id " + found.getId() + " already exists");
         });
@@ -364,6 +407,8 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
     @Override
     public void showErrorDepartmentNotFound(Department notFound) {
         SwingUtilities.invokeLater(() -> {
+            removeFromList(notFound);
+            enableUI();
             clearInfoLabel();
             showErrorMessage("No Department with id " + notFound.getId() + " was found");
         });
