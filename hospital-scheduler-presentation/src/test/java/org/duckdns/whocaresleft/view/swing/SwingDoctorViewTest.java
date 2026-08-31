@@ -547,4 +547,177 @@ class SwingDoctorViewTest {
         window.label("errorLabel").requireText("Id contains invalid value: Letters, digits, and underscores only");
         verifyNoInteractions(presenter);
     }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenUIIsDisabled() {
+        window.textBox("idTextBox").enterText("doctor_id");
+        window.textBox("firstNameTextBox").enterText("doc");
+        window.textBox("lastNameTextBox").enterText("tor");
+        
+        window.button("addButton").click();
+        
+        window.textBox("idTextBox").requireNotEditable();
+        window.textBox("firstNameTextBox").requireNotEditable();
+        window.textBox("lastNameTextBox").requireNotEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireDisabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDoctorAddedIsCalledThenUIIsEnabledAgain() {
+        window.textBox("idTextBox").enterText("doctor_id");
+        window.textBox("firstNameTextBox").enterText("doc");
+        window.textBox("lastNameTextBox").enterText("tor");
+        
+        window.button("addButton").click();
+        
+        view.doctorAdded(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("firstNameTextBox").requireEditable();
+        window.textBox("lastNameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireEnabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorDuplicateDoctorIsCalledThenItShouldReEnableTheUI() {
+        window.textBox("idTextBox").enterText("doctor_id");
+        window.textBox("firstNameTextBox").enterText("doc");
+        window.textBox("lastNameTextBox").enterText("tor");
+        
+        window.button("addButton").click();
+        
+        view.showErrorDuplicateDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor"));
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("firstNameTextBox").requireEditable();
+        window.textBox("lastNameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireEnabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedThenUIIsDisabled() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> 
+            view.getDoctorListModel()
+                .addElement(doctor));
+        
+        window.list("doctorList").selectItem(0);
+        window.button("deleteButton").click();
+        
+        window.textBox("idTextBox").requireNotEditable();
+        window.textBox("firstNameTextBox").requireNotEditable();
+        window.textBox("lastNameTextBox").requireNotEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireDisabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDoctorRemovedIsCalledThenUIIsEnabledAgain() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> 
+            view.getDoctorListModel()
+                .addElement(doctor));
+        
+        window.list("doctorList").selectItem(0);
+        window.button("deleteButton").click();
+        
+        view.doctorRemoved(doctor);
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("firstNameTextBox").requireEditable();
+        window.textBox("lastNameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireEnabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorDoctorNotFoundIsCalledThenItShouldReEnableTheUI() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> 
+            view.getDoctorListModel()
+                .addElement(doctor));
+        
+        window.list("doctorList").selectItem(0);
+        window.button("deleteButton").click();
+        
+        view.showErrorDoctorNotFound(doctor);
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("firstNameTextBox").requireEditable();
+        window.textBox("lastNameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireEnabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenUIIsDisabled() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> 
+            view.getDoctorListModel()
+                .addElement(doctor));
+        
+        window.list("doctorList").selectItem(0);
+        window.checkBox("editDoctor").click();
+        window.textBox("selectedFirstNameTextBox").enterText("-new");
+        window.textBox("selectedLastNameTextBox").enterText("-new");
+        
+        window.button("updateButton").click();
+        
+        window.textBox("idTextBox").requireNotEditable();
+        window.textBox("firstNameTextBox").requireNotEditable();
+        window.textBox("lastNameTextBox").requireNotEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireDisabled();
+        window.checkBox("editDoctor").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDoctorUpdatedIsCalledThenUIIsEnabledAgain() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> 
+            view.getDoctorListModel()
+                .addElement(doctor));
+        
+        window.list("doctorList").selectItem(0);
+        window.textBox("selectedFirstNameTextBox").enterText("-new");
+        window.textBox("selectedLastNameTextBox").enterText("-new");
+        
+        window.button("updateButton").click();
+        
+        view.doctorUpdated(
+            doctor,
+            Doctor.createDoctor(Id.createId("doctor_1"), "doc-new", "tor-new"));
+        
+        window.textBox("idTextBox").requireEditable();
+        window.textBox("firstNameTextBox").requireEditable();
+        window.textBox("lastNameTextBox").requireEditable();
+        window.button("addButton").requireDisabled();
+        window.list("doctorList").requireEnabled();
+        window.checkBox("editDoctor").requireEnabled().requireNotSelected();
+        window.button("deleteButton").requireEnabled();
+        window.button("updateButton").requireDisabled();
+    }
 }
