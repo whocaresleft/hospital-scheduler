@@ -294,7 +294,9 @@ class SwingDoctorViewTest {
             view.getDoctorListModel()
                 .addElement(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
         window.list("doctorList").selectItem(0);
+        window.checkBox("editDoctor").click();
 
+        window.checkBox("editDoctor").requireSelected();
         window.textBox("selectedFirstNameTextBox").enterText("extension");
         window.button("updateButton").click();
         window.checkBox("editDoctor").requireNotSelected();
@@ -412,7 +414,7 @@ class SwingDoctorViewTest {
     }
     
     @Test @GUITest
-    void testDoctorRemovedShouldRemoveTheDoctorToTheListShowInfoMessageAndResetErrorLabel() {
+    void testDoctorRemovedShouldRemoveTheDoctorFromTheListShowInfoMessageAndResetErrorLabel() {
         Doctor doctor1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doc", "Tor");
         Doctor doctor2 = Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter");
         
@@ -431,7 +433,7 @@ class SwingDoctorViewTest {
     }
     
     @Test @GUITest
-    void testDoctorUpdateShouldUpdateTheDoctorInTheListShowInfoMessageAndResetErrorLabel() {
+    void testDoctorUpdatedShouldUpdateTheDoctorInTheListShowInfoMessageAndResetErrorLabel() {
         Doctor oldDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "Old", "Doctor");
         Doctor newDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor");
         
@@ -514,6 +516,24 @@ class SwingDoctorViewTest {
                 .updateDoctor(
                     doctor,
                     Doctor.createDoctor(Id.createId("doctor_1"), "doc exte", "tor nsion")));
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsEnabledAndEditIsFirstDeselectedAndReselectedThenUpdateShouldBeEnableAgain() {
+        Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
+        GuiActionRunner.execute(() -> {
+            view.getDoctorListModel()
+                .addElement(doctor);
+        });
+        window.list("doctorList").selectItem(0);
+        window.checkBox("editDoctor").click();
+        window.textBox("selectedFirstNameTextBox").enterText(" exte");
+        
+        window.button("updateButton").requireEnabled();
+        window.checkBox("editDoctor").click();
+        window.button("updateButton").requireDisabled();
+        window.checkBox("editDoctor").click();
+        window.button("updateButton").requireEnabled();
     }
     
     @Test @GUITest

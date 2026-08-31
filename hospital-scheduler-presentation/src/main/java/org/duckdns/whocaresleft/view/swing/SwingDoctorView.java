@@ -337,20 +337,13 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             selectedFirstNameTextBox.setEditable(ticked);
             selectedLastNameTextBox.setEditable(ticked);
             
-            if (!ticked) updateButton.setEnabled(false);
+            updateButton.setEnabled(ticked && isUpdatePossible());
         });
         
         KeyAdapter updateButtonEnabler = new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                Doctor d = doctorList.getSelectedValue();
-                
-                String fnText = selectedFirstNameTextBox.getText();
-                String lnText = selectedLastNameTextBox.getText();
-                
-                updateButton.setEnabled(
-                    !fnText.isBlank() && !lnText.isBlank() &&
-                    !(fnText.equals(d.getFirstName()) && lnText.equals(d.getLastName())));
+                updateButton.setEnabled(isUpdatePossible());
             }
         };
         
@@ -366,7 +359,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             
             new Thread(() -> presenter.updateDoctor(current, updated)).start();
             
-            editDoctor.setEnabled(false);
+            editDoctor.setSelected(false);
             showInfoMessage("Updating Doctor...");
         });
     }
@@ -374,6 +367,16 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     public void setPresenter(DoctorPresenter presenter) { this.presenter = presenter; }
     
     public DefaultListModel<Doctor> getDoctorListModel() { return doctorListModel; }
+    
+    private boolean isUpdatePossible() {
+        Doctor d = doctorList.getSelectedValue();
+        
+        String fnText = selectedFirstNameTextBox.getText();
+        String lnText = selectedLastNameTextBox.getText();
+        
+        return !fnText.isBlank() && !lnText.isBlank() &&
+        !(fnText.equals(d.getFirstName()) && lnText.equals(d.getLastName()));
+    }
     
     private void showInfoMessage(String message) { infoLabel.setText(message); }
     private void clearInfoLabel() { showInfoMessage(" "); }
