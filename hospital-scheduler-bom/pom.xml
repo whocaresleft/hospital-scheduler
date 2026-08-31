@@ -21,6 +21,7 @@
     <picocli.version>4.7.7</picocli.version>
     <equalsverifier.version>4.5.1</equalsverifier.version>
     <awaitility.version>4.3.0</awaitility.version>
+    <equalsverifier.version>4.5.2</equalsverifier.version>
   </properties>
 
   <dependencyManagement>
