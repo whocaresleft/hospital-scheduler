@@ -37,8 +37,9 @@ public class MariaDepartmentRepository implements DepartmentRepository {
     
     @Override
     public void save(Department department) throws DuplicateDepartmentException {
-        if (findById(department.getId()) != null)
-            throw new DuplicateDepartmentException(department);
+        Department found = findById(department.getId());
+        if (found != null)
+            throw new DuplicateDepartmentException(found);
         entityManager.persist(DepartmentEntity.fromDepartment(department));
     }
     
