@@ -391,6 +391,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testShowAllDoctorsShouldAddEachDoctorsDescriptionToTheList() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor d1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doctor", "One");
         Doctor d2 = Doctor.createDoctor(Id.createId("doctor_2"), "Doktor", "Two");
         
@@ -528,6 +529,7 @@ class SwingDoctorViewTest {
     
     @Test @GUITest
     void testWhenDeleteButtonIsPressedThenItShouldDelegateToPresenterRemoveDoctor() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Doctor doctor = Doctor.createDoctor(Id.createId("doctor_1"), "doc", "tor");
         GuiActionRunner.execute(() -> {
             view.getDoctorListModel()

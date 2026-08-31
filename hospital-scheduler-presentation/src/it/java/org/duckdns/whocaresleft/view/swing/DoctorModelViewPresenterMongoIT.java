@@ -1,10 +1,9 @@
-package org.duckdns.whocaresleft.view.swing.mongodb;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+package org.duckdns.whocaresleft.view.swing;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.Containers;
@@ -15,7 +14,6 @@ import org.duckdns.whocaresleft.presenter.DoctorPresenter;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 import org.duckdns.whocaresleft.transaction.TransactionManager;
 import org.duckdns.whocaresleft.transaction.mongodb.MongoTransactionManager;
-import org.duckdns.whocaresleft.view.swing.SwingDoctorView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,6 +66,7 @@ class DoctorModelViewPresenterMongoIT {
             view = new SwingDoctorView();
             presenter = new DoctorPresenter(transactionManager, view);
             view.setPresenter(presenter);
+            view.enableUI();
             return view;
         });
         window = Containers.showInFrame(view);

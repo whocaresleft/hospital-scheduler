@@ -1,4 +1,4 @@
-package org.duckdns.whocaresleft.view.swing.mongodb;
+package org.duckdns.whocaresleft.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -16,7 +16,6 @@ import org.duckdns.whocaresleft.presenter.DoctorPresenter;
 import org.duckdns.whocaresleft.repository.DoctorRepository;
 import org.duckdns.whocaresleft.transaction.TransactionManager;
 import org.duckdns.whocaresleft.transaction.mongodb.MongoTransactionManager;
-import org.duckdns.whocaresleft.view.swing.SwingDoctorView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,6 +68,7 @@ class SwingDoctorViewMongoIT {
             view = new SwingDoctorView();
             presenter = new DoctorPresenter(transactionManager, view);
             view.setPresenter(presenter);
+            view.enableUI();
             return view;
         });
         window = Containers.showInFrame(view);

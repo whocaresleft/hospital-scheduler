@@ -139,6 +139,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         
         doctorListModel = new DefaultListModel<>();
         doctorList = new JList<>(doctorListModel);
+        doctorList.setEnabled(false);
         scrollPane.setViewportView(doctorList);
         doctorList.setName("doctorList");
         

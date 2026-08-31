@@ -184,6 +184,7 @@ class SwingDepartmentViewTest {
     
     @Test @GUITest
     void testWhenEditDepartmentCheckBoxIsTickedThenTheSelectedNameTextBoxShouldBeEditable() {
+        GuiActionRunner.execute(() -> view.enableUI());
         GuiActionRunner.execute(() ->
             view.getDepartmentListModel()
                 .addElement(Department.createDepartment(Id.createId("er"), "Emergency Room")));
@@ -391,6 +392,7 @@ class SwingDepartmentViewTest {
     
     @Test @GUITest
     void testShowErrorDepartmentNotFoundShouldShowMessageInErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
         Department notFound = Department.createDepartment(Id.createId("er"), "Not Found");
         
         view.showErrorDepartmentNotFound(notFound);
