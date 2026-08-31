@@ -31,7 +31,7 @@
       **/repository/**/*RepositoryProvider*
     </sonar.coverage.exclusions>
     <sonar.cpd.exclusions>
-      **/view/swing/*.*
+      **/view/swing/**/*.java
     </sonar.cpd.exclusions>
     <sonar.organization>whocaresleft</sonar.organization>
     
