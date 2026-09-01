@@ -274,35 +274,14 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         
         KeyAdapter addButtonEnabler = new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                addButton.setEnabled(
-                    !idTextBox.getText().isBlank() &&
-                    !firstNameTextBox.getText().isBlank() &&
-                    !lastNameTextBox.getText().isBlank());
-            }
+            public void keyReleased(KeyEvent e) { addButton.setEnabled(isAddPossible()); }
         };
         
         idTextBox.addKeyListener(addButtonEnabler);
         firstNameTextBox.addKeyListener(addButtonEnabler);
         lastNameTextBox.addKeyListener(addButtonEnabler);
         
-        addButton.addActionListener(e -> {
-            try {
-                Doctor doctor = Doctor.createDoctor(
-                    Id.createId(idTextBox.getText()),
-                    firstNameTextBox.getText(), lastNameTextBox.getText());
-                
-                disableUI();
-                new Thread(() -> presenter.addDoctor(doctor)).start();
-                
-                idTextBox.setText("");
-                firstNameTextBox.setText("");
-                lastNameTextBox.setText("");
-                showInfoMessage("Adding Doctor...");
-            } catch (IllegalArgumentException iae) {
-                showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
-            }
-        });
+        addButton.addActionListener(e -> add());
         
         doctorList.addListSelectionListener(e -> {
             boolean isDoctorSelected = !doctorList.isSelectionEmpty();
@@ -323,19 +302,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             }
         });
         
-        deleteButton.addActionListener(e -> {
-            Doctor d = doctorList.getSelectedValue();
-            
-            disableUI();
-            new Thread(() -> presenter.removeDoctor(d)).start();
-
-            doctorList.clearSelection();
-            
-            selectedIdTextBox.setText("");
-            selectedFirstNameTextBox.setText("");
-            selectedLastNameTextBox.setText("");
-            showInfoMessage("Deleting Doctor...");
-        });
+        deleteButton.addActionListener(e -> delete());
         
         editDoctor.addChangeListener(e -> {
             boolean ticked = editDoctor.isSelected();
@@ -349,31 +316,71 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         
         KeyAdapter updateButtonEnabler = new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                updateButton.setEnabled(isUpdatePossible());
-            }
+            public void keyReleased(KeyEvent e) { updateButton.setEnabled(isUpdatePossible()); }
         };
         
         selectedFirstNameTextBox.addKeyListener(updateButtonEnabler);
         selectedLastNameTextBox.addKeyListener(updateButtonEnabler);
         
-        updateButton.addActionListener(e -> {
-            Doctor current = doctorList.getSelectedValue();
-            Doctor updated = Doctor.createDoctor(
-                current.getId(),
-                selectedFirstNameTextBox.getText(),
-                selectedLastNameTextBox.getText());
-
-            editDoctor.setSelected(false);
-            disableUI();
-            new Thread(() -> presenter.updateDoctor(current, updated)).start();
-            showInfoMessage("Updating Doctor...");
-        });
+        updateButton.addActionListener(e -> update());
     }
     
     public void setPresenter(DoctorPresenter presenter) { this.presenter = presenter; }
     
     public DefaultListModel<Doctor> getDoctorListModel() { return doctorListModel; }
+    
+    private void add() {
+        Doctor doctor;
+        try {
+            doctor = Doctor.createDoctor(
+                Id.createId(idTextBox.getText()),
+                firstNameTextBox.getText(), lastNameTextBox.getText());
+        } catch (IllegalArgumentException iae) {
+            showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
+            return;
+        }
+            
+        disableUI();
+        new Thread(() -> presenter.addDoctor(doctor)).start();
+        
+        idTextBox.setText("");
+        firstNameTextBox.setText("");
+        lastNameTextBox.setText("");
+        showInfoMessage("Adding Doctor...");
+    }
+    
+    private void delete() {
+        Doctor d = doctorList.getSelectedValue();
+        
+        disableUI();
+        new Thread(() -> presenter.removeDoctor(d)).start();
+        
+        doctorList.clearSelection();
+        
+        selectedIdTextBox.setText("");
+        selectedFirstNameTextBox.setText("");
+        selectedLastNameTextBox.setText("");
+        showInfoMessage("Deleting Doctor...");
+    }
+    
+    private void update() {
+        Doctor current = doctorList.getSelectedValue();
+        Doctor updated = Doctor.createDoctor(
+            current.getId(),
+            selectedFirstNameTextBox.getText(),
+            selectedLastNameTextBox.getText());
+
+        editDoctor.setSelected(false);
+        disableUI();
+        new Thread(() -> presenter.updateDoctor(current, updated)).start();
+        showInfoMessage("Updating Doctor...");
+    }
+    
+    private boolean isAddPossible() {
+        return !idTextBox.getText().isBlank()
+            && !firstNameTextBox.getText().isBlank()
+            && !lastNameTextBox.getText().isBlank();
+    }
     
     private boolean isUpdatePossible() {
         Doctor d = doctorList.getSelectedValue();
@@ -385,16 +392,22 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         !(fnText.equals(d.getFirstName()) && lnText.equals(d.getLastName()));
     }
     
-    private void showInfoMessage(String message) { infoLabel.setText(message); }
-    private void clearInfoLabel() { showInfoMessage(" "); }
+    void showInfoMessage(String message) {
+        infoLabel.setText(message);
+        clearErrorLabel();
+    }
+    private void clearInfoLabel() { infoLabel.setText(" "); }
     
-    private void showErrorMessage(String message) { errorLabel.setText(message); }
-    private void clearErrorLabel() { showErrorMessage(" "); }
+    void showErrorMessage(String message) {
+        clearInfoLabel();
+        errorLabel.setText(message);
+    }
+    private void clearErrorLabel() { errorLabel.setText(" "); }
     
     private void addToList(Doctor toAdd) { doctorListModel.addElement(toAdd); }
     private void removeFromList(Doctor toRemove) { doctorListModel.removeElement(toRemove); }
     
-    private void disableUI() {
+    void disableUI() {
         idTextBox.setEditable(false);
         firstNameTextBox.setEditable(false);
         lastNameTextBox.setEditable(false);
@@ -452,7 +465,6 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             addToList(doctor);
             enableUI();
             showInfoMessage("Doctor added!");
-            clearErrorLabel();
         });
     }
     
@@ -462,7 +474,6 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             removeFromList(doctor);
             enableUI();
             showInfoMessage("Doctor removed!");
-            clearErrorLabel();
         });
     }
     
@@ -473,7 +484,6 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             doctorListModel.setElementAt(newDoctor, oldDoctorIndex);
             restoreUpdateUI();
             showInfoMessage("Doctor updated!");
-            clearErrorLabel();
         });
     }
     
@@ -482,7 +492,6 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         SwingUtilities.invokeLater(() -> {
             addToList(found);
             enableUI();
-            clearInfoLabel();
             showErrorMessage("A Doctor with id " + found.getId().getValue() + " already exists");
         });
     }
@@ -492,7 +501,6 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         SwingUtilities.invokeLater(() -> {
             removeFromList(notFound);
             enableUI();
-            clearInfoLabel();
             showErrorMessage("No Doctor with id " + notFound.getId().getValue() + " was found");
         });
     }
