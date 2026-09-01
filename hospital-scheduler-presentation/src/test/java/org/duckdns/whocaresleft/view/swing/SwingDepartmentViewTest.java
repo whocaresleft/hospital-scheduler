@@ -719,6 +719,7 @@ class SwingDepartmentViewTest {
                 .addElement(department));
         
         window.list("departmentList").selectItem(0);
+        window.checkBox("editDepartment").click();
         window.textBox("selectedNameTextBox").enterText("-new");
         
         window.button("updateButton").click();

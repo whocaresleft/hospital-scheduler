@@ -1,11 +1,20 @@
 package org.duckdns.whocaresleft.view.swing;
 
+import static org.awaitility.Awaitility.await;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -20,6 +29,8 @@ import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JButtonFixture;
 import org.assertj.swing.fixture.JListFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
+import org.duckdns.whocaresleft.core.Id;
+import org.duckdns.whocaresleft.model.Shift;
 import org.duckdns.whocaresleft.presenter.ShiftPresenter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,6 +56,22 @@ class SwingShiftViewTest {
 
     private SwingShiftView view;
     private FrameFixture window;
+    
+    private JLabel searchDateLabel(int day) {
+        return window.robot().finder().find(new GenericTypeMatcher<JLabel>(JLabel.class) {
+            @Override
+            protected boolean isMatching(JLabel label) {
+                return ("" + day).equals(label.getText()) && label.isShowing();
+            }
+        });
+    }
+    
+    private void slideDownToHourInMenu(int hour) {
+        if (hour > 23) return;
+        for(int i = 0; i < hour + 1; i++) {
+            window.robot().pressAndReleaseKeys(KeyEvent.VK_DOWN);
+        }
+    }
     
     @BeforeAll
     static void setupOnce() {
@@ -229,19 +256,957 @@ class SwingShiftViewTest {
         window.button("addButton").requireEnabled();
     }
     
-    private JLabel searchDateLabel(int day) {
-        return window.robot().finder().find(new GenericTypeMatcher<JLabel>(JLabel.class) {
-            @Override
-            protected boolean isMatching(JLabel label) {
-                return ("" + day).equals(label.getText()) && label.isShowing();
-            }
-        });
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenTheInputTextFieldsShouldBeClearedAndAddButtonDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        JTextComponentFixture doctorIdTextBox = window.textBox("doctorIdTextBox");
+        JTextComponentFixture departmentIdTextBox = window.textBox("departmentIdTextBox");
+        JTextComponentFixture dateTextBox = window.textBox("dateTextBox");
+        JTextComponentFixture startTimeTextBox = window.textBox("startTimeTextBox");
+        JTextComponentFixture endTextBox = window.textBox("endTimeTextBox");
+        JButtonFixture addButton = window.button("addButton");
+        
+        doctorIdTextBox.enterText("doctor_id");
+        departmentIdTextBox.enterText("er");
+        dateTextBox.enterText("24/07/2026");
+        startTimeTextBox.enterText("08:00");
+        endTextBox.enterText("09:00");
+        addButton.requireEnabled();
+        
+        addButton.click();
+        
+        doctorIdTextBox.requireText("");
+        departmentIdTextBox.requireText("");
+        dateTextBox.requireText("");
+        startTimeTextBox.requireText("");
+        endTextBox.requireText("");
+        addButton.requireDisabled();
     }
     
-    private void slideDownToHourInMenu(int hour) {
-        if (hour > 23) return;
-        for(int i = 0; i < hour + 1; i++) {
-            window.robot().pressAndReleaseKeys(KeyEvent.VK_DOWN);
-        }
+    @Test @GUITest
+    void testWhenShiftIsSelectedThenTheSelectedShiftTextFieldsShouldContainItsValues() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        
+        window.list("shiftList").selectItem(0);
+        
+        window.textBox("selectedDoctorIdTextBox").requireText("doctor_id");
+        window.textBox("selectedDepartmentIdTextBox").requireText("er");
+        window.textBox("selectedDateTextBox").requireText("24/07/2026");
+        window.textBox("selectedStartTimeTextBox").requireText("08:00");
+        window.textBox("selectedEndTimeTextBox").requireText("09:00");
+    }
+    
+    @Test @GUITest
+    void testWhenShiftIsSelectedThenDeleteButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        
+        window.button("deleteButton").requireDisabled();
+        window.list("shiftList").selectItem(0);
+        window.button("deleteButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShiftIsSelectedThenEditCheckBoxShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        
+        window.checkBox("editShift").requireDisabled();
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenEditCheckBoxIsTickedThenDeleteButtonShouldBeDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").requireEnabled();
+        window.checkBox("editShift").click();
+        window.button("deleteButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenEditCheckBoxIsTickedThenTheSelectedShiftTextBoxesShouldBeEditable() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedDoctorIdTextBox").requireEnabled().requireEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireEnabled().requireEditable();
+        window.textBox("selectedDateTextBox").requireEnabled().requireEditable();
+        window.button("selectedDateButton").requireEnabled();
+        window.textBox("selectedStartTimeTextBox").requireEnabled().requireEditable();
+        window.button("selectedStartTimeButton").requireEnabled();
+        window.textBox("selectedEndTimeTextBox").requireEnabled().requireEditable();
+        window.button("selectedEndTimeButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenSelectedShiftDoctorIdIsModifiedThenUpdateButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.button("updateButton").requireDisabled();
+        
+        window.textBox("selectedDoctorIdTextBox").setText("");
+        window.textBox("selectedDoctorIdTextBox").enterText("another_doctor_id");
+        
+        window.button("updateButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenSelectedShiftDepartmentIdIsModifiedThenUpdateButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.button("updateButton").requireDisabled();
+        
+        window.textBox("selectedDepartmentIdTextBox").setText("");
+        window.textBox("selectedDepartmentIdTextBox").enterText("sr");
+        
+        window.button("updateButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenSelectedShiftDateIsModifiedThenUpdateButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.button("updateButton").requireDisabled();
+        
+        window.textBox("selectedDateTextBox").setText("");
+        window.textBox("selectedDateTextBox").enterText("01/09/2026");
+        
+        window.button("updateButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenSelectedShiftStartTimeIsModifiedThenUpdateButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.button("updateButton").requireDisabled();
+        
+        window.textBox("selectedStartTimeTextBox").setText("");
+        window.textBox("selectedStartTimeTextBox").enterText("08:30");
+        
+        window.button("updateButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenSelectedShiftEndTimeIsModifiedThenUpdateButtonShouldBeEnabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.button("updateButton").requireDisabled();
+        
+        window.textBox("selectedEndTimeTextBox").setText("");
+        window.textBox("selectedEndTimeTextBox").enterText("09:30");
+        
+        window.button("updateButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedThenTheSelectedShiftShouldBeDeselected() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        window.list("shiftList").requireNoSelection();
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedThenTheSelectedShiftTextBoxesShouldBeCleared() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        window.textBox("selectedDoctorIdTextBox").requireText("");
+        window.textBox("selectedDepartmentIdTextBox").requireText("");
+        window.textBox("selectedDateTextBox").requireText("");
+        window.textBox("selectedStartTimeTextBox").requireText("");
+        window.textBox("selectedEndTimeTextBox").requireText("");
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenTheEditShiftCheckBoxShouldBeDeselected() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.checkBox("editShift").requireSelected();
+        window.textBox("selectedDoctorIdTextBox").enterText("_new");
+        window.button("updateButton").click();
+        window.checkBox("editShift").requireNotSelected();
+    }
+    
+    @Test @GUITest
+    void testWhenEditShiftIsDeselectedWhileUpdateButtonIsEnabledThenUpdateButtonShouldBeDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedDoctorIdTextBox").enterText("_new");
+        window.button("updateButton").requireEnabled();
+        
+        window.checkBox("editShift").click();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenInfoLabelShouldShowActionMessage() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_id");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        window.label("infoLabel").requireText("Adding Shift...");
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedThenInfoLabelShouldShowActionMessage() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        window.label("infoLabel").requireText("Deleting Shift...");
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenInfoLabelShouldShowActionMessage() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedDoctorIdTextBox").enterText("_new");
+        window.button("updateButton").click();
+        
+        window.label("infoLabel").requireText("Updating Shift...");
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenItShouldKeepUpdatedInfoBothInSelectedShiftTextBoxesAndListSelection() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        GuiActionRunner.execute(() ->
+            view.getShiftListModel().addElement(
+                Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedDoctorIdTextBox").enterText("_new");
+        window.button("updateButton").click();
+        
+        window.list("shiftList").requireSelection(0);
+        window.textBox("selectedDoctorIdTextBox").requireText("doctor_id_new");
+    }
+    
+    @Test @GUITest
+    void testShowAllShiftsShouldAddEachShiftDescriptionToTheList() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift s1 = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30);
+        Shift s2 = Shift.createShift(
+                Id.createId("doctor_2"), Id.createId("er"), DATE_24_07_2026, TIME_08_30, TIME_09_00);
+        
+        view.showAllShifts(Arrays.asList(s1, s2));
+        
+        String[] listContents = window.list("shiftList").contents();
+        assertThat(listContents)
+            .containsExactlyInAnyOrder(s1.toString(), s2.toString());
+    }
+    
+    @Test @GUITest
+    void testShowAllShiftsShouldEnableUI() {
+        Shift s1 = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30);
+        Shift s2 = Shift.createShift(
+            Id.createId("doctor_2"), Id.createId("er"), DATE_24_07_2026, TIME_08_30, TIME_09_00);
+        
+        view.showAllShifts(Arrays.asList(s1, s2));
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testShowErrorOverlappedShiftShouldShowMessageInErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift original = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift overlapped = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("sr"), DATE_24_07_2026, TIME_08_30, TIME_09_30);
+        
+        view.showErrorOverlappedShift(original, overlapped);
+        
+        window.label("errorLabel").requireText("Shift doctor_1-er overlaps with doctor_1-sr on 2026-07-24 (08:00-09:00/08:30-09:30)");
+    }
+    
+    @Test @GUITest
+    void testShowErrorShiftNotFoundShouldShowMessageInErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift notFound = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        
+        view.showErrorShiftNotFound(notFound);
+        
+        window.label("errorLabel").requireText("No Shift matching (doctor_1-er), 2026-07-24: (08:00-09:00) was found");
+    }
+    
+    @Test @GUITest
+    void testShowErrorDoctorNotFoundShouldShowMessageInErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Id nonExistentDoctorId = Id.createId("doctor_id");
+        
+        view.showErrorDoctorNotFound(nonExistentDoctorId);
+        
+        window.label("errorLabel").requireText("No Doctor with id doctor_id was found");
+    }
+    
+    @Test @GUITest
+    void testShowErrorDepartmentNotFoundShouldShowMessageInErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Id nonExistentDepartmentId = Id.createId("er");
+        
+        view.showErrorDepartmentNotFound(nonExistentDepartmentId);
+        
+        window.label("errorLabel").requireText("No Department with id er was found");
+    }
+    
+    @Test @GUITest
+    void testShiftAddedShouldAddTheShiftToTheListShowInfoMessageAndClearErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        
+        view.shiftAdded(shift);
+        
+        assertThat(window.list("shiftList").contents())
+            .containsExactly(shift.toString());
+        window.label("infoLabel").requireText("Shift added!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testShiftRemovedShouldRemoveTheShiftFromTheListShowInfoMessageAndClearErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift s1 = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift s2 = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("sr"), DATE_24_07_2026, TIME_09_00, TIME_09_30);
+        
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Shift> dlm = view.getShiftListModel();
+            dlm.addElement(s1);
+            dlm.addElement(s2);
+        });
+        
+        view.shiftRemoved(Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("sr"), DATE_24_07_2026, TIME_09_00, TIME_09_30));
+        
+        assertThat(window.list("shiftList").contents())
+            .containsExactly(s1.toString());
+        window.label("infoLabel").requireText("Shift removed!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testShiftUpdatedShouldUpdateTheShiftInTheListShowInfoMessageAndClearErrorLabel() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift oldShift = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift newShift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("sr"), DATE_24_07_2026, TIME_08_30, TIME_09_00);
+        
+        GuiActionRunner.execute(() -> 
+            view.getShiftListModel().addElement(oldShift));
+        
+        view.shiftUpdated(
+            Shift.createShift(Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00),
+            Shift.createShift(Id.createId("doctor_1"), Id.createId("sr"), DATE_24_07_2026, TIME_08_30, TIME_09_00));
+        
+        assertThat(window.list("shiftList").contents())
+            .containsExactly(newShift.toString());
+        window.label("infoLabel").requireText("Shift updated!");
+        window.label("errorLabel").requireText(" ");
+    }
+    
+    @Test @GUITest
+    void testWhenShiftIsSelectedAndEditIsTickedThenChangingSelectionShouldRemoveTheTickAndReEnableDeleteButton() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift s1 = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        Shift s2 = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("sr"), DATE_24_07_2026, TIME_09_00, TIME_09_30);
+        
+        GuiActionRunner.execute(() -> {
+            DefaultListModel<Shift> dlm = view.getShiftListModel();
+            dlm.addElement(s1);
+            dlm.addElement(s2);
+        });
+        window.list("shiftList").selectItem(0);
+        
+        window.checkBox("editShift").click();
+        window.button("deleteButton").requireDisabled();
+        
+        window.list("shiftList").selectItem(1);
+        
+        window.checkBox("editShift").requireEnabled().requireNotSelected();
+        window.button("deleteButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenItShouldDelegateToPresenterAddShift() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_id");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .addShift(Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedItShouldDelegateToPresenterRemoveShift() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .removeShift(shift));
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedItShouldDelegateToPresenterUpdateShift() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedStartTimeTextBox").setText("");
+        window.textBox("selectedEndTimeTextBox").setText("");
+        window.textBox("selectedStartTimeTextBox").enterText("08:30");
+        window.textBox("selectedEndTimeTextBox").enterText("09:30");
+        
+        window.button("updateButton").click();
+        
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+            verify(presenter)
+                .updateShift(
+                    shift,
+                    Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_30, TIME_09_30)));
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsEnabledAndEditCheckboxIsDeselectedAndReselectedThenUpdateShouldBeEnabledAgainWithoutFurtherFieldsModifications() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedStartTimeTextBox").setText("");
+        window.textBox("selectedStartTimeTextBox").enterText("08:30");
+        
+        window.button("updateButton").requireEnabled();
+        window.checkBox("editShift").click();
+        window.button("updateButton").requireDisabled();
+        window.checkBox("editShift").click();
+        window.button("updateButton").requireEnabled();
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedAndDoctorIdCreationFailsThenItDoesNotDelegateToPresenterAddShift() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("invalid-doctor-id");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        window.label("errorLabel").requireText("Doctor Id contains invalid value: Letters, digits, and underscores only");
+        verifyNoInteractions(presenter);
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedAndDepartmentIdCreationFailsThenItDoesNotDelegateToPresenterAddShift() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_id");
+        window.textBox("departmentIdTextBox").enterText("invalid-department-id");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        window.label("errorLabel").requireText("Department Id contains invalid value: Letters, digits, and underscores only");
+        verifyNoInteractions(presenter);
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedAndShiftCreationFailsThenItDoesNotDelegateToPresenterAddShift() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_id");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("09:00");
+        window.textBox("endTimeTextBox").enterText("08:00");
+        
+        window.button("addButton").click();
+        
+        window.label("errorLabel").requireText("Shift has negative duration, starting time is after than ending time");
+        verifyNoInteractions(presenter);
+    }
+    
+    @Test @GUITest
+    void testWhenAddButtonIsPressedThenUIIsDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_id");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        window.textBox("doctorIdTextBox").requireNotEditable();
+        window.textBox("departmentIdTextBox").requireNotEditable();
+        window.textBox("dateTextBox").requireNotEditable();
+        window.button("dateButton").requireDisabled();
+        window.textBox("startTimeTextBox").requireNotEditable();
+        window.button("startTimeButton").requireDisabled();
+        window.textBox("endTimeTextBox").requireNotEditable();
+        window.button("endTimeButton").requireDisabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireDisabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShiftAddedIsCalledThenUIIsEnabledAgain() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_id");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        view.shiftAdded(Shift.createShift(Id.createId("doctor_id"), Id.createId("er"),
+            DATE_24_07_2026, TIME_08_00, TIME_09_00));
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorOverlappedShiftIsCalledThenItShouldReEnableTheUI() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_2");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        view.showErrorOverlappedShift(
+            Shift.createShift(Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00),
+            Shift.createShift(Id.createId("doctor_2"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00));
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorDoctorNotFoundtIsCalledThenItShouldReEnableTheUI() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_id");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        view.showErrorDoctorNotFound(Id.createId("doctor_id"));
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorDepartmentNotFoundIsCalledThenItShouldReEnableTheUI() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        window.textBox("doctorIdTextBox").enterText("doctor_2");
+        window.textBox("departmentIdTextBox").enterText("er");
+        window.textBox("dateTextBox").enterText("24/07/2026");
+        window.textBox("startTimeTextBox").enterText("08:00");
+        window.textBox("endTimeTextBox").enterText("09:00");
+        
+        window.button("addButton").click();
+        
+        view.showErrorDepartmentNotFound(Id.createId("er"));
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenDeleteButtonIsPressedThenUIIsDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        window.textBox("doctorIdTextBox").requireNotEditable();
+        window.textBox("departmentIdTextBox").requireNotEditable();
+        window.textBox("dateTextBox").requireNotEditable();
+        window.button("dateButton").requireDisabled();
+        window.textBox("startTimeTextBox").requireNotEditable();
+        window.button("startTimeButton").requireDisabled();
+        window.textBox("endTimeTextBox").requireNotEditable();
+        window.button("endTimeButton").requireDisabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireDisabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShiftRemovedIsCalledThenUIIsEnabledAgain() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        view.shiftRemoved(shift);
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShowErrorShiftNotFoundIsCalledThenItShouldReEnableUI() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        
+        window.button("deleteButton").click();
+        
+        view.showErrorShiftNotFound(shift);
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenUpdateButtonIsPressedThenUIIsDisabled() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedDoctorIdTextBox").enterText("_new");
+        window.button("updateButton").click();
+        
+        window.textBox("doctorIdTextBox").requireNotEditable();
+        window.textBox("departmentIdTextBox").requireNotEditable();
+        window.textBox("dateTextBox").requireNotEditable();
+        window.button("dateButton").requireDisabled();
+        window.textBox("startTimeTextBox").requireNotEditable();
+        window.button("startTimeButton").requireDisabled();
+        window.textBox("endTimeTextBox").requireNotEditable();
+        window.button("endTimeButton").requireDisabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireDisabled();
+        window.checkBox("editShift").requireDisabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+    
+    @Test @GUITest
+    void testWhenShiftUpdatedIsCalledThenUIIsEnabledAgain() {
+        GuiActionRunner.execute(() -> view.enableUI());
+        Shift shift = Shift.createShift(
+            Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+        GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+        window.list("shiftList").selectItem(0);
+        window.checkBox("editShift").click();
+        
+        window.textBox("selectedDoctorIdTextBox").enterText("_new");
+        window.button("updateButton").click();
+        
+        view.shiftUpdated(
+            shift,
+            Shift.createShift(
+                Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_30, TIME_09_30));
+        
+        window.textBox("doctorIdTextBox").requireEditable();
+        window.textBox("departmentIdTextBox").requireEditable();
+        window.textBox("dateTextBox").requireEditable();
+        window.button("dateButton").requireEnabled();
+        window.textBox("startTimeTextBox").requireEditable();
+        window.button("startTimeButton").requireEnabled();
+        window.textBox("endTimeTextBox").requireEditable();
+        window.button("endTimeButton").requireEnabled();
+        window.button("addButton").requireDisabled();
+        window.list("shiftList").requireEnabled();
+        window.checkBox("editShift").requireEnabled();
+        window.textBox("selectedDoctorIdTextBox").requireNotEditable();
+        window.textBox("selectedDepartmentIdTextBox").requireNotEditable();
+        window.textBox("selectedDateTextBox").requireNotEditable();
+        window.button("selectedDateButton").requireDisabled();
+        window.textBox("selectedStartTimeTextBox").requireNotEditable();
+        window.button("selectedStartTimeButton").requireDisabled();
+        window.textBox("selectedEndTimeTextBox").requireNotEditable();
+        window.button("selectedEndTimeButton").requireDisabled();
+        window.button("deleteButton").requireEnabled();
+        window.button("updateButton").requireDisabled();
     }
 }
