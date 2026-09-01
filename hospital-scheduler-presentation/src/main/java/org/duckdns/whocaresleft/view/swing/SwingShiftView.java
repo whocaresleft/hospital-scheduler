@@ -425,7 +425,7 @@ public class SwingShiftView extends JPanel implements ShiftView {
     
     public void setPresenter(ShiftPresenter presenter) { this.presenter = presenter; }
     
-    DefaultListModel<Shift> getShiftListModel() { return shiftListModel; }
+    public DefaultListModel<Shift> getShiftListModel() { return shiftListModel; }
     
     private void add() {
         Shift shift = createShift(
