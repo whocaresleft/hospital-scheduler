@@ -72,6 +72,7 @@ class SwingDoctorViewTest {
             
             @Test @GUITest
             void testInitialSetupUIIsDisabled() {
+                window.label("doctorCreation");
                 window.label("idLabel");
                 window.textBox("idTextBox").requireEnabled().requireNotEditable();
                 window.label("firstNameLabel");

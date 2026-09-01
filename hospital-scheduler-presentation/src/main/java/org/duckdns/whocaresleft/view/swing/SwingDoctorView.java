@@ -22,7 +22,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JCheckBox;
-import javax.swing.JSeparator;
 import java.awt.Color;
 import javax.swing.JScrollPane;
 
@@ -42,25 +41,35 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     private JCheckBox editDoctor;
     private JButton deleteButton;
     private JButton updateButton;
+    
+    private transient DoctorPresenter presenter;
+    private JLabel addDoctorLabel;
     private JLabel infoLabel;
     private JLabel errorLabel;
     
-    private transient DoctorPresenter presenter;
-    
     public SwingDoctorView() {
         GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
-        gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gridBagLayout.columnWeights = new double[]{1.0, 1.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
-        gridBagLayout.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+        gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0};
+        gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        gridBagLayout.columnWeights = new double[]{1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+        gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         setLayout(gridBagLayout);
+        
+        addDoctorLabel = new JLabel("Doctor Creation");
+        addDoctorLabel.setName("doctorCreation");
+        GridBagConstraints gbc_addDoctorLabel = new GridBagConstraints();
+        gbc_addDoctorLabel.gridwidth = 4;
+        gbc_addDoctorLabel.insets = new Insets(0, 0, 5, 0);
+        gbc_addDoctorLabel.gridx = 0;
+        gbc_addDoctorLabel.gridy = 0;
+        add(addDoctorLabel, gbc_addDoctorLabel);
         
         JLabel idLabel = new JLabel("Id");
         idLabel.setName("idLabel");
         GridBagConstraints gbc_idLabel = new GridBagConstraints();
         gbc_idLabel.insets = new Insets(0, 0, 5, 5);
         gbc_idLabel.anchor = GridBagConstraints.EAST;
-        gbc_idLabel.gridx = 1;
+        gbc_idLabel.gridx = 0;
         gbc_idLabel.gridy = 1;
         add(idLabel, gbc_idLabel);
         
@@ -71,7 +80,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_idTextBox.gridwidth = 3;
         gbc_idTextBox.insets = new Insets(0, 0, 5, 0);
         gbc_idTextBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_idTextBox.gridx = 2;
+        gbc_idTextBox.gridx = 1;
         gbc_idTextBox.gridy = 1;
         add(idTextBox, gbc_idTextBox);
         idTextBox.setColumns(10);
@@ -81,7 +90,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_firstNameLabel = new GridBagConstraints();
         gbc_firstNameLabel.anchor = GridBagConstraints.EAST;
         gbc_firstNameLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_firstNameLabel.gridx = 1;
+        gbc_firstNameLabel.gridx = 0;
         gbc_firstNameLabel.gridy = 2;
         add(firstNameLabel, gbc_firstNameLabel);
         
@@ -92,7 +101,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_firstNameTextBox.gridwidth = 3;
         gbc_firstNameTextBox.insets = new Insets(0, 0, 5, 0);
         gbc_firstNameTextBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_firstNameTextBox.gridx = 2;
+        gbc_firstNameTextBox.gridx = 1;
         gbc_firstNameTextBox.gridy = 2;
         add(firstNameTextBox, gbc_firstNameTextBox);
         firstNameTextBox.setColumns(10);
@@ -102,7 +111,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_lastNameLabel = new GridBagConstraints();
         gbc_lastNameLabel.anchor = GridBagConstraints.EAST;
         gbc_lastNameLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_lastNameLabel.gridx = 1;
+        gbc_lastNameLabel.gridx = 0;
         gbc_lastNameLabel.gridy = 3;
         add(lastNameLabel, gbc_lastNameLabel);
         
@@ -113,7 +122,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_lastNameTextBox.gridwidth = 3;
         gbc_lastNameTextBox.insets = new Insets(0, 0, 5, 0);
         gbc_lastNameTextBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_lastNameTextBox.gridx = 2;
+        gbc_lastNameTextBox.gridx = 1;
         gbc_lastNameTextBox.gridy = 3;
         add(lastNameTextBox, gbc_lastNameTextBox);
         lastNameTextBox.setColumns(10);
@@ -124,16 +133,16 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_addButton = new GridBagConstraints();
         gbc_addButton.insets = new Insets(0, 0, 5, 0);
         gbc_addButton.gridwidth = 4;
-        gbc_addButton.gridx = 1;
+        gbc_addButton.gridx = 0;
         gbc_addButton.gridy = 4;
         add(addButton, gbc_addButton);
         
         JScrollPane scrollPane = new JScrollPane();
         GridBagConstraints gbc_scrollPane = new GridBagConstraints();
         gbc_scrollPane.gridwidth = 4;
-        gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
+        gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
         gbc_scrollPane.fill = GridBagConstraints.BOTH;
-        gbc_scrollPane.gridx = 1;
+        gbc_scrollPane.gridx = 0;
         gbc_scrollPane.gridy = 5;
         add(scrollPane, gbc_scrollPane);
         
@@ -143,21 +152,13 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         scrollPane.setViewportView(doctorList);
         doctorList.setName("doctorList");
         
-        JSeparator separator = new JSeparator();
-        GridBagConstraints gbc_separator = new GridBagConstraints();
-        gbc_separator.gridwidth = 4;
-        gbc_separator.insets = new Insets(0, 0, 5, 0);
-        gbc_separator.gridx = 1;
-        gbc_separator.gridy = 6;
-        add(separator, gbc_separator);
-        
         JLabel selectedDoctorLabel = new JLabel("Selected Doctor");
         selectedDoctorLabel.setName("selectedDoctorLabel");
         GridBagConstraints gbc_selectedDoctorLabel = new GridBagConstraints();
         gbc_selectedDoctorLabel.gridwidth = 2;
         gbc_selectedDoctorLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_selectedDoctorLabel.gridx = 1;
-        gbc_selectedDoctorLabel.gridy = 7;
+        gbc_selectedDoctorLabel.gridx = 0;
+        gbc_selectedDoctorLabel.gridy = 6;
         add(selectedDoctorLabel, gbc_selectedDoctorLabel);
         
         editDoctor = new JCheckBox("Edit");
@@ -166,8 +167,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_editDoctor = new GridBagConstraints();
         gbc_editDoctor.gridwidth = 2;
         gbc_editDoctor.insets = new Insets(0, 0, 5, 0);
-        gbc_editDoctor.gridx = 3;
-        gbc_editDoctor.gridy = 7;
+        gbc_editDoctor.gridx = 2;
+        gbc_editDoctor.gridy = 6;
         add(editDoctor, gbc_editDoctor);
         
         JLabel selectedIdLabel = new JLabel("Id");
@@ -175,8 +176,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_selectedIdLabel = new GridBagConstraints();
         gbc_selectedIdLabel.anchor = GridBagConstraints.EAST;
         gbc_selectedIdLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_selectedIdLabel.gridx = 1;
-        gbc_selectedIdLabel.gridy = 8;
+        gbc_selectedIdLabel.gridx = 0;
+        gbc_selectedIdLabel.gridy = 7;
         add(selectedIdLabel, gbc_selectedIdLabel);
         
         selectedIdTextBox = new JTextField();
@@ -186,8 +187,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_selectedIdTextBox.gridwidth = 3;
         gbc_selectedIdTextBox.insets = new Insets(0, 0, 5, 0);
         gbc_selectedIdTextBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_selectedIdTextBox.gridx = 2;
-        gbc_selectedIdTextBox.gridy = 8;
+        gbc_selectedIdTextBox.gridx = 1;
+        gbc_selectedIdTextBox.gridy = 7;
         add(selectedIdTextBox, gbc_selectedIdTextBox);
         selectedIdTextBox.setColumns(10);
         
@@ -196,8 +197,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_selectedFirstNameLabel = new GridBagConstraints();
         gbc_selectedFirstNameLabel.anchor = GridBagConstraints.EAST;
         gbc_selectedFirstNameLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_selectedFirstNameLabel.gridx = 1;
-        gbc_selectedFirstNameLabel.gridy = 9;
+        gbc_selectedFirstNameLabel.gridx = 0;
+        gbc_selectedFirstNameLabel.gridy = 8;
         add(selectedFirstNameLabel, gbc_selectedFirstNameLabel);
         
         selectedFirstNameTextBox = new JTextField();
@@ -207,8 +208,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_selectedFirstNameTextBox.gridwidth = 3;
         gbc_selectedFirstNameTextBox.insets = new Insets(0, 0, 5, 0);
         gbc_selectedFirstNameTextBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_selectedFirstNameTextBox.gridx = 2;
-        gbc_selectedFirstNameTextBox.gridy = 9;
+        gbc_selectedFirstNameTextBox.gridx = 1;
+        gbc_selectedFirstNameTextBox.gridy = 8;
         add(selectedFirstNameTextBox, gbc_selectedFirstNameTextBox);
         selectedFirstNameTextBox.setColumns(10);
         
@@ -217,8 +218,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_selectedLastNameLabel = new GridBagConstraints();
         gbc_selectedLastNameLabel.anchor = GridBagConstraints.EAST;
         gbc_selectedLastNameLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_selectedLastNameLabel.gridx = 1;
-        gbc_selectedLastNameLabel.gridy = 10;
+        gbc_selectedLastNameLabel.gridx = 0;
+        gbc_selectedLastNameLabel.gridy = 9;
         add(selectedLastNameLabel, gbc_selectedLastNameLabel);
         
         selectedLastNameTextBox = new JTextField();
@@ -228,8 +229,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         gbc_selectedLastNameTextBox.gridwidth = 3;
         gbc_selectedLastNameTextBox.insets = new Insets(0, 0, 5, 0);
         gbc_selectedLastNameTextBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_selectedLastNameTextBox.gridx = 2;
-        gbc_selectedLastNameTextBox.gridy = 10;
+        gbc_selectedLastNameTextBox.gridx = 1;
+        gbc_selectedLastNameTextBox.gridy = 9;
         add(selectedLastNameTextBox, gbc_selectedLastNameTextBox);
         selectedLastNameTextBox.setColumns(10);
         
@@ -239,8 +240,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_deleteButton = new GridBagConstraints();
         gbc_deleteButton.gridwidth = 2;
         gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
-        gbc_deleteButton.gridx = 1;
-        gbc_deleteButton.gridy = 11;
+        gbc_deleteButton.gridx = 0;
+        gbc_deleteButton.gridy = 10;
         add(deleteButton, gbc_deleteButton);
         
         updateButton = new JButton("Update selected");
@@ -249,27 +250,26 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         GridBagConstraints gbc_updateButton = new GridBagConstraints();
         gbc_updateButton.gridwidth = 2;
         gbc_updateButton.insets = new Insets(0, 0, 5, 0);
-        gbc_updateButton.gridx = 3;
-        gbc_updateButton.gridy = 11;
+        gbc_updateButton.gridx = 2;
+        gbc_updateButton.gridy = 10;
         add(updateButton, gbc_updateButton);
         
         infoLabel = new JLabel(" ");
         infoLabel.setName("infoLabel");
         GridBagConstraints gbc_infoLabel = new GridBagConstraints();
-        gbc_infoLabel.gridwidth = 5;
+        gbc_infoLabel.gridwidth = 4;
         gbc_infoLabel.insets = new Insets(0, 0, 5, 0);
         gbc_infoLabel.gridx = 0;
-        gbc_infoLabel.gridy = 12;
+        gbc_infoLabel.gridy = 11;
         add(infoLabel, gbc_infoLabel);
         
         errorLabel = new JLabel(" ");
-        errorLabel.setForeground(new Color(237, 51, 59));
         errorLabel.setName("errorLabel");
+        errorLabel.setForeground(new Color(237, 51, 59));
         GridBagConstraints gbc_errorLabel = new GridBagConstraints();
-        gbc_errorLabel.gridwidth = 5;
-        gbc_errorLabel.insets = new Insets(0, 0, 5, 0);
+        gbc_errorLabel.gridwidth = 4;
         gbc_errorLabel.gridx = 0;
-        gbc_errorLabel.gridy = 13;
+        gbc_errorLabel.gridy = 12;
         add(errorLabel, gbc_errorLabel);
         
         KeyAdapter addButtonEnabler = new KeyAdapter() {
