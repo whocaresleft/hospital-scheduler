@@ -353,6 +353,32 @@ class ShiftPresenterTest {
     }
     
     @Test
+    void testUpdateShiftWhenItOverlapsButWithTheOriginalOne() {
+        Id doctorId = Id.createId("doctor_id");
+        Id departmentId1 = Id.createId("department_1");
+        Id departmentId2 = Id.createId("department_2");
+        
+        Shift originalShift = Shift.createShift(
+                doctorId, departmentId1, DATE_24_07_2026, TIME_08_00, TIME_09_30);
+        Shift newShift = Shift.createShift(
+                doctorId, departmentId2, DATE_24_07_2026, TIME_08_30, TIME_09_30);
+        
+        when(doctorRepository.findById(doctorId))
+            .thenReturn(Doctor.createDoctor(doctorId, "doc", "tor"));
+        when(departmentRepository.findById(departmentId2))
+            .thenReturn(Department.createDepartment(departmentId2, "er"));
+        
+        when(shiftRepository.findByDoctorId(doctorId))
+            .thenReturn(Arrays.asList(originalShift));
+        
+        shiftPresenter.updateShift(originalShift, newShift);
+
+        InOrder inOrder = inOrder(shiftRepository, shiftView);
+        inOrder.verify(shiftRepository).update(originalShift, newShift);
+        inOrder.verify(shiftView).shiftUpdated(originalShift, newShift);
+    }
+    
+    @Test
     void testUpdateShiftWhenShiftDoesNotExist() {
         Id doctorId = Id.createId("doctor_id");
         Id departmentId = Id.createId("department_id");

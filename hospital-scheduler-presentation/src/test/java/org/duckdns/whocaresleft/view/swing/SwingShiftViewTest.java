@@ -178,7 +178,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenAddButtonIsPressedThenTheUIShouldBeDisabled() {
+            void testWhenAddButtonIsPressedThenUIShouldBeDisabled() {
                 GuiActionRunner.execute(() -> view.enableUI());
                 window.textBox("doctorIdTextBox").enterText("doctor_id");
                 window.textBox("departmentIdTextBox").enterText("er");
@@ -212,7 +212,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenShiftAddedIsCalledThenTheUIShouldBeReEnabled() {
+            void testWhenShiftAddedIsCalledThenUIShouldBeEnabled() {
                 GuiActionRunner.execute(() -> view.disableUI());
                 
                 Shift shift = Shift.createShift(
@@ -244,7 +244,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenShowErrorOverlappedShiftIsCalledThenTheUIShouldBeReEnabled() {
+            void testWhenShowErrorOverlappedShiftIsCalledThenUIShouldBeEnabled() {
                 GuiActionRunner.execute(() -> view.disableUI());
                 
                 Shift shift1 = Shift.createShift(
@@ -280,7 +280,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenShowErrorDoctorNotFoundtIsCalledThenTheUIShouldBeReEnabled() {
+            void testWhenShowErrorDoctorNotFoundtIsCalledThenUIShouldBeEnabled() {
                 GuiActionRunner.execute(() -> view.disableUI());
                 
                 view.showErrorDoctorNotFound(Id.createId("doctor_id"));
@@ -309,7 +309,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenShowErrorDepartmentNotFoundIsCalledThenTheUIShouldBeReEnabled() {
+            void testWhenShowErrorDepartmentNotFoundIsCalledThenUIShouldBeEnabled() {
                 GuiActionRunner.execute(() -> view.disableUI());
                 
                 view.showErrorDepartmentNotFound(Id.createId("er"));
@@ -338,7 +338,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenDeleteButtonIsPressedThenTheUIShouldBeDisabled() {
+            void testWhenDeleteButtonIsPressedThenUIShouldBeDisabled() {
                 GuiActionRunner.execute(() -> view.enableUI());
                 Shift shift = Shift.createShift(
                         Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
@@ -371,7 +371,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenShiftRemovedIsCalledThenTheUIShouldBeReEnabled() {
+            void testWhenShiftRemovedIsCalledThenUIShouldBeEnabled() {
                 Shift shift = Shift.createShift(
                         Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
                 GuiActionRunner.execute(() -> view.disableUI());
@@ -402,7 +402,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenShowErrorShiftNotFoundIsCalledThenItShouldReEnableUI() {
+            void testWhenShowErrorShiftNotFoundIsCalledThenUIShouldBeEnabled() {
                 GuiActionRunner.execute(() -> view.disableUI());
                 
                 view.showErrorShiftNotFound(Shift.createShift(
@@ -432,7 +432,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenUpdateButtonIsPressedThenTheUIShouldBeDisabled() {
+            void testWhenUpdateButtonIsPressedThenUIShouldBeDisabled() {
                 GuiActionRunner.execute(() -> view.enableUI());
                 Shift shift = Shift.createShift(
                         Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
@@ -467,7 +467,7 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
-            void testWhenShiftUpdatedIsCalledThenTheUIShouldBeReEnabled() {
+            void testWhenShiftUpdatedIsCalledThenUIShouldBeEnabled() {
                 Shift original = Shift.createShift(Id.createId("Doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30);
                 GuiActionRunner.execute(() -> view.getShiftListModel().addElement(original));
                 GuiActionRunner.execute(() -> view.disableUI());
