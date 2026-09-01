@@ -230,31 +230,12 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         
         KeyAdapter addButtonEnabler = new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                addButton.setEnabled(
-                    !idTextBox.getText().isBlank() &&
-                    !nameTextBox.getText().isBlank());
-            }
+            public void keyReleased(KeyEvent e) { addButton.setEnabled(isAddPossible()); }
         };
         idTextBox.addKeyListener(addButtonEnabler);
         nameTextBox.addKeyListener(addButtonEnabler);
         
-        addButton.addActionListener(e -> {
-            try {
-                Department department = Department.createDepartment(
-                    Id.createId(idTextBox.getText()),
-                    nameTextBox.getText());
-                
-                disableUI();
-                new Thread(() -> presenter.addDepartment(department)).start();
-                
-                idTextBox.setText("");
-                nameTextBox.setText("");
-                showInfoMessage("Adding Department...");
-            } catch (IllegalArgumentException iae) {
-                showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
-            }
-        });
+        addButton.addActionListener(e -> add());
         
         departmentList.addListSelectionListener(e -> {
             boolean isDepartmentSelected = !departmentList.isSelectionEmpty();
@@ -283,40 +264,66 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         
         KeyAdapter updateButtonEnabler = new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                updateButton.setEnabled(isUpdatePossible());
-            }
+            public void keyReleased(KeyEvent e) { updateButton.setEnabled(isUpdatePossible()); }
         };
         selectedNameTextBox.addKeyListener(updateButtonEnabler);
         
-        deleteButton.addActionListener(e -> {
-            Department d = departmentList.getSelectedValue();
-            
-            disableUI();
-            new Thread(() -> presenter.removeDepartment(d)).start();
-            
-            departmentList.clearSelection();
-            
-            selectedIdTextBox.setText("");
-            selectedNameTextBox.setText("");
-            showInfoMessage("Deleting Department...");
-        });
+        deleteButton.addActionListener(e -> delete());
         
-        updateButton.addActionListener(e -> {
-            Department current = departmentList.getSelectedValue();
-            Department updated = Department.createDepartment(
-                current.getId(), selectedNameTextBox.getText());
-
-            editDepartment.setSelected(false);
-            disableUI();
-            new Thread(() -> presenter.updateDepartment(current, updated)).start();
-            showInfoMessage("Updating Department...");
-        });
+        updateButton.addActionListener(e -> update());
     }
     
     public void setPresenter(DepartmentPresenter presenter) { this.presenter = presenter; }
     
     public DefaultListModel<Department> getDepartmentListModel() { return departmentListModel; }
+    
+    private void add() {
+        Department department;
+        try {
+            department = Department.createDepartment(
+                Id.createId(idTextBox.getText()),
+                nameTextBox.getText());
+        } catch (IllegalArgumentException iae) {
+            showErrorMessage("Id contains invalid value: Letters, digits, and underscores only");
+            return;
+        }
+            
+        disableUI();
+        new Thread(() -> presenter.addDepartment(department)).start();
+        
+        idTextBox.setText("");
+        nameTextBox.setText("");
+        showInfoMessage("Adding Department...");
+    }
+    
+    private void delete() {
+        Department d = departmentList.getSelectedValue();
+        
+        disableUI();
+        new Thread(() -> presenter.removeDepartment(d)).start();
+        
+        departmentList.clearSelection();
+        
+        selectedIdTextBox.setText("");
+        selectedNameTextBox.setText("");
+        showInfoMessage("Deleting Department...");
+    }
+    
+    private void update() {
+        Department current = departmentList.getSelectedValue();
+        Department updated = Department.createDepartment(
+            current.getId(), selectedNameTextBox.getText());
+        
+        editDepartment.setSelected(false);
+        disableUI();
+        new Thread(() -> presenter.updateDepartment(current, updated)).start();
+        showInfoMessage("Updating Department...");
+    }
+    
+    private boolean isAddPossible() {
+        return !idTextBox.getText().isBlank()
+            && !nameTextBox.getText().isBlank();
+    }
     
     private boolean isUpdatePossible() {
         Department d = departmentList.getSelectedValue();
@@ -325,16 +332,22 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         return !(written.isBlank() || written.equals(d.getName()));
     }
     
-    private void showInfoMessage(String message) { infoLabel.setText(message); }
-    private void clearInfoLabel() { showInfoMessage(" "); }
+    void showInfoMessage(String message) {
+        infoLabel.setText(message);
+        clearErrorLabel();
+    }
+    private void clearInfoLabel() { infoLabel.setText(" "); }
     
-    private void showErrorMessage(String message) { errorLabel.setText(message); }
-    private void clearErrorLabel() { showErrorMessage(" "); }
+    void showErrorMessage(String message) {
+        clearInfoLabel();
+        errorLabel.setText(message);
+    }
+    private void clearErrorLabel() { errorLabel.setText(" "); }
     
     private void addToList(Department toAdd) { departmentListModel.addElement(toAdd); }
     private void removeFromList(Department toRemove) { departmentListModel.removeElement(toRemove); }
     
-    private void disableUI() {
+    void disableUI() {
         idTextBox.setEditable(false);
         nameTextBox.setEditable(false);
         addButton.setEnabled(false);
@@ -385,7 +398,6 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
             addToList(department);
             enableUI();
             showInfoMessage("Department added!");
-            clearErrorLabel();
         });
     }
     
@@ -395,7 +407,6 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
             removeFromList(department);
             enableUI();
             showInfoMessage("Department removed!");
-            clearErrorLabel();
         });
     }
     
@@ -406,7 +417,6 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
             departmentListModel.setElementAt(newDepartment, oldDepartmentIndex);
             restoreUpdateUI();
             showInfoMessage("Department updated!");
-            clearErrorLabel();
         });
     }
     
@@ -415,7 +425,6 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         SwingUtilities.invokeLater(() -> {
             addToList(found);
             enableUI();
-            clearInfoLabel();
             showErrorMessage("A Department with id " + found.getId() + " already exists");
         });
     }
@@ -425,7 +434,6 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         SwingUtilities.invokeLater(() -> {
             removeFromList(notFound);
             enableUI();
-            clearInfoLabel();
             showErrorMessage("No Department with id " + notFound.getId() + " was found");
         });
     }
