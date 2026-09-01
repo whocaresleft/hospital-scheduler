@@ -22,6 +22,7 @@
     <equalsverifier.version>4.5.1</equalsverifier.version>
     <awaitility.version>4.3.0</awaitility.version>
     <equalsverifier.version>4.5.2</equalsverifier.version>
+    <datepicker.version>11.2.1</datepicker.version>
   </properties>
 
   <dependencyManagement>
@@ -149,6 +150,12 @@
         <artifactId>awaitility</artifactId>
         <version>${awaitility.version}</version>
         <scope>test</scope>
+      </dependency>
+      
+      <dependency>
+        <groupId>com.github.lgooddatepicker</groupId>
+        <artifactId>LGoodDatePicker</artifactId>
+        <version>${datepicker.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
