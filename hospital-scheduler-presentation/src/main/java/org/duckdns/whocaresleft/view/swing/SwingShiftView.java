@@ -371,41 +371,7 @@ public class SwingShiftView extends JPanel implements ShiftView {
         startTimePicker.addTimeChangeListener(e -> addButton.setEnabled(isAddPossible()));
         endTimePicker.addTimeChangeListener(e -> addButton.setEnabled(isAddPossible()));
         
-        addButton.addActionListener(e -> {
-            Id doctorId, departmentId;
-            
-            try {
-                doctorId = Id.createId(doctorIdTextBox.getText());
-            } catch (IllegalArgumentException iae) {
-                showErrorMessage("Doctor Id contains invalid value: Letters, digits, and underscores only");
-                return;
-            }
-            
-            try {
-                departmentId = Id.createId(departmentIdTextBox.getText());
-            } catch (IllegalArgumentException iae) {
-                showErrorMessage("Department Id contains invalid value: Letters, digits, and underscores only");
-                return;
-            }
-            
-            try {
-                Shift shift = Shift.createShift(doctorId, departmentId,
-                    datePicker.getDate(), startTimePicker.getTime(), endTimePicker.getTime());
-                
-                disableUI();
-                new Thread(() -> presenter.addShift(shift)).start();
-                
-                doctorIdTextBox.setText("");
-                departmentIdTextBox.setText("");
-                datePicker.setDate(null);
-                startTimePicker.setTime(null);
-                endTimePicker.setTime(null);
-                addButton.setEnabled(false);
-                showInfoMessage("Adding Shift...");
-            } catch (IllegalArgumentException iae) {
-                showErrorMessage(iae.getMessage());
-            }
-        });
+        addButton.addActionListener(e -> add());
         
         shiftList.addListSelectionListener(e -> {
             boolean isShiftSelected = !shiftList.isSelectionEmpty();
@@ -452,37 +418,96 @@ public class SwingShiftView extends JPanel implements ShiftView {
         selectedStartTimePicker.addTimeChangeListener(e -> updateButton.setEnabled(isUpdatePossible()));
         selectedEndTimePicker.addTimeChangeListener(e -> updateButton.setEnabled(isUpdatePossible()));
         
-        deleteButton.addActionListener(e -> {
-            Shift shift = shiftList.getSelectedValue();
-            
-            disableUI();
-            new Thread(() -> presenter.removeShift(shift)).start();
-            
-            shiftList.clearSelection();
-            
-            selectedDoctorIdTextBox.setText("");
-            selectedDepartmentIdTextBox.setText("");
-            selectedDatePicker.setDate(null);
-            selectedStartTimePicker.setTime(null);
-            selectedEndTimePicker.setTime(null);
-            showInfoMessage("Deleting Shift...");
-        });
+        deleteButton.addActionListener(e -> delete());
         
-        updateButton.addActionListener(e -> {
-            Shift current = shiftList.getSelectedValue();
-            Shift updated = Shift.createShift(Id.createId("doctor_id"), Id.createId("er"),
-                selectedDatePicker.getDate(), selectedStartTimePicker.getTime(), selectedEndTimePicker.getTime());
-            
-            editShift.setSelected(false);
-            disableUI();
-            new Thread(() -> presenter.updateShift(current, updated)).start();
-            showInfoMessage("Updating Shift...");
-        });
+        updateButton.addActionListener(e -> update());
     }
     
     public void setPresenter(ShiftPresenter presenter) { this.presenter = presenter; }
     
     DefaultListModel<Shift> getShiftListModel() { return shiftListModel; }
+    
+    private void add() {
+        Shift shift = createShift(
+            doctorIdTextBox.getText(),
+            departmentIdTextBox.getText(),
+            datePicker.getDate(),
+            startTimePicker.getTime(),
+            endTimePicker.getTime());
+        
+        if (shift != null) {
+            disableUI();
+            new Thread(() -> presenter.addShift(shift)).start();
+            
+            doctorIdTextBox.setText("");
+            departmentIdTextBox.setText("");
+            datePicker.setDate(null);
+            startTimePicker.setTime(null);
+            endTimePicker.setTime(null);
+            addButton.setEnabled(false);
+            showInfoMessage("Adding Shift...");
+        }
+    }
+    
+    private void delete() {
+        Shift shift = shiftList.getSelectedValue();
+        
+        disableUI();
+        new Thread(() -> presenter.removeShift(shift)).start();
+        
+        shiftList.clearSelection();
+        
+        selectedDoctorIdTextBox.setText("");
+        selectedDepartmentIdTextBox.setText("");
+        selectedDatePicker.setDate(null);
+        selectedStartTimePicker.setTime(null);
+        selectedEndTimePicker.setTime(null);
+        showInfoMessage("Deleting Shift...");
+    }
+    
+    private void update() {
+        Shift current = shiftList.getSelectedValue();
+        Shift updated = createShift(
+            selectedDoctorIdTextBox.getText(),
+            selectedDepartmentIdTextBox.getText(),
+            selectedDatePicker.getDate(),
+            selectedStartTimePicker.getTime(),
+            selectedEndTimePicker.getTime());
+        
+        if (updated != null) {
+            editShift.setSelected(false);
+            disableUI();
+            new Thread(() -> presenter.updateShift(current, updated)).start();
+            showInfoMessage("Updating Shift...");
+        }
+    }
+    
+    private Shift createShift(String doctorIdValue, String departmentIdValue, LocalDate date, LocalTime starTime, LocalTime endTime) {
+        Id doctorId, departmentId;
+        Shift shift = null;
+        
+        try {
+            doctorId = Id.createId(doctorIdValue);
+        } catch (IllegalArgumentException iae) {
+            showErrorMessage("Doctor Id contains invalid value: Letters, digits, and underscores only");
+            return null;
+        }
+        
+        try {
+            departmentId = Id.createId(departmentIdValue);
+        } catch (IllegalArgumentException iae) {
+            showErrorMessage("Department Id contains invalid value: Letters, digits, and underscores only");
+            return null;
+        }
+        
+        try {
+            shift = Shift.createShift(doctorId, departmentId, date, starTime, endTime);
+        } catch (IllegalArgumentException iae) {
+            showErrorMessage(iae.getMessage());
+        }
+        
+        return shift;
+    }
     
     private boolean isAddPossible() {
         boolean isDoctorIdPresent = !doctorIdTextBox.getText().isBlank();
@@ -522,16 +547,22 @@ public class SwingShiftView extends JPanel implements ShiftView {
                 );
     }
     
-    private void showInfoMessage(String message) { infoLabel.setText(message); }
-    private void clearInfoLabel() { infoLabel.setText(" "); }
+    void showInfoMessage(String message) {
+        infoLabel.setText(message);
+        clearErrorLabel();
+    }
+    private void clearInfoLabel() { infoLabel.setText(" ");}
     
-    private void showErrorMessage(String message) { errorLabel.setText(message); }
+    void showErrorMessage(String message) {
+        clearInfoLabel();
+        errorLabel.setText(message);
+    }
     private void clearErrorLabel() { errorLabel.setText(" "); }
     
     private void addToList(Shift toAdd) { shiftListModel.addElement(toAdd); }
     private void removeFromList(Shift toRemove) { shiftListModel.removeElement(toRemove); }
     
-    private void disableUI() {
+    void disableUI() {
         doctorIdTextBox.setEditable(false);
         departmentIdTextBox.setEditable(false);
         datePicker.getComponentDateTextField().setEditable(false);
@@ -633,7 +664,6 @@ public class SwingShiftView extends JPanel implements ShiftView {
             addToList(shift);
             enableUI();
             showInfoMessage("Shift added!");
-            clearErrorLabel();
         });
     }
     
@@ -643,7 +673,6 @@ public class SwingShiftView extends JPanel implements ShiftView {
             removeFromList(shift);
             enableUI();
             showInfoMessage("Shift removed!");
-            clearErrorLabel();
         });
     }
     
@@ -654,7 +683,6 @@ public class SwingShiftView extends JPanel implements ShiftView {
             shiftListModel.setElementAt(newShift, oldShiftIndex);
             restoreUpdateUI();
             showInfoMessage("Shift updated!");
-            clearErrorLabel();
         });
     }
     
@@ -668,8 +696,8 @@ public class SwingShiftView extends JPanel implements ShiftView {
             overlapped.getStartTime(), overlapped.getEndTime());
         
         SwingUtilities.invokeLater(() -> {
+            if (shiftListModel.indexOf(original) == -1) addToList(original);
             enableUI();
-            clearInfoLabel();
             showErrorMessage(message);
         });
     }
@@ -679,8 +707,8 @@ public class SwingShiftView extends JPanel implements ShiftView {
         String message = String.format("No Shift matching %s was found", shift);
         
         SwingUtilities.invokeLater(() -> {
+            removeFromList(shift);
             enableUI();
-            clearInfoLabel();
             showErrorMessage(message);
         });
     }
@@ -691,7 +719,6 @@ public class SwingShiftView extends JPanel implements ShiftView {
         
         SwingUtilities.invokeLater(() -> {
             enableUI();
-            clearInfoLabel();
             showErrorMessage(message);
         });
     }
@@ -702,7 +729,6 @@ public class SwingShiftView extends JPanel implements ShiftView {
         
         SwingUtilities.invokeLater(() -> {
             enableUI();
-            clearInfoLabel();
             showErrorMessage(message);
         });
     }
