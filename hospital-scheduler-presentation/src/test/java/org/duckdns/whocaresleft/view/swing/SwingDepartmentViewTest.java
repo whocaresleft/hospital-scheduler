@@ -65,6 +65,7 @@ class SwingDepartmentViewTest {
     
     @Test @GUITest
     void testInitialSetupDisabledUI() {
+        window.label("departmentCreation");
         window.label("idLabel");
         window.textBox("idTextBox").requireEnabled().requireNotEditable();
         window.label("nameLabel");
