@@ -31,6 +31,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -763,8 +765,15 @@ class SwingShiftViewTest {
         @Nested @DisplayName("Related to Update button")
         class UpdateButtonRelated {
             
-            @Test @GUITest
-            void testWhenSelectedShiftDoctorIdIsModifiedThenUpdateButtonShouldBeEnabled() {
+            @ParameterizedTest @GUITest
+            @CsvSource({
+                "selectedDoctorIdTextBox,another_doctor_id",
+                "selectedDepartmentIdTextBox,sr",
+                "selectedDateTextBox,01/09/2026",
+                "selectedStartTimeTextBox,08:30",
+                "selectedEndTimeTextBox,09:30",
+            })
+            void testWhenSelectedShiftDoctorIdIsModifiedThenUpdateButtonShouldBeEnabled(String textBoxName, String writeValue) {
                 GuiActionRunner.execute(() -> view.enableUI());
                 GuiActionRunner.execute(() ->
                     view.getShiftListModel().addElement(
@@ -774,76 +783,8 @@ class SwingShiftViewTest {
                 
                 window.button("updateButton").requireDisabled();
                 
-                window.textBox("selectedDoctorIdTextBox").setText("");
-                window.textBox("selectedDoctorIdTextBox").enterText("another_doctor_id");
-                
-                window.button("updateButton").requireEnabled();
-            }
-            
-            @Test @GUITest
-            void testWhenSelectedShiftDepartmentIdIsModifiedThenUpdateButtonShouldBeEnabled() {
-                GuiActionRunner.execute(() -> view.enableUI());
-                GuiActionRunner.execute(() ->
-                    view.getShiftListModel().addElement(
-                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
-                window.list("shiftList").selectItem(0);
-                window.checkBox("editShift").click();
-                
-                window.button("updateButton").requireDisabled();
-                
-                window.textBox("selectedDepartmentIdTextBox").setText("");
-                window.textBox("selectedDepartmentIdTextBox").enterText("sr");
-                
-                window.button("updateButton").requireEnabled();
-            }
-            
-            @Test @GUITest
-            void testWhenSelectedShiftDateIsModifiedThenUpdateButtonShouldBeEnabled() {
-                GuiActionRunner.execute(() -> view.enableUI());
-                GuiActionRunner.execute(() ->
-                    view.getShiftListModel().addElement(
-                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
-                window.list("shiftList").selectItem(0);
-                window.checkBox("editShift").click();
-                
-                window.button("updateButton").requireDisabled();
-                
-                window.textBox("selectedDateTextBox").setText("");
-                window.textBox("selectedDateTextBox").enterText("01/09/2026");
-                
-                window.button("updateButton").requireEnabled();
-            }
-            
-            @Test @GUITest
-            void testWhenSelectedShiftStartTimeIsModifiedThenUpdateButtonShouldBeEnabled() {
-                GuiActionRunner.execute(() -> view.enableUI());
-                GuiActionRunner.execute(() ->
-                    view.getShiftListModel().addElement(
-                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
-                window.list("shiftList").selectItem(0);
-                window.checkBox("editShift").click();
-                
-                window.button("updateButton").requireDisabled();
-                
-                window.textBox("selectedStartTimeTextBox").setText("");
-                window.textBox("selectedStartTimeTextBox").enterText("08:30");
-                
-                window.button("updateButton").requireEnabled();
-            }
-            
-            @Test @GUITest
-            void testWhenSelectedShiftEndTimeIsModifiedThenUpdateButtonShouldBeEnabled() {
-                GuiActionRunner.execute(() -> view.enableUI());
-                GuiActionRunner.execute(() ->
-                    view.getShiftListModel().addElement(
-                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
-                window.list("shiftList").selectItem(0);
-                window.checkBox("editShift").click();
-                
-                window.button("updateButton").requireDisabled();
-                
-                window.textBox("selectedEndTimeTextBox").setText("");
-                window.textBox("selectedEndTimeTextBox").enterText("09:30");
+                window.textBox(textBoxName).setText("");
+                window.textBox(textBoxName).enterText(writeValue);
                 
                 window.button("updateButton").requireEnabled();
             }
@@ -971,17 +912,17 @@ class SwingShiftViewTest {
                 selectedDepartmentIdTextBox.setText("").enterText("er");
                 updateButton.requireDisabled();
                 
-                selectedDateTextBox.enterText("01/01/2026");
+                selectedDateTextBox.setText("").enterText("01/01/2026");
                 updateButton.requireEnabled();
                 selectedDateTextBox.setText("").enterText("24/07/2026");
                 updateButton.requireDisabled();
                 
-                selectedStartTimeTextBox.enterText("01:00");
+                selectedStartTimeTextBox.setText("").enterText("01:00");
                 updateButton.requireEnabled();
                 selectedStartTimeTextBox.setText("").enterText("08:00");
                 updateButton.requireDisabled();
                 
-                selectedEndTextBox.enterText("02:00");
+                selectedEndTextBox.setText("").enterText("02:00");
                 updateButton.requireEnabled();
                 selectedEndTextBox.setText("").enterText("09:00");
                 updateButton.requireDisabled();

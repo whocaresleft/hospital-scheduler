@@ -483,7 +483,8 @@ public class SwingShiftView extends JPanel implements ShiftView {
     }
     
     private Shift createShift(String doctorIdValue, String departmentIdValue, LocalDate date, LocalTime starTime, LocalTime endTime) {
-        Id doctorId, departmentId;
+        Id doctorId;
+        Id departmentId;
         Shift shift = null;
         
         try {
