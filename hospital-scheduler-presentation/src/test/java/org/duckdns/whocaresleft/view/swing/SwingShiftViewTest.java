@@ -1129,6 +1129,24 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
+            void testShowAllShiftsWhenListAlreadyContainsShiftsShouldReplaceTheExtinsgOnesWithTheNewOnes() {
+                Shift old  = Shift.createShift(Id.createId("doc"), Id.createId("dep"), DATE_24_07_2026, TIME_08_00, TIME_09_30);
+                Shift new1 = Shift.createShift(Id.createId("doc"), Id.createId("dep"), DATE_24_07_2026, TIME_08_00, TIME_08_30);
+                Shift new2 = Shift.createShift(Id.createId("doc"), Id.createId("dep"), DATE_24_07_2026, TIME_09_00, TIME_09_30);
+                
+                GuiActionRunner.execute(() ->
+                    view.getShiftListModel().addElement(old));
+                
+                assertThat(window.list("shiftList").contents())
+                    .containsExactly(old.toString());
+                
+                view.showAllShifts(Arrays.asList(new1, new2));
+                
+                assertThat(window.list("shiftList").contents())
+                    .containsExactlyInAnyOrder(new1.toString(), new2.toString());
+            }
+            
+            @Test @GUITest
             void testShowErrorOverlappedShiftShouldShowMessageInErrorLabel() {
                 GuiActionRunner.execute(() -> view.enableUI());
                 Shift original = Shift.createShift(

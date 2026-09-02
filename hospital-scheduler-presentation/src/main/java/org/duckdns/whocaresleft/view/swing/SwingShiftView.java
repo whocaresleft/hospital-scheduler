@@ -654,6 +654,7 @@ public class SwingShiftView extends JPanel implements ShiftView {
     @Override
     public void showAllShifts(List<Shift> shifts) {
         SwingUtilities.invokeLater(() -> {
+            shiftListModel.clear();
             shifts.forEach(this::addToList);
             enableUI();
         });
