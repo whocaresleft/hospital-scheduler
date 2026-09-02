@@ -9,6 +9,9 @@ import javax.swing.border.EmptyBorder;
 import org.duckdns.whocaresleft.presenter.DepartmentPresenter;
 import org.duckdns.whocaresleft.presenter.DoctorPresenter;
 import org.duckdns.whocaresleft.presenter.ShiftPresenter;
+import org.duckdns.whocaresleft.view.DepartmentView;
+import org.duckdns.whocaresleft.view.DoctorView;
+import org.duckdns.whocaresleft.view.ShiftView;
 
 import javax.swing.JTabbedPane;
 import java.awt.GridBagLayout;
@@ -108,4 +111,8 @@ public class SwingHospitalFrame extends JFrame {
         this.shiftPresenter = shiftPresenter;
         shiftView.setPresenter(shiftPresenter);
     }
+    
+    public DoctorView getDoctorView() { return doctorView; }
+    public DepartmentView getDepartmentView() { return departmentView; }
+    public ShiftView getShiftView() { return shiftView; }
 }

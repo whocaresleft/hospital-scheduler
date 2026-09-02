@@ -11,7 +11,7 @@
         <class>org.duckdns.whocaresleft.repository.mariadb.entity.ShiftEntity</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
-            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
         </properties>
     </persistence-unit>
 </persistence>

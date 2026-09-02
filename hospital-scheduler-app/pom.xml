@@ -43,6 +43,16 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven.assembly.version}</version>
@@ -58,7 +68,7 @@
               </descriptorRefs>
               <archive>
                 <manifest>
-                  <mainClass>org.duckdns.whocaresleft.app.App</mainClass>
+                  <mainClass>org.duckdns.whocaresleft.app.SwingHospitalApp</mainClass>
                 </manifest>
               </archive>
             </configuration>
