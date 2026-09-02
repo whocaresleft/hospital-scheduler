@@ -10,31 +10,37 @@ import com.mongodb.client.MongoDatabase;
 
 public class MongoRepositoryProvider implements RepositoryProvider {
     
-    private static final String DOCTOR_COLLECTION_NAME = "doctor";
-    private static final String DEPARTMENT_COLLECTION_NAME = "department";
-    private static final String SHIFT_COLLECTION_NAME = "shift";
-    
     private final ClientSession mongoClientSession;
     private final MongoDatabase database;
     
-    public MongoRepositoryProvider(ClientSession mongoClientSession, MongoDatabase database) {
+    private final String doctorCollectionName;
+    private final String departmentCollectionName;
+    private final String shiftCollectionName;
+    
+    public MongoRepositoryProvider(ClientSession mongoClientSession, MongoDatabase database,
+        String doctorCollectionName, String departmentCollectionName, String shiftCollectionName)
+    {
         this.mongoClientSession = mongoClientSession;
         this.database = database;
+        
+        this.doctorCollectionName = doctorCollectionName;
+        this.departmentCollectionName = departmentCollectionName;
+        this.shiftCollectionName = shiftCollectionName;
     }
     
     @Override
     public DoctorRepository getDoctorRepository() {
-        return new MongoDoctorRepository(mongoClientSession, database.getCollection(DOCTOR_COLLECTION_NAME));
+        return new MongoDoctorRepository(mongoClientSession, database.getCollection(doctorCollectionName));
     }
     
     @Override
     public DepartmentRepository getDepartmentRepository() {
-        return new MongoDepartmentRepository(mongoClientSession, database.getCollection(DEPARTMENT_COLLECTION_NAME));
+        return new MongoDepartmentRepository(mongoClientSession, database.getCollection(departmentCollectionName));
     }
     
     @Override
     public ShiftRepository getShiftRepository() {
-        return new MongoShiftRepository(mongoClientSession, database.getCollection(SHIFT_COLLECTION_NAME));
+        return new MongoShiftRepository(mongoClientSession, database.getCollection(shiftCollectionName));
     }
     
 }

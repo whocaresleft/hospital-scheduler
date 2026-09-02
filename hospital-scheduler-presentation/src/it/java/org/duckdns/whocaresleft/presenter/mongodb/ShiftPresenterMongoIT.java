@@ -33,7 +33,10 @@ import com.mongodb.client.MongoDatabase;
 
 @Testcontainers @DisplayName("Integration tests for ShiftPresenter with MongoTransactionManager")
 class ShiftPresenterMongoIT {
-    
+
+    private static final String DOCTOR_COLLECTION = "doctor";
+    private static final String DEPARTMENT_COLLECTION = "department";
+    private static final String SHIFT_COLLECTION = "shift";
     private static final LocalDate DATE_24_07_2026 = LocalDate.of(2026, 7, 24);
     private static final LocalTime TIME_08_00 = LocalTime.of(8, 0);
     private static final LocalTime TIME_08_30 = LocalTime.of(8, 30);
@@ -57,7 +60,7 @@ class ShiftPresenterMongoIT {
         client = MongoClients.create(mongo.getReplicaSetUrl());
         MongoDatabase db = client.getDatabase("hospital");
         
-        transactionManager = new MongoTransactionManager(client, db);
+        transactionManager = new MongoTransactionManager(client, db, DOCTOR_COLLECTION, DEPARTMENT_COLLECTION, SHIFT_COLLECTION);
         transactionManager.doInTransaction(provider -> {
             DoctorRepository doctorRepo = provider.getDoctorRepository();
             DepartmentRepository departmentRepo = provider.getDepartmentRepository();
