@@ -14,6 +14,9 @@ import org.duckdns.whocaresleft.view.DoctorView;
 import org.duckdns.whocaresleft.view.ShiftView;
 
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.JLabel;
@@ -26,9 +29,9 @@ public class SwingHospitalFrame extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     
-    private DoctorPresenter doctorPresenter;
-    private DepartmentPresenter departmentPresenter;
-    private ShiftPresenter shiftPresenter;
+    private transient DoctorPresenter doctorPresenter;
+    private transient DepartmentPresenter departmentPresenter;
+    private transient ShiftPresenter shiftPresenter;
     
     private SwingDoctorView doctorView;
     private SwingDepartmentView departmentView;
@@ -42,7 +45,7 @@ public class SwingHospitalFrame extends JFrame {
         departmentView = new SwingDepartmentView();
         shiftView = new SwingShiftView();
         
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setBounds(100, 100, 450, 600);
         setMinimumSize(new Dimension(450, 600));
         contentPane = new JPanel();
@@ -63,7 +66,7 @@ public class SwingHospitalFrame extends JFrame {
         gbc_hospitalLabel.gridy = 0;
         contentPane.add(hospitalLabel, gbc_hospitalLabel);
         
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
         GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
         gbc_tabbedPane.fill = GridBagConstraints.BOTH;
         gbc_tabbedPane.gridx = 0;

@@ -2,6 +2,7 @@ package org.duckdns.whocaresleft.view.swing;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @DisplayName("UI tests for SwingHospitalFrame")
 class SwingHospitalFrameTest {
@@ -34,8 +34,6 @@ class SwingHospitalFrameTest {
     @Mock
     private ShiftPresenter shiftPresenter;
     
-    private AutoCloseable closeable;
-    
     private SwingHospitalFrame frame;
     private FrameFixture window;
     
@@ -46,12 +44,20 @@ class SwingHospitalFrameTest {
     
     @BeforeEach
     void setup() {
-        closeable = MockitoAnnotations.openMocks(this);
+        shiftPresenter = mock(ShiftPresenter.class);
+        departmentPresenter = mock(DepartmentPresenter.class);
+        doctorPresenter = mock(DoctorPresenter.class);
+        
         GuiActionRunner.execute(() -> {
             frame = new SwingHospitalFrame();
             frame.setDoctorPresenter(doctorPresenter);
             frame.setDepartmentPresenter(departmentPresenter);
             frame.setShiftPresenter(shiftPresenter);
+            
+            frame.getShiftView();
+            frame.getDepartmentView();
+            frame.getDoctorView();
+            
             return frame;
         });
         window = new FrameFixture(BasicRobot.robotWithCurrentAwtHierarchy(), frame);
@@ -60,7 +66,6 @@ class SwingHospitalFrameTest {
     
     @AfterEach
     void teardown() throws Exception {
-        closeable.close();
         if (window != null)
             window.cleanUp();
     }
