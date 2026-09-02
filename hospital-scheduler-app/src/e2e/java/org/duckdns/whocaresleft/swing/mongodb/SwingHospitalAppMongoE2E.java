@@ -1,7 +1,6 @@
 package org.duckdns.whocaresleft.swing.mongodb;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -142,7 +141,7 @@ class SwingHospitalAppMongoE2E {
         @Test @GUITest
         void testRemoveShiftSuccess() {
             window.tabbedPane().selectTab("Shifts");
-            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("dateTextBox").requireEnabled());
+            waitForTabToLoad("shift");
             
             window.list("shiftList").selectItem(Pattern.compile(".*" + DOCTOR_FIXTURE_2_ID + ".*"));
             
@@ -156,7 +155,7 @@ class SwingHospitalAppMongoE2E {
         @Test @GUITest
         void testUpdateShiftSuccess() {
             window.tabbedPane().selectTab("Shifts");
-            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("dateTextBox").requireEnabled());
+            waitForTabToLoad("shift");
             
             window.list("shiftList").selectItem(Pattern.compile(".*" + DOCTOR_FIXTURE_2_ID + ".*"));
             
@@ -166,9 +165,34 @@ class SwingHospitalAppMongoE2E {
             
             await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
                 assertThat(window.list("shiftList").contents())
-                .anySatisfy(e -> assertThat(e).contains(
-                    DOCTOR_FIXTURE_1_ID, DEPARTMENT_FIXTURE_1_ID,
-                    DATE_24_07_2026.toString(), TIME_08_00.toString(), TIME_09_00.toString())));
+                    .anySatisfy(e -> assertThat(e).contains(
+                        DOCTOR_FIXTURE_1_ID, DEPARTMENT_FIXTURE_1_ID,
+                        DATE_24_07_2026.toString(), TIME_08_00.toString(), TIME_09_00.toString())));
+        }
+        
+        @Test @GUITest
+        void testDeleteDoctorAlsoDeletesItsShifts() {
+            window.tabbedPane().selectTab("Shifts");
+            
+            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+                assertThat(window.list("shiftList").contents())
+                    .anySatisfy(e -> assertThat(e).contains(
+                        DOCTOR_FIXTURE_2_ID, DEPARTMENT_FIXTURE_1_ID,
+                        DATE_24_07_2026.toString(), TIME_08_00.toString(), TIME_09_00.toString())));
+            
+            window.tabbedPane().selectTab("Doctors");
+            waitForTabToLoad("doctor");
+            window.list("doctorList").selectItem(Pattern.compile(".*" + DOCTOR_FIXTURE_2_ID + ".*"));
+            
+            window.button("deleteButton").click();
+            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+                assertThat(window.list("doctorList").contents())
+                    .noneMatch(e -> e.contains(DOCTOR_FIXTURE_2_ID)));
+            
+            window.tabbedPane().selectTab("Shifts");
+            waitForTabToLoad("shift");
+            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+                assertThat(window.list("shiftList").contents()).isEmpty());
         }
     }
     
@@ -178,8 +202,7 @@ class SwingHospitalAppMongoE2E {
         @Test @GUITest
         void testAddShiftError() {
             window.tabbedPane().selectTab("Shifts");
-            
-            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("dateTextBox").requireEnabled());
+            waitForTabToLoad("shift");
             
             window.textBox("doctorIdTextBox").enterText(DOCTOR_FIXTURE_1_ID);
             window.textBox("departmentIdTextBox").enterText(DEPARTMENT_FIXTURE_NON_EXISTENT_ID);
@@ -196,7 +219,7 @@ class SwingHospitalAppMongoE2E {
         @Test @GUITest
         void testRemoveShiftError() {
             window.tabbedPane().selectTab("Shifts");
-            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("dateTextBox").requireEnabled());
+            waitForTabToLoad("shift");
             
             window.list("shiftList").selectItem(Pattern.compile(".*" + DOCTOR_FIXTURE_2_ID + ".*"));
             
@@ -211,7 +234,7 @@ class SwingHospitalAppMongoE2E {
         @Test @GUITest
         void testUpdateShiftError() {
             window.tabbedPane().selectTab("Shifts");
-            await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> window.textBox("dateTextBox").requireEnabled());
+            waitForTabToLoad("shift");
             
             window.list("shiftList").selectItem(Pattern.compile(".*" + DOCTOR_FIXTURE_2_ID + ".*"));
             
@@ -231,6 +254,10 @@ class SwingHospitalAppMongoE2E {
             .insertOne(new Document()
                 .append("_id", id)
                 .append("name", name));
+    }
+    
+    private void waitForTabToLoad(String tab) {
+        await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> window.list(tab + "List").requireEnabled());
     }
     
     private void addTestDoctorToDatabase(String id, String firstName, String lastName) {
