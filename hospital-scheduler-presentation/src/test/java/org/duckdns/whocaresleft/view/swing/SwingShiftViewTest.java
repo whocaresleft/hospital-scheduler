@@ -1115,7 +1115,6 @@ class SwingShiftViewTest {
             
             @Test @GUITest
             void testShowAllShiftsShouldAddEachShiftDescriptionToTheList() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Shift s1 = Shift.createShift(
                     Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_08_30);
                 Shift s2 = Shift.createShift(
@@ -1129,8 +1128,25 @@ class SwingShiftViewTest {
             }
             
             @Test @GUITest
+            void testShowAllShiftsWhenListAlreadyContainsShiftsShouldReplaceTheExtinsgOnesWithTheNewOnes() {
+                Shift old  = Shift.createShift(Id.createId("doc"), Id.createId("dep"), DATE_24_07_2026, TIME_08_00, TIME_09_30);
+                Shift new1 = Shift.createShift(Id.createId("doc"), Id.createId("dep"), DATE_24_07_2026, TIME_08_00, TIME_08_30);
+                Shift new2 = Shift.createShift(Id.createId("doc"), Id.createId("dep"), DATE_24_07_2026, TIME_09_00, TIME_09_30);
+                
+                GuiActionRunner.execute(() ->
+                    view.getShiftListModel().addElement(old));
+                
+                assertThat(window.list("shiftList").contents())
+                    .containsExactly(old.toString());
+                
+                view.showAllShifts(Arrays.asList(new1, new2));
+                
+                assertThat(window.list("shiftList").contents())
+                    .containsExactlyInAnyOrder(new1.toString(), new2.toString());
+            }
+            
+            @Test @GUITest
             void testShowErrorOverlappedShiftShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Shift original = Shift.createShift(
                     Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
                 Shift overlapped = Shift.createShift(
@@ -1143,7 +1159,6 @@ class SwingShiftViewTest {
             
             @Test @GUITest
             void testShowErrorShiftNotFoundShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Shift notFound = Shift.createShift(
                     Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
                 
@@ -1154,7 +1169,6 @@ class SwingShiftViewTest {
             
             @Test @GUITest
             void testShowErrorDoctorNotFoundShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Id nonExistentDoctorId = Id.createId("doctor_id");
                 
                 view.showErrorDoctorNotFound(nonExistentDoctorId);
@@ -1164,7 +1178,6 @@ class SwingShiftViewTest {
             
             @Test @GUITest
             void testShowErrorDepartmentNotFoundShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Id nonExistentDepartmentId = Id.createId("er");
                 
                 view.showErrorDepartmentNotFound(nonExistentDepartmentId);
@@ -1174,7 +1187,6 @@ class SwingShiftViewTest {
             
             @Test @GUITest
             void testShiftAddedShouldAddTheShiftToTheListShowInfoMessageAndClearErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Shift shift = Shift.createShift(
                     Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
                 
@@ -1188,7 +1200,6 @@ class SwingShiftViewTest {
             
             @Test @GUITest
             void testShiftRemovedShouldRemoveTheShiftFromTheListShowInfoMessageAndClearErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Shift s1 = Shift.createShift(
                     Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
                 Shift s2 = Shift.createShift(
@@ -1211,7 +1222,6 @@ class SwingShiftViewTest {
             
             @Test @GUITest
             void testShiftUpdatedShouldUpdateTheShiftInTheListShowInfoMessageAndClearErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Shift oldShift = Shift.createShift(
                     Id.createId("doctor_1"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
                 Shift newShift = Shift.createShift(

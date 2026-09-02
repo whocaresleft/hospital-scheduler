@@ -387,6 +387,7 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
     @Override
     public void showAllDepartments(List<Department> departments) {
         SwingUtilities.invokeLater(() -> {
+            departmentListModel.clear();
             departments.forEach(this::addToList);
             enableUI();
         });
