@@ -454,6 +454,7 @@ public class SwingDoctorView extends JPanel implements DoctorView {
     @Override
     public void showAllDoctors(List<Doctor> doctors) {
         SwingUtilities.invokeLater(() -> {
+            doctorListModel.clear();
             doctors.forEach(this::addToList);
             enableUI();
         });

@@ -682,7 +682,6 @@ class SwingDoctorViewTest {
             
             @Test @GUITest
             void testShowAllDoctorsShouldAddEachDoctorsDescriptionToTheList() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Doctor d1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doctor", "One");
                 Doctor d2 = Doctor.createDoctor(Id.createId("doctor_2"), "Doktor", "Two");
                 
@@ -694,8 +693,25 @@ class SwingDoctorViewTest {
             }
             
             @Test @GUITest
+            void testShowAllDoctorsWhenListAlreadyContainsDoctorsShouldReplaceTheExtinsgOnesWithTheNewOnes() {
+                Doctor old  = Doctor.createDoctor(Id.createId("doctor_old"),  "Old",  "Doc");
+                Doctor new1 = Doctor.createDoctor(Id.createId("doctor_new1"), "New",  "One");
+                Doctor new2 = Doctor.createDoctor(Id.createId("doctor_new2"), "Neww", "Two");
+                
+                GuiActionRunner.execute(() -> 
+                    view.getDoctorListModel().addElement(old));
+                
+                assertThat(window.list("doctorList").contents())
+                    .containsExactly(old.toString());
+                
+                view.showAllDoctors(Arrays.asList(new1, new2));
+                
+                assertThat(window.list("doctorList").contents())
+                    .containsExactlyInAnyOrder(new1.toString(), new2.toString());
+            }
+            
+            @Test @GUITest
             void testShowErrorDuplicateDoctorShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Doctor duplicatedDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "duplicated", "doctor");
                 
                 view.showErrorDuplicateDoctor(duplicatedDoctor);
@@ -705,7 +721,6 @@ class SwingDoctorViewTest {
             
             @Test @GUITest
             void testShowErrorDoctorNotFoundShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Doctor notFound = Doctor.createDoctor(Id.createId("doctor_id"), "not", "found");
                 
                 view.showErrorDoctorNotFound(notFound);
@@ -715,7 +730,6 @@ class SwingDoctorViewTest {
             
             @Test @GUITest
             void testDoctorAddedShouldAddTheDoctorToTheListShowInfoMessageAndResetErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Doctor doctor = Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor");
                 
                 view.doctorAdded(Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor"));
@@ -728,7 +742,6 @@ class SwingDoctorViewTest {
             
             @Test @GUITest
             void testDoctorRemovedShouldRemoveTheDoctorFromTheListShowInfoMessageAndResetErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Doctor doctor1 = Doctor.createDoctor(Id.createId("doctor_1"), "Doc", "Tor");
                 Doctor doctor2 = Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter");
                 
@@ -748,7 +761,6 @@ class SwingDoctorViewTest {
             
             @Test @GUITest
             void testDoctorUpdatedShouldUpdateTheDoctorInTheListShowInfoMessageAndResetErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Doctor oldDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "Old", "Doctor");
                 Doctor newDoctor = Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor");
                 
