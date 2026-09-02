@@ -14,7 +14,7 @@
     <assertj.swing.version>3.17.1</assertj.swing.version>
     <mockito.version>4.11.0</mockito.version>
     <mongo.driver.version>5.11.0</mongo.driver.version>
-    <qos.logback.version>1.2.13</qos.logback.version>
+    <qos.logback.version>1.6.3</qos.logback.version>
     <maria.driver.version>3.5.10</maria.driver.version>
     <hibernate.version>6.5.2.Final</hibernate.version>
     <testcontainers.version>1.21.4</testcontainers.version>
