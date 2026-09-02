@@ -22,7 +22,7 @@
     </File>
   </Appenders>
   <Loggers>
-    <Logger name="org.duckdns.whocaresleft.app.SwingHospitalApp" level="INFO" additivity="false">
+    <Logger name="org.duckdns.whocaresleft.app.swing.SwingHospitalApp" level="INFO" additivity="false">
       <AppenderRef ref="ConsoleAppender"/>
       <AppenderRef ref="MainFileAppender"/>
     </Logger>

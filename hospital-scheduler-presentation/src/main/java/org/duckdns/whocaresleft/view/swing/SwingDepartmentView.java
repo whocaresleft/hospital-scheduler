@@ -390,6 +390,8 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
             departmentListModel.clear();
             departments.forEach(this::addToList);
             enableUI();
+            clearInfoLabel();
+            clearErrorLabel();
         });
     }
     

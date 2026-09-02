@@ -631,6 +631,8 @@ public class SwingShiftView extends JPanel implements ShiftView {
             shiftListModel.clear();
             shifts.forEach(this::addToList);
             enableUI();
+            clearInfoLabel();
+            clearErrorLabel();
         });
     }
     
