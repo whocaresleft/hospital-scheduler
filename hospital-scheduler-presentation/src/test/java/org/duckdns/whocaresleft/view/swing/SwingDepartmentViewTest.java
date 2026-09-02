@@ -42,7 +42,7 @@ class SwingDepartmentViewTest {
     private SwingDepartmentView view;
     
     @BeforeAll
-    static void setupOne() {
+    static void setupOnce() {
         FailOnThreadViolationRepaintManager.install();
     }
     

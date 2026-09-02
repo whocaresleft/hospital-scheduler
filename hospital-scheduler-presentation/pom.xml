@@ -73,6 +73,11 @@
       <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.github.lgooddatepicker</groupId>
+      <artifactId>LGoodDatePicker</artifactId>
+    </dependency>
   </dependencies>
   
   <build>

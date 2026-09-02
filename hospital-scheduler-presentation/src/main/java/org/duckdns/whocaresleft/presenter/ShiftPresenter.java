@@ -102,6 +102,7 @@ public class ShiftPresenter {
                     repository.findByDoctorId(newShift.getDoctorId())
                         .stream()
                         .filter(s -> s.overlaps(newShift))
+                        .filter(s -> !s.equals(oldShift))
                         .findFirst();
                 
                 if (conflicting.isPresent())
