@@ -27,6 +27,10 @@ import com.mongodb.client.MongoDatabase;
 @Testcontainers @DisplayName("Integration tests for MongoTransactionManager using Testcontainers")
 class MongoTransactionManagerTestcontainersIT {
     
+    private static final String DOCTOR_COLLECTION = "doctor";
+    private static final String DEPARTMENT_COLLECTION = "department";
+    private static final String SHIFT_COLLECTION = "shift";
+    
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
     
@@ -42,7 +46,7 @@ class MongoTransactionManagerTestcontainersIT {
         database.drop();
         departmentCollection = database.getCollection("department");
         
-        transactionManager = new MongoTransactionManager(client, database);
+        transactionManager = new MongoTransactionManager(client, database, DOCTOR_COLLECTION, DEPARTMENT_COLLECTION, SHIFT_COLLECTION);
     }
     
     @AfterEach

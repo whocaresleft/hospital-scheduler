@@ -26,6 +26,10 @@ import com.mongodb.client.MongoDatabase;
 
 @Testcontainers @DisplayName("Integration tests for DoctorPresenter with MongoTransactionManager")
 class DoctorPresenterMongoIT {
+
+    private static final String DOCTOR_COLLECTION = "doctor";
+    private static final String DEPARTMENT_COLLECTION = "department";
+    private static final String SHIFT_COLLECTION = "shift";
     
     @Container
     private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
@@ -45,7 +49,7 @@ class DoctorPresenterMongoIT {
         client = MongoClients.create(mongo.getReplicaSetUrl());
         MongoDatabase db = client.getDatabase("hospital");
         
-        transactionManager = new MongoTransactionManager(client, db);
+        transactionManager = new MongoTransactionManager(client, db, DOCTOR_COLLECTION, DEPARTMENT_COLLECTION, SHIFT_COLLECTION);
         transactionManager.doInTransaction(provider -> {
             DoctorRepository repository = provider.getDoctorRepository();
             

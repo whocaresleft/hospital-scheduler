@@ -14,15 +14,25 @@ public class MongoTransactionManager implements TransactionManager {
     private final MongoClient client;
     private final MongoDatabase database;
     
-    public MongoTransactionManager(MongoClient client, MongoDatabase database) {
+    private final String doctorCollectionName;
+    private final String departmentCollectionName;
+    private final String shiftCollectionName;
+    
+    public MongoTransactionManager(MongoClient client, MongoDatabase database,
+            String doctorCollectionName, String departmentCollectionName, String shiftCollectionName)
+    {
         this.client = client;
         this.database = database;
+        
+        this.doctorCollectionName = doctorCollectionName;
+        this.departmentCollectionName = departmentCollectionName;
+        this.shiftCollectionName = shiftCollectionName;
     }
     
     @Override
     public <T> T doInTransaction(TransactionCode<T> code) {
         ClientSession session = client.startSession();
-        RepositoryProvider provider = new MongoRepositoryProvider(session, database);
+        RepositoryProvider provider = new MongoRepositoryProvider(session, database, doctorCollectionName, departmentCollectionName, shiftCollectionName);
         return session.withTransaction(() ->  code.apply(provider) );
     }
 
