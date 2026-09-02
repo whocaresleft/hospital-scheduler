@@ -622,7 +622,6 @@ class SwingDepartmentViewTest {
             
             @Test @GUITest
             void testShowAllDepartmentsShouldAddEachDepartmentDescriptionToTheList() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Department d1 = Department.createDepartment(Id.createId("er"), "Emergency Room");
                 Department d2 = Department.createDepartment(Id.createId("sr"), "Surgery Room");
                 
@@ -634,7 +633,7 @@ class SwingDepartmentViewTest {
             }
             
             @Test @GUITest
-            void testShowAllDepartmentsWhenListAlreadyContainsDepartmentssShouldReplaceTheExtinsgOnesWithTheNewOnes() {
+            void testShowAllDepartmentsWhenListAlreadyContainsDepartmentsShouldReplaceTheExtinsgOnesWithTheNewOnes() {
                 Department old  = Department.createDepartment(Id.createId("department_old"),  "Old Dep");
                 Department new1 = Department.createDepartment(Id.createId("department_new1"), "New One");
                 Department new2 = Department.createDepartment(Id.createId("department_new2"), "New Two");
@@ -653,7 +652,6 @@ class SwingDepartmentViewTest {
             
             @Test @GUITest
             void testShowErrorDuplicateDepartmentShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Department duplicated = Department.createDepartment(Id.createId("er"), "Old ER");
                 
                 view.showErrorDuplicateDepartment(duplicated);
@@ -663,7 +661,6 @@ class SwingDepartmentViewTest {
             
             @Test @GUITest
             void testShowErrorDepartmentNotFoundShouldShowMessageInErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Department notFound = Department.createDepartment(Id.createId("er"), "Not Found");
                 
                 view.showErrorDepartmentNotFound(notFound);
@@ -673,7 +670,6 @@ class SwingDepartmentViewTest {
             
             @Test @GUITest
             void testDepartmentAddedShouldAddTheDepartmentToTheListShowInfoMessageAndClearErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Department department = Department.createDepartment(Id.createId("er"), "Emergency room");
                 
                 view.departmentAdded(department);
@@ -686,7 +682,6 @@ class SwingDepartmentViewTest {
             
             @Test @GUITest
             void testDepartmentRemovedShouldRemoveTheDepartmentFromTheListShowInfoMessageAndClearErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Department d1 = Department.createDepartment(Id.createId("er"), "Emergency room");
                 Department d2 = Department.createDepartment(Id.createId("sr"), "Surgery room");
                 
@@ -706,7 +701,6 @@ class SwingDepartmentViewTest {
             
             @Test @GUITest
             void testDepartmentUpdatedShouldUpdateTheDepartmentInTheListShowInfoMessageAndClearErrorLabel() {
-                GuiActionRunner.execute(() -> view.enableUI());
                 Department oldDepartment = Department.createDepartment(Id.createId("er"), "Emergency room");
                 Department newDepartment = Department.createDepartment(Id.createId("er"), "New Emergency room");
                 
