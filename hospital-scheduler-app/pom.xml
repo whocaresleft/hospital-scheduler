@@ -35,6 +35,18 @@
     </dependency>
     
     <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-swing-junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
     </dependency>
@@ -68,7 +80,7 @@
               </descriptorRefs>
               <archive>
                 <manifest>
-                  <mainClass>org.duckdns.whocaresleft.app.SwingHospitalApp</mainClass>
+                  <mainClass>org.duckdns.whocaresleft.app.swing.SwingHospitalApp</mainClass>
                 </manifest>
               </archive>
             </configuration>

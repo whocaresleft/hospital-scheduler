@@ -36,6 +36,8 @@ public class SwingHospitalFrame extends JFrame {
     private JLabel hospitalLabel;
     
     public SwingHospitalFrame() {
+        setTitle("Hospital Scheduler X");
+        
         doctorView = new SwingDoctorView();
         departmentView = new SwingDepartmentView();
         shiftView = new SwingShiftView();

@@ -1,4 +1,4 @@
-package org.duckdns.whocaresleft.app;
+package org.duckdns.whocaresleft.app.swing;
 
 import java.awt.EventQueue;
 import java.util.Map;
@@ -33,17 +33,14 @@ public class SwingHospitalApp implements Callable<Void>{
     @Option(names = {"-d", "--db-backend"}, description = "Database backend: ${COMPLETITION-CANDIDATES}")
     private String databaseBackend = "mongodb";
     
-    @Option(names = {"-h", "--db-host"}, description = "Database host address")
-    private String host = "localhost";
+    @Option(names = {"--mongo-connection-string"}, description = "MongoDB connection string")
+    private String mongoConnectionString;
     
-    @Option(names = {"-p", "--db-port"}, description = "Database host port")
-    private int port = 27017;
+    @Option(names = {"--maria-jdbc-url"}, description = "JDBC connection URL for MariaDB")
+    private String mariaJdbcUrl;
     
-    @Option(names = {"-n", "--db-name"}, description = "Database name")
+    @Option(names = {"--db-name"}, description = "Database name")
     private String databaseName = "hospital";
-    
-    @Option(names = {"--mongo-replica-set"}, description = "Replica Set name")
-    private String replicaSet = "rs0";
     
     @Option(names = {"--db-mongo-doctor-collection"}, description = "Doctor collectio name")
     private String doctorCollection = "doctor";
@@ -98,28 +95,23 @@ public class SwingHospitalApp implements Callable<Void>{
         switch (databaseBackend.toLowerCase()) {
         
         case "mongodb":
-            String connectionString = String.format("mongodb://%s:%d?replicaSet=%s&serverSelectionTimeoutMS=5000",
-                host, port, replicaSet);
-            
-            MongoClient client = MongoClients.create(connectionString);
+            MongoClient client = MongoClients.create(mongoConnectionString + "&serverSelectionTimeoutMS=15000");
             MongoDatabase database = client.getDatabase(databaseName);
             
             try {
                 database.runCommand(new Document("ping", 1));
             } catch (Exception e) {
                 client.close();
-                throw new IllegalStateException("Cannot connect to MongoDB @" + host + ":" + port);
+                throw new IllegalStateException("Cannot connect to MongoDB @" + mongoConnectionString);
             }
             
             transactionManager = new MongoTransactionManager(client, database, doctorCollection, departmentCollection, shiftCollection);
             break;
             
         case "mariadb":
-            String jdbcUrl = String.format("jdbc://mariadb://%s:%d/%s?createDatabaseIfNotExist=true&connectTimeout=5000",
-                host, port, databaseName);
             
             Map<String, String> properties = Map.of(
-                "jakarta.persistence.jdbc.url", jdbcUrl,
+                "jakarta.persistence.jdbc.url", (mariaJdbcUrl + "?createDatabaseIfNotExist=true&connectTimeout=5000"),
                 "jakarta.persistence.jdbc.user", mariaUser,
                 "jakarta.persistence.jdbc.password", mariaPassword,
                 "jakarta.persistence.jdbc.driver", "org.mariadb.jdbc.Driver",
@@ -128,7 +120,7 @@ public class SwingHospitalApp implements Callable<Void>{
             try {
                 emf = Persistence.createEntityManagerFactory("hospital_pu", properties);
             } catch (Exception e) {
-                throw new IllegalStateException("Cannot connect to MariaDB @" + host + ":" + port);
+                throw new IllegalStateException("Cannot connect to MariaDB @" + mariaJdbcUrl);
             }
                 
             transactionManager = new MariaTransactionManager(emf);
