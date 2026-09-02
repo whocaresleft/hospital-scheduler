@@ -26,7 +26,7 @@ public class ShiftPresenter {
         this.view = view;
     }
     
-    public void allShifts() {
+    public synchronized void allShifts() {
         List<Shift> shifts = transactionManager.doInTransaction(repositoryProvider -> {
             ShiftRepository repository = repositoryProvider.getShiftRepository();
             return repository.findAll();
@@ -35,7 +35,7 @@ public class ShiftPresenter {
         view.showAllShifts(shifts);
     }
     
-    public void addShift(Shift shift) {
+    public synchronized void addShift(Shift shift) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 if (repositoryProvider.getDoctorRepository().findById(shift.getDoctorId()) == null)
@@ -73,7 +73,7 @@ public class ShiftPresenter {
         }
     }
     
-    public void removeShift(Shift shift) {
+    public synchronized void removeShift(Shift shift) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 ShiftRepository repository = repositoryProvider.getShiftRepository();
@@ -88,7 +88,7 @@ public class ShiftPresenter {
         }
     }
     
-    public void updateShift(Shift oldShift, Shift newShift) {
+    public synchronized void updateShift(Shift oldShift, Shift newShift) {
         try {
             transactionManager.doInTransaction(repositoryProvider -> {
                 if (repositoryProvider.getDoctorRepository().findById(newShift.getDoctorId()) == null)

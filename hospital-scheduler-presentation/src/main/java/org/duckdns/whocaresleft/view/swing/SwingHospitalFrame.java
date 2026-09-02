@@ -5,16 +5,27 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import org.duckdns.whocaresleft.presenter.DepartmentPresenter;
+import org.duckdns.whocaresleft.presenter.DoctorPresenter;
+import org.duckdns.whocaresleft.presenter.ShiftPresenter;
+
 import javax.swing.JTabbedPane;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.JLabel;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class SwingHospitalFrame extends JFrame {
     
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
+    
+    private DoctorPresenter doctorPresenter;
+    private DepartmentPresenter departmentPresenter;
+    private ShiftPresenter shiftPresenter;
     
     private SwingDoctorView doctorView;
     private SwingDepartmentView departmentView;
@@ -62,5 +73,39 @@ public class SwingHospitalFrame extends JFrame {
         
         shiftView.setName("shiftView");
         tabbedPane.addTab("Shifts", null, shiftView, null);
+        
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                if (tabbedPane.getSelectedIndex() == 0 && doctorPresenter != null)
+                    new Thread(() -> doctorPresenter.allDoctors()).start();
+            }
+        });
+        
+        tabbedPane.addChangeListener(e -> {
+            int index = tabbedPane.getSelectedIndex();
+            
+            if (index == 0 && doctorPresenter != null)
+                new Thread(() -> doctorPresenter.allDoctors()).start();
+            else if (index == 1 && departmentPresenter != null)
+                new Thread(() -> departmentPresenter.allDepartments()).start();
+            else if (index == 2 && shiftPresenter != null)
+                new Thread(() -> shiftPresenter.allShifts()).start();
+        });
+    }
+    
+    public void setDoctorPresenter(DoctorPresenter doctorPresenter) {
+        this.doctorPresenter = doctorPresenter;
+        doctorView.setPresenter(doctorPresenter);
+    }
+    
+    public void setDepartmentPresenter(DepartmentPresenter departmentPresenter) {
+        this.departmentPresenter = departmentPresenter;
+        departmentView.setPresenter(departmentPresenter);
+    }
+    
+    public void setShiftPresenter(ShiftPresenter shiftPresenter) {
+        this.shiftPresenter = shiftPresenter;
+        shiftView.setPresenter(shiftPresenter);
     }
 }
