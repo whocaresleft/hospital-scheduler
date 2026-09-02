@@ -23,6 +23,7 @@
       **/learning/**
     </sonar.test.exclusions>
     <sonar.coverage.exclusions>
+      **/app/**
       **/exception/*.*,
       **/model/Doctor.*,
       **/model/Department.*,

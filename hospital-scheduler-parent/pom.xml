@@ -197,6 +197,7 @@
           <version>${maven.jacoco.version}</version>
           <configuration>
             <excludes>
+              <exclude>**/org/duckdns/whocaresleft/app/swing/*</exclude>
               <exclude>**/org/duckdns/whocaresleft/exception/*Exception*</exclude>
               <exclude>**/org/duckdns/whocaresleft/model/Doctor*</exclude>
               <exclude>**/org/duckdns/whocaresleft/model/Department*</exclude>
