@@ -634,6 +634,24 @@ class SwingDepartmentViewTest {
             }
             
             @Test @GUITest
+            void testShowAllDepartmentsWhenListAlreadyContainsDepartmentssShouldReplaceTheExtinsgOnesWithTheNewOnes() {
+                Department old  = Department.createDepartment(Id.createId("department_old"),  "Old Dep");
+                Department new1 = Department.createDepartment(Id.createId("department_new1"), "New One");
+                Department new2 = Department.createDepartment(Id.createId("department_new2"), "New Two");
+                
+                GuiActionRunner.execute(() -> 
+                    view.getDepartmentListModel().addElement(old));
+                
+                assertThat(window.list("departmentList").contents())
+                    .containsExactly(old.toString());
+                
+                view.showAllDepartments(Arrays.asList(new1, new2));
+                
+                assertThat(window.list("departmentList").contents())
+                    .containsExactlyInAnyOrder(new1.toString(), new2.toString());
+            }
+            
+            @Test @GUITest
             void testShowErrorDuplicateDepartmentShouldShowMessageInErrorLabel() {
                 GuiActionRunner.execute(() -> view.enableUI());
                 Department duplicated = Department.createDepartment(Id.createId("er"), "Old ER");
