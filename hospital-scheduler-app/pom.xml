@@ -1,9 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.duckdns.whocarelseft</groupId>
+  <parent>
+    <groupId>org.duckdns.whocaresleft</groupId>
+    <artifactId>hospital-scheduler-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../hospital-scheduler-parent</relativePath>
+  </parent>
   <artifactId>hospital-scheduler-app</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -14,18 +18,6 @@
     <maven.exec.version>1.6.0</maven.exec.version>
   </properties>
   
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.duckdns.whocaresleft</groupId>
-        <artifactId>hospital-scheduler-bom</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  
   <dependencies>
     <dependency>
       <groupId>org.duckdns.whocaresleft</groupId>
@@ -33,8 +25,18 @@
     </dependency>
     
     <dependency>
+      <groupId>org.duckdns.whocaresleft</groupId>
+      <artifactId>hospital-scheduler-presentation</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
     </dependency>
   </dependencies>
   

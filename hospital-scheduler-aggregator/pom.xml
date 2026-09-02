@@ -13,7 +13,7 @@
     <sonar.tests>
       ${project.basedir}/src/test/java,
       ${project.basedir}/src/it/java,
-      <!--${project.basedir}/src/e2e/java, these are not present yet  --> 
+      ${project.basedir}/src/e2e/java
     </sonar.tests>
     <sonar.junit.reportPaths>
       ${project.build.directory}/target/surefire-reports,
@@ -47,6 +47,7 @@
     <module>../hospital-scheduler-parent</module>
     <module>../hospital-scheduler-domain</module>
     <module>../hospital-scheduler-presentation</module>
+    <module>../hospital-scheduler-app</module>
   </modules>
   
   <build>
@@ -69,13 +70,6 @@
   </build>
   
   <profiles>
-    <profile>
-      <id>app</id>
-      <modules>
-        <module>../hospital-scheduler-app</module>
-      </modules>
-    </profile>
-    
     <profile>
       <id>jacoco</id>
       <modules>
