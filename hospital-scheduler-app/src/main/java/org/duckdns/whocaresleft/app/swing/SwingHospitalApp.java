@@ -39,7 +39,7 @@ public class SwingHospitalApp implements Callable<Void>{
     @Option(names = {"--maria-jdbc-url"}, description = "JDBC connection URL for MariaDB")
     private String mariaJdbcUrl;
     
-    @Option(names = {"--db-name"}, description = "Database name")
+    @Option(names = {"--db-mongo-name"}, description = "MongoDB database name")
     private String databaseName = "hospital";
     
     @Option(names = {"--db-mongo-doctor-collection"}, description = "Doctor collectio name")
@@ -59,6 +59,9 @@ public class SwingHospitalApp implements Callable<Void>{
     
     @Option(names = {"--maria-ddl"}, description = "Hibernate schema generation strategy")
     private String mariaDdl = "update";
+    
+    @Option(names = {"--connection-timeout"}, description = "Amount (ms) of time before considering the connection timed out")
+    private int timeout = 15000;
     
     public static void main(String[] args) {
         new CommandLine(new SwingHospitalApp()).execute(args);
@@ -95,14 +98,14 @@ public class SwingHospitalApp implements Callable<Void>{
         switch (databaseBackend.toLowerCase()) {
         
         case "mongodb":
-            MongoClient client = MongoClients.create(mongoConnectionString + "&serverSelectionTimeoutMS=15000");
+            MongoClient client = MongoClients.create(mongoConnectionString + "&serverSelectionTimeoutMS=" + timeout);
             MongoDatabase database = client.getDatabase(databaseName);
             
             try {
                 database.runCommand(new Document("ping", 1));
             } catch (Exception e) {
                 client.close();
-                throw new IllegalStateException("Cannot connect to MongoDB @" + mongoConnectionString);
+                throw new IllegalStateException("Cannot connect within " + timeout + "ms to MongoDB @" + mongoConnectionString);
             }
             
             transactionManager = new MongoTransactionManager(client, database, doctorCollection, departmentCollection, shiftCollection);
@@ -110,17 +113,22 @@ public class SwingHospitalApp implements Callable<Void>{
             
         case "mariadb":
             
+            String additionalArgs = "createDatabaseIfNotExist=true&connectTimeout=" + timeout;
+            String finalUrl = mariaJdbcUrl.contains("?")
+                ? mariaJdbcUrl + "&" + additionalArgs
+                : mariaJdbcUrl + "?" + additionalArgs;
+            
             Map<String, String> properties = Map.of(
-                "jakarta.persistence.jdbc.url", (mariaJdbcUrl + "?createDatabaseIfNotExist=true&connectTimeout=5000"),
+                "jakarta.persistence.jdbc.url", finalUrl,
                 "jakarta.persistence.jdbc.user", mariaUser,
                 "jakarta.persistence.jdbc.password", mariaPassword,
                 "jakarta.persistence.jdbc.driver", "org.mariadb.jdbc.Driver",
                 "hibernate.hbm2ddl.auto", mariaDdl);
             EntityManagerFactory  emf;
             try {
-                emf = Persistence.createEntityManagerFactory("hospital_pu", properties);
+                emf = Persistence.createEntityManagerFactory("maria_repository_it", properties);
             } catch (Exception e) {
-                throw new IllegalStateException("Cannot connect to MariaDB @" + mariaJdbcUrl);
+                throw new IllegalStateException("Cannot connect within " + timeout + "ms to MariaDB @" + mariaJdbcUrl);
             }
                 
             transactionManager = new MariaTransactionManager(emf);

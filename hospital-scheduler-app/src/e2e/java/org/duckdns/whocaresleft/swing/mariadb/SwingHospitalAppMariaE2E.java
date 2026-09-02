@@ -1,9 +1,10 @@
-package org.duckdns.whocaresleft.swing.mongodb;
+package org.duckdns.whocaresleft.swing.mariadb;
 
 import static org.awaitility.Awaitility.await;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -18,29 +19,29 @@ import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.finder.WindowFinder;
 import org.assertj.swing.fixture.FrameFixture;
-import org.bson.Document;
+import org.duckdns.whocaresleft.repository.mariadb.entity.DepartmentEntity;
+import org.duckdns.whocaresleft.repository.mariadb.entity.DoctorEntity;
+import org.duckdns.whocaresleft.repository.mariadb.entity.ShiftEntity;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.model.Filters;
 
-@Testcontainers @DisplayName("End-to-End tests for the SwingHospitalApp, using MongoDB as database backend")
-class SwingHospitalAppMongoE2E {
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
+@Testcontainers @DisplayName("End-to-End tests for the SwingHospitalApp, using MariaDB as database backend")
+class SwingHospitalAppMariaE2E {
     
     private static final int TIMEOUT = 15;
-    private static final String DB_NAME = "test-hospital";
-    private static final String DOCTOR_COLLECTION = "test-doctor";
-    private static final String DEPARTMENT_COLLECTION = "test-department";
-    private static final String SHIFT_COLLECTION = "test-shift";
     
     private static final String DOCTOR_FIXTURE_1_ID = "doctor_1";
     private static final String DOCTOR_FIXTURE_1_FIRST_NAME = "Doc";
@@ -58,23 +59,38 @@ class SwingHospitalAppMongoE2E {
     private static final LocalTime TIME_09_00 = LocalTime.of(9, 0);
     
     @Container
-    private static final MongoDBContainer mongo = new MongoDBContainer("mongo:5");
+    private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.3.39");
     
-    private MongoClient client;
+    private EntityManager em;
+    private static EntityManagerFactory emf;
     private FrameFixture window;
     
     @BeforeAll
-    static void setupOnce() {
+    static void setupEntityManagerFactory() {
         FailOnThreadViolationRepaintManager.install();
+        Map<String, String> properties = Map.of(
+            "jakarta.persistence.jdbc.url", maria.getJdbcUrl(),
+            "jakarta.persistence.jdbc.user", maria.getUsername(),
+            "jakarta.persistence.jdbc.password", maria.getPassword(),
+            "jakarta.persistence.jdbc.driver", "org.mariadb.jdbc.Driver",
+            "hibernate.hbm2ddl.auto", "create-drop");
+        emf = Persistence.createEntityManagerFactory("maria_repository_it", properties);
+    }
+    
+    @AfterAll
+    static void teardownEntityManagerFactory() {
+        if (emf != null)
+            emf.close();
     }
     
     @BeforeEach
     void setup() {
-        String connectionString = mongo.getReplicaSetUrl();
-        
-        client = MongoClients.create(connectionString);
-        
-        client.getDatabase(DB_NAME).drop();
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM ShiftEntity").executeUpdate();
+        em.createQuery("DELETE FROM DepartmentEntity").executeUpdate();
+        em.createQuery("DELETE FROM DoctorEntity").executeUpdate();
+        em.getTransaction().commit();
         
         addTestDoctorToDatabase(DOCTOR_FIXTURE_1_ID, DOCTOR_FIXTURE_1_FIRST_NAME, DOCTOR_FIXTURE_1_LAST_NAME);
         addTestDoctorToDatabase(DOCTOR_FIXTURE_2_ID, DOCTOR_FIXTURE_2_FIRST_NAME, DOCTOR_FIXTURE_2_LAST_NAME);
@@ -85,11 +101,11 @@ class SwingHospitalAppMongoE2E {
         
         application("org.duckdns.whocaresleft.app.swing.SwingHospitalApp")
             .withArgs(
-                "--mongo-connection-string=" + connectionString,
-                "--db-mongo-name=" + DB_NAME,
-                "--db-mongo-doctor-collection=" + DOCTOR_COLLECTION,
-                "--db-mongo-department-collection=" + DEPARTMENT_COLLECTION,
-                "--db-mongo-shift-collection=" + SHIFT_COLLECTION
+                "--db-backend=mariadb",
+                "--maria-jdbc-url=" + maria.getJdbcUrl(),
+                "--maria-user=" + maria.getUsername(),
+                "--maria-password=" + maria.getPassword(),
+                "--maria-ddl=update"
             ).start();
         
         window = WindowFinder.findFrame(new GenericTypeMatcher<JFrame>(JFrame.class) {
@@ -102,9 +118,9 @@ class SwingHospitalAppMongoE2E {
     
     @AfterEach
     void teardown() {
+        em.close();
         if (window != null)
             window.cleanUp();
-        client.close();
     }
     
     @Nested @DisplayName("Success Cases")
@@ -247,55 +263,50 @@ class SwingHospitalAppMongoE2E {
         }
     }
     
-    private void addTestDepartmentToDatabase(String id, String name) {
-        client
-            .getDatabase(DB_NAME)
-            .getCollection(DEPARTMENT_COLLECTION)
-            .insertOne(new Document()
-                .append("_id", id)
-                .append("name", name));
-    }
-    
     private void waitForTabToLoad(String tab) {
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> window.list(tab + "List").requireEnabled());
     }
     
+    private void addTestDepartmentToDatabase(String id, String name) {
+        em.getTransaction().begin();
+        em.persist(new DepartmentEntity(id, name));
+        em.getTransaction().commit();
+        em.clear();
+    }
+    
     private void addTestDoctorToDatabase(String id, String firstName, String lastName) {
-        client
-        .getDatabase(DB_NAME)
-        .getCollection(DOCTOR_COLLECTION)
-        .insertOne(new Document()
-            .append("_id", id)
-            .append("firstName", firstName)
-            .append("lastName", lastName));
+        em.getTransaction().begin();
+        em.persist(new DoctorEntity(id, firstName, lastName));
+        em.getTransaction().commit();
+        em.clear();
     }
     
     private void addTestShiftToDatabase(String doctorId, String departmentId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        String documentId = String.format("%s-%s-%s-%s-%s",
+        String shiftId = String.format("%s-%s-%s-%s-%s",
             doctorId,
             departmentId,
             date.toString(),
             startTime.toString(),
             endTime.toString());
         
-        Document toInsert = new Document()
-            .append("_id", documentId)
-            .append("doctorId", doctorId)
-            .append("departmentId", departmentId)
-            .append("date", date.toString())
-            .append("startTime", startTime.toString())
-            .append("endTime", endTime.toString());
-        
-        client
-            .getDatabase(DB_NAME)
-            .getCollection(SHIFT_COLLECTION)
-            .insertOne(toInsert);
+        em.getTransaction().begin();
+        em.persist(new ShiftEntity(
+            shiftId,
+            doctorId,
+            departmentId,
+            date,
+            startTime,
+            endTime));
+        em.getTransaction().commit();
+        em.clear();
     }
     
     private void removeTestShiftsFromDatabase(String doctorId) {
-        client
-            .getDatabase(DB_NAME)
-            .getCollection(SHIFT_COLLECTION)
-            .deleteMany(Filters.eq("doctorId", doctorId));
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM ShiftEntity e WHERE e.doctorId = :doctorId")
+            .setParameter("doctorId", doctorId)
+            .executeUpdate();
+        em.getTransaction().commit();
+        em.clear();
     }
 }
