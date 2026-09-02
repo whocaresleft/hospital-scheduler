@@ -16,7 +16,7 @@
     <mongo.driver.version>5.11.0</mongo.driver.version>
     <qos.logback.version>1.6.3</qos.logback.version>
     <maria.driver.version>3.5.10</maria.driver.version>
-    <hibernate.version>6.5.2.Final</hibernate.version>
+    <hibernate.version>7.4.7.Final</hibernate.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <picocli.version>4.7.7</picocli.version>
     <equalsverifier.version>4.5.1</equalsverifier.version>
