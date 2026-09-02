@@ -359,9 +359,11 @@ class ShiftPresenterTest {
         Id departmentId2 = Id.createId("department_2");
         
         Shift originalShift = Shift.createShift(
-                doctorId, departmentId1, DATE_24_07_2026, TIME_08_00, TIME_09_30);
+                doctorId, departmentId1, DATE_24_07_2026, TIME_08_00, TIME_09_00);
         Shift newShift = Shift.createShift(
-                doctorId, departmentId2, DATE_24_07_2026, TIME_08_30, TIME_09_30);
+                doctorId, departmentId2, DATE_24_07_2026, TIME_08_30, TIME_09_00);
+        Shift nonConflicting = Shift.createShift(
+                doctorId, departmentId1, DATE_24_07_2026, TIME_09_00, TIME_09_30);
         
         when(doctorRepository.findById(doctorId))
             .thenReturn(Doctor.createDoctor(doctorId, "doc", "tor"));
@@ -369,7 +371,7 @@ class ShiftPresenterTest {
             .thenReturn(Department.createDepartment(departmentId2, "er"));
         
         when(shiftRepository.findByDoctorId(doctorId))
-            .thenReturn(Arrays.asList(originalShift));
+            .thenReturn(Arrays.asList(originalShift, nonConflicting));
         
         shiftPresenter.updateShift(originalShift, newShift);
 

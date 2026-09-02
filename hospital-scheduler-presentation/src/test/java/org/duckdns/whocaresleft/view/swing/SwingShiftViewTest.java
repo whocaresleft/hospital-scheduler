@@ -848,8 +848,6 @@ class SwingShiftViewTest {
                 window.button("updateButton").requireEnabled();
             }
             
-            
-            
             @Test @GUITest
             void testWhenUpdateButtonIsPressedThenTheEditShiftCheckBoxShouldBeDeselected() {
                 GuiActionRunner.execute(() -> view.enableUI());
@@ -880,8 +878,115 @@ class SwingShiftViewTest {
                 window.checkBox("editShift").click();
                 window.button("updateButton").requireDisabled();
             }
+            
+            @Test @GUITest
+            void testWhenEitherSelectedStartOrEndTimeAreNotValidThenUpdateButtonShouldBeDisabled() {
+                GuiActionRunner.execute(() -> view.enableUI());
+                GuiActionRunner.execute(() ->
+                    view.getShiftListModel().addElement(
+                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+                window.list("shiftList").selectItem(0);
+                window.checkBox("editShift").click();
+                
+                JTextComponentFixture selectedStartTimeTextBox = window.textBox("selectedStartTimeTextBox");
+                JTextComponentFixture selectedEndTextBox = window.textBox("selectedEndTimeTextBox");
+                JButtonFixture updateButton = window.button("updateButton");
+                selectedStartTimeTextBox.setText("").enterText("07:00");
+                updateButton.requireEnabled();
+                
+                selectedStartTimeTextBox.setText("").enterText("08:00");
+                selectedEndTextBox.setText("").enterText("   ");
+                updateButton.requireDisabled();
+                
+                selectedStartTimeTextBox.setText("").enterText("   ");
+                selectedEndTextBox.setText("").enterText("09:00");
+                updateButton.requireDisabled();
+            }
+            
+            @Test @GUITest
+            void testWhenEitherSelectedDoctorOrDepartmentIdAreEmptyThenUpdateButtonShouldBeDisabled() {
+                GuiActionRunner.execute(() -> view.enableUI());
+                GuiActionRunner.execute(() ->
+                    view.getShiftListModel().addElement(
+                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+                window.list("shiftList").selectItem(0);
+                window.checkBox("editShift").click();
+                
+                JTextComponentFixture selectedDoctorIdTextBox = window.textBox("selectedDoctorIdTextBox");
+                JTextComponentFixture selectedDepartmentIdTextBox = window.textBox("selectedDepartmentIdTextBox");
+                JButtonFixture updateButton = window.button("updateButton");
+                selectedDoctorIdTextBox.enterText("_new");
+                updateButton.requireEnabled();
+                
+                selectedDoctorIdTextBox.setText("").enterText("   ");
+                selectedDepartmentIdTextBox.setText("").enterText("er_new");
+                updateButton.requireDisabled();
+                
+                selectedDoctorIdTextBox.setText("").enterText("doctor_id_new");
+                selectedDepartmentIdTextBox.setText("").enterText("   ");
+                updateButton.requireDisabled();
+            }
+            
+            @Test @GUITest
+            void testWhenSelectedDateIsNotValidThenUpdateButtonShouldBeDisabled() {
+                GuiActionRunner.execute(() -> view.enableUI());
+                GuiActionRunner.execute(() ->
+                    view.getShiftListModel().addElement(
+                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+                window.list("shiftList").selectItem(0);
+                window.checkBox("editShift").click();
+                
+                JTextComponentFixture selectedDateTextBox = window.textBox("selectedDateTextBox");
+                JButtonFixture updateButton = window.button("updateButton");
+                selectedDateTextBox.setText("").enterText("01/01/2026");
+                updateButton.requireEnabled();
+                
+                selectedDateTextBox.setText("").enterText("   ");
+                updateButton.requireDisabled();
+            }
+            
+            @Test @GUITest
+            void testWhenUpdateButtonIsEnabledButAllFieldsAreBroughtBackToOriginalValueThenUpdateShouldBeDisabled() {
+                GuiActionRunner.execute(() -> view.enableUI());
+                GuiActionRunner.execute(() ->
+                    view.getShiftListModel().addElement(
+                        Shift.createShift(Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00)));
+                window.list("shiftList").selectItem(0);
+                window.checkBox("editShift").click();
+                
+                JTextComponentFixture selectedDoctorIdTextBox = window.textBox("selectedDoctorIdTextBox");
+                JTextComponentFixture selectedDepartmentIdTextBox = window.textBox("selectedDepartmentIdTextBox");
+                JTextComponentFixture selectedDateTextBox = window.textBox("selectedDateTextBox");
+                JTextComponentFixture selectedStartTimeTextBox = window.textBox("selectedStartTimeTextBox");
+                JTextComponentFixture selectedEndTextBox = window.textBox("selectedEndTimeTextBox");
+                JButtonFixture updateButton = window.button("updateButton");
+                
+                selectedDoctorIdTextBox.enterText("_new");
+                updateButton.requireEnabled();
+                selectedDoctorIdTextBox.setText("").enterText("doctor_id");
+                updateButton.requireDisabled();
+                
+                selectedDepartmentIdTextBox.enterText("_new");
+                updateButton.requireEnabled();
+                selectedDepartmentIdTextBox.setText("").enterText("er");
+                updateButton.requireDisabled();
+                
+                selectedDateTextBox.enterText("01/01/2026");
+                updateButton.requireEnabled();
+                selectedDateTextBox.setText("").enterText("24/07/2026");
+                updateButton.requireDisabled();
+                
+                selectedStartTimeTextBox.enterText("01:00");
+                updateButton.requireEnabled();
+                selectedStartTimeTextBox.setText("").enterText("08:00");
+                updateButton.requireDisabled();
+                
+                selectedEndTextBox.enterText("02:00");
+                updateButton.requireEnabled();
+                selectedEndTextBox.setText("").enterText("09:00");
+                updateButton.requireDisabled();
+            }
         }
-        
     }
     
     @Nested @DisplayName("UI Logic")
@@ -1281,6 +1386,58 @@ class SwingShiftViewTest {
                 window.textBox("endTimeTextBox").enterText("08:00");
                 
                 window.button("addButton").click();
+                
+                window.label("errorLabel").requireText("Shift has negative duration, starting time is after than ending time");
+                verifyNoInteractions(presenter);
+            }
+            
+            @Test @GUITest
+            void testWhenUpdateButtonIsPressedAndDoctorIdCreationFailsThenItDoesNotDelegateToPresenterUpdateShift() {
+                GuiActionRunner.execute(() -> view.enableUI());
+                Shift shift = Shift.createShift(
+                        Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+                GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+                window.list("shiftList").selectItem(0);
+                window.checkBox("editShift").click();
+                
+                window.textBox("selectedDoctorIdTextBox").setText("").enterText("invalid-doctor-id");
+                
+                window.button("updateButton").click();
+                
+                window.label("errorLabel").requireText("Doctor Id contains invalid value: Letters, digits, and underscores only");
+                verifyNoInteractions(presenter);
+            }
+            
+            @Test @GUITest
+            void testWhenUpdateButtonIsPressedAndDepartmentIdCreationFailsThenItDoesNotDelegateToPresenterUpdateShift() {
+                GuiActionRunner.execute(() -> view.enableUI());
+                Shift shift = Shift.createShift(
+                        Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+                GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+                window.list("shiftList").selectItem(0);
+                window.checkBox("editShift").click();
+                
+                window.textBox("selectedDepartmentIdTextBox").setText("").enterText("invalid-department-id");
+                
+                window.button("updateButton").click();
+                
+                window.label("errorLabel").requireText("Department Id contains invalid value: Letters, digits, and underscores only");
+                verifyNoInteractions(presenter);
+            }
+            
+            @Test @GUITest
+            void testWhenUpdateButtonIsPressedAndShiftCreationFailsThenItDoesNotDelegateToPresenterUpdateShift() {
+                GuiActionRunner.execute(() -> view.enableUI());
+                Shift shift = Shift.createShift(
+                        Id.createId("doctor_id"), Id.createId("er"), DATE_24_07_2026, TIME_08_00, TIME_09_00);
+                GuiActionRunner.execute(() -> view.getShiftListModel().addElement(shift));
+                window.list("shiftList").selectItem(0);
+                window.checkBox("editShift").click();
+                
+                window.textBox("selectedStartTimeTextBox").setText("").enterText("09:00");
+                window.textBox("selectedEndTimeTextBox").setText("").enterText("08:50");
+                
+                window.button("updateButton").click();
                 
                 window.label("errorLabel").requireText("Shift has negative duration, starting time is after than ending time");
                 verifyNoInteractions(presenter);
