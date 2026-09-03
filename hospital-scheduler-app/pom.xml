@@ -1,9 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.duckdns.whocarelseft</groupId>
+  <parent>
+    <groupId>org.duckdns.whocaresleft</groupId>
+    <artifactId>hospital-scheduler-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../hospital-scheduler-parent</relativePath>
+  </parent>
   <artifactId>hospital-scheduler-app</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -14,18 +18,6 @@
     <maven.exec.version>1.6.0</maven.exec.version>
   </properties>
   
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.duckdns.whocaresleft</groupId>
-        <artifactId>hospital-scheduler-bom</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  
   <dependencies>
     <dependency>
       <groupId>org.duckdns.whocaresleft</groupId>
@@ -33,13 +25,45 @@
     </dependency>
     
     <dependency>
+      <groupId>org.duckdns.whocaresleft</groupId>
+      <artifactId>hospital-scheduler-presentation</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-swing-junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
     </dependency>
   </dependencies>
   
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -56,34 +80,44 @@
               </descriptorRefs>
               <archive>
                 <manifest>
-                  <mainClass>org.duckdns.whocaresleft.app.App</mainClass>
+                  <mainClass>org.duckdns.whocaresleft.app.swing.SwingHospitalApp</mainClass>
                 </manifest>
               </archive>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>${maven.exec.version}</version>
-        <executions>
-          <execution>
-            <id>run-jar-with-dependencies</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>java</executable>
-              <arguments>
-                <argument>-jar</argument>
-                <argument>${project.basedir}/${project.artifactId}-${project.version}-jar-with-dependencies.jar</argument>
-              </arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>app</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>${maven.exec.version}</version>
+            <executions>
+              <execution>
+                <id>run-jar-with-dependencies</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>java</executable>
+                  <arguments>
+                    <argument>-jar</argument>
+                    <argument>${project.basedir}/${project.artifactId}-${project.version}-jar-with-dependencies.jar</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

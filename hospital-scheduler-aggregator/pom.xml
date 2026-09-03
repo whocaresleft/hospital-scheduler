@@ -13,7 +13,7 @@
     <sonar.tests>
       ${project.basedir}/src/test/java,
       ${project.basedir}/src/it/java,
-      <!--${project.basedir}/src/e2e/java, these are not present yet  --> 
+      ${project.basedir}/src/e2e/java
     </sonar.tests>
     <sonar.junit.reportPaths>
       ${project.build.directory}/target/surefire-reports,
@@ -23,6 +23,7 @@
       **/learning/**
     </sonar.test.exclusions>
     <sonar.coverage.exclusions>
+      **/app/swing/**/*,
       **/exception/*.*,
       **/model/Doctor.*,
       **/model/Department.*,
@@ -35,11 +36,15 @@
     </sonar.cpd.exclusions>
     <sonar.organization>whocaresleft</sonar.organization>
     
-    <sonar.issue.ignore.multicriteria>e1,e2</sonar.issue.ignore.multicriteria>
+    <sonar.issue.ignore.multicriteria>e1,e2,e3,e4</sonar.issue.ignore.multicriteria>
     <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S117</sonar.issue.ignore.multicriteria.e1.ruleKey>
     <sonar.issue.ignore.multicriteria.e1.resourceKey>**/Swing*View.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
     <sonar.issue.ignore.multicriteria.e2.ruleKey>java:S2699</sonar.issue.ignore.multicriteria.e2.ruleKey>
-    <sonar.issue.ignore.multicriteria.e2.resourceKey>**/Swing*ViewTest.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
+    <sonar.issue.ignore.multicriteria.e2.resourceKey>**/Swing*Test.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
+    <sonar.issue.ignore.multicriteria.e3.ruleKey>java:S3577</sonar.issue.ignore.multicriteria.e3.ruleKey>
+    <sonar.issue.ignore.multicriteria.e3.resourceKey>**/Swing*E2E.java</sonar.issue.ignore.multicriteria.e3.resourceKey>
+    <sonar.issue.ignore.multicriteria.e4.ruleKey>java:S117</sonar.issue.ignore.multicriteria.e4.ruleKey>
+    <sonar.issue.ignore.multicriteria.e4.resourceKey>**/Swing*Frame.java</sonar.issue.ignore.multicriteria.e4.resourceKey>
   </properties>
 
   <modules>
@@ -47,6 +52,7 @@
     <module>../hospital-scheduler-parent</module>
     <module>../hospital-scheduler-domain</module>
     <module>../hospital-scheduler-presentation</module>
+    <module>../hospital-scheduler-app</module>
   </modules>
   
   <build>
@@ -69,13 +75,6 @@
   </build>
   
   <profiles>
-    <profile>
-      <id>app</id>
-      <modules>
-        <module>../hospital-scheduler-app</module>
-      </modules>
-    </profile>
-    
     <profile>
       <id>jacoco</id>
       <modules>

@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
   <Appenders>
+    <Console name="ConsoleAppender" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
+    </Console>
+    
+    <File name="MainFileAppender" fileName="logs/App.log" append="true">
+      <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
+    </File>
+    
     <File name="DoctorFileAppender" fileName="logs/DoctorPresenter.log" append="true">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </File>
     
-    <File name="DepartmentFileAppender" filename="logs/DepartmentPresenter.log" append="true">
+    <File name="DepartmentFileAppender" fileName="logs/DepartmentPresenter.log" append="true">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </File>
     
-    <File name="ShiftFileAppender" filename="logs/ShiftPresenter.log" append="true">
+    <File name="ShiftFileAppender" fileName="logs/ShiftPresenter.log" append="true">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </File>
   </Appenders>
   <Loggers>
+    <Logger name="org.duckdns.whocaresleft.app.swing.SwingHospitalApp" level="DEBUG" additivity="false">
+      <AppenderRef ref="ConsoleAppender"/>
+      <AppenderRef ref="MainFileAppender"/>
+    </Logger>
+    
     <Logger name="org.duckdns.whocaresleft.presenter.DoctorPresenter" level="DEBUG" additivity="false">
       <AppenderRef ref="DoctorFileAppender"/>
     </Logger>
@@ -26,6 +39,8 @@
       <AppenderRef ref="ShiftFileAppender"/>
     </Logger>
     <Root level="DEBUG">
+      <AppenderRef ref="ConsoleAppender"/>
+      <AppenderRef ref="MainFileAppender"/>
     </Root>
   </Loggers>
 </Configuration>

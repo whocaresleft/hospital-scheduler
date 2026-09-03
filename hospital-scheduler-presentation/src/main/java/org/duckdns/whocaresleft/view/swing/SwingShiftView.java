@@ -145,21 +145,20 @@ public class SwingShiftView extends JPanel implements ShiftView {
         add(endTimeLabel, gbc_endTimeLabel);
         
         datePicker = new DatePicker(customDateFormat());
+        datePicker.setEnabled(false);
         datePicker.getComponentDateTextField().setName("dateTextBox");
-        datePicker.getComponentDateTextField().setEditable(false);
         datePicker.getComponentToggleCalendarButton().setName("dateButton");
-        datePicker.getComponentToggleCalendarButton().setEnabled(false);
         GridBagConstraints gbc_datePicker = new GridBagConstraints();
         gbc_datePicker.insets = new Insets(0, 0, 5, 0);
         gbc_datePicker.fill = GridBagConstraints.BOTH;
         gbc_datePicker.gridx = 1;
         gbc_datePicker.gridy = 3;
         add(datePicker, gbc_datePicker);
+        
         startTimePicker = new TimePicker(customTimeFormat());
+        startTimePicker.setEnabled(false);
         startTimePicker.getComponentTimeTextField().setName("startTimeTextBox");
-        startTimePicker.getComponentTimeTextField().setEditable(false);
         startTimePicker.getComponentToggleTimeMenuButton().setName("startTimeButton");
-        startTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
         GridBagConstraints gbc_startTimePicker = new GridBagConstraints();
         gbc_startTimePicker.insets = new Insets(0, 0, 5, 0);
         gbc_startTimePicker.fill = GridBagConstraints.BOTH;
@@ -168,10 +167,9 @@ public class SwingShiftView extends JPanel implements ShiftView {
         add(startTimePicker, gbc_startTimePicker);
         
         endTimePicker = new TimePicker(customTimeFormat());
+        endTimePicker.setEnabled(false);
         endTimePicker.getComponentTimeTextField().setName("endTimeTextBox");
-        endTimePicker.getComponentTimeTextField().setEditable(false);
         endTimePicker.getComponentToggleTimeMenuButton().setName("endTimeButton");
-        endTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
         GridBagConstraints gbc_endTimePicker = new GridBagConstraints();
         gbc_endTimePicker.insets = new Insets(0, 0, 5, 0);
         gbc_endTimePicker.fill = GridBagConstraints.BOTH;
@@ -272,10 +270,9 @@ public class SwingShiftView extends JPanel implements ShiftView {
         add(selectedDateLabel, gbc_selectedDateLabel);
         
         selectedDatePicker = new DatePicker(customDateFormat());
+        selectedDatePicker.setEnabled(false);
         selectedDatePicker.getComponentDateTextField().setName("selectedDateTextBox");
-        selectedDatePicker.getComponentDateTextField().setEditable(false);
         selectedDatePicker.getComponentToggleCalendarButton().setName("selectedDateButton");
-        selectedDatePicker.getComponentToggleCalendarButton().setEnabled(false);
         GridBagConstraints gbc_selectedDatePicker = new GridBagConstraints();
         gbc_selectedDatePicker.insets = new Insets(0, 0, 5, 0);
         gbc_selectedDatePicker.fill = GridBagConstraints.BOTH;
@@ -302,10 +299,9 @@ public class SwingShiftView extends JPanel implements ShiftView {
         add(selectedEndTimeLabel, gbc_selectedEndTimeLabel);
         
         selectedStartTimePicker = new TimePicker(customTimeFormat());
+        selectedStartTimePicker.setEnabled(false);
         selectedStartTimePicker.getComponentTimeTextField().setName("selectedStartTimeTextBox");
-        selectedStartTimePicker.getComponentTimeTextField().setEditable(false);
         selectedStartTimePicker.getComponentToggleTimeMenuButton().setName("selectedStartTimeButton");
-        selectedStartTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
         GridBagConstraints gbc_selectedStartTimePicker = new GridBagConstraints();
         gbc_selectedStartTimePicker.insets = new Insets(0, 0, 5, 0);
         gbc_selectedStartTimePicker.fill = GridBagConstraints.BOTH;
@@ -314,10 +310,9 @@ public class SwingShiftView extends JPanel implements ShiftView {
         add(selectedStartTimePicker, gbc_selectedStartTimePicker);
         
         selectedEndTimePicker = new TimePicker(customTimeFormat());
+        selectedEndTimePicker.setEnabled(false);
         selectedEndTimePicker.getComponentTimeTextField().setName("selectedEndTimeTextBox");
-        selectedEndTimePicker.getComponentTimeTextField().setEditable(false);
         selectedEndTimePicker.getComponentToggleTimeMenuButton().setName("selectedEndTimeButton");
-        selectedEndTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
         GridBagConstraints gbc_selectedEndTimePicker = new GridBagConstraints();
         gbc_selectedEndTimePicker.insets = new Insets(0, 0, 5, 0);
         gbc_selectedEndTimePicker.fill = GridBagConstraints.BOTH;
@@ -398,12 +393,9 @@ public class SwingShiftView extends JPanel implements ShiftView {
             
             selectedDoctorIdTextBox.setEditable(isTicked);
             selectedDepartmentIdTextBox.setEditable(isTicked);
-            selectedDatePicker.getComponentDateTextField().setEditable(isTicked);
-            selectedDatePicker.getComponentToggleCalendarButton().setEnabled(isTicked);
-            selectedStartTimePicker.getComponentTimeTextField().setEditable(isTicked);
-            selectedStartTimePicker.getComponentToggleTimeMenuButton().setEnabled(isTicked);
-            selectedEndTimePicker.getComponentTimeTextField().setEditable(isTicked);
-            selectedEndTimePicker.getComponentToggleTimeMenuButton().setEnabled(isTicked);
+            selectedDatePicker.setEnabled(isTicked);
+            selectedStartTimePicker.setEnabled(isTicked);
+            selectedEndTimePicker.setEnabled(isTicked);
             
             updateButton.setEnabled(isTicked && isUpdatePossible());
         });
@@ -566,23 +558,17 @@ public class SwingShiftView extends JPanel implements ShiftView {
     void disableUI() {
         doctorIdTextBox.setEditable(false);
         departmentIdTextBox.setEditable(false);
-        datePicker.getComponentDateTextField().setEditable(false);
-        datePicker.getComponentToggleCalendarButton().setEnabled(false);
-        startTimePicker.getComponentTimeTextField().setEditable(false);
-        startTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
-        endTimePicker.getComponentTimeTextField().setEditable(false);
-        endTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
+        datePicker.setEnabled(false);
+        startTimePicker.setEnabled(false);
+        endTimePicker.setEnabled(false);
         addButton.setEnabled(false);
         shiftList.setEnabled(false);
         editShift.setEnabled(false);
         selectedDoctorIdTextBox.setEditable(false);
         selectedDepartmentIdTextBox.setEditable(false);
-        selectedDatePicker.getComponentDateTextField().setEditable(false);
-        selectedDatePicker.getComponentToggleCalendarButton().setEnabled(false);
-        selectedStartTimePicker.getComponentTimeTextField().setEditable(false);
-        selectedStartTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
-        selectedEndTimePicker.getComponentTimeTextField().setEditable(false);
-        selectedEndTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
+        selectedDatePicker.setEnabled(false);
+        selectedStartTimePicker.setEnabled(false);
+        selectedEndTimePicker.setEnabled(false);
         deleteButton.setEnabled(false);
         updateButton.setEnabled(false);
     }
@@ -590,24 +576,18 @@ public class SwingShiftView extends JPanel implements ShiftView {
     void enableUI() {
         doctorIdTextBox.setEditable(true);
         departmentIdTextBox.setEditable(true);
-        datePicker.getComponentDateTextField().setEditable(true);
-        datePicker.getComponentToggleCalendarButton().setEnabled(true);
-        startTimePicker.getComponentTimeTextField().setEditable(true);
-        startTimePicker.getComponentToggleTimeMenuButton().setEnabled(true);
-        endTimePicker.getComponentTimeTextField().setEditable(true);
-        endTimePicker.getComponentToggleTimeMenuButton().setEnabled(true);
+        datePicker.setEnabled(true);
+        startTimePicker.setEnabled(true);
+        endTimePicker.setEnabled(true);
         addButton.setEnabled(false);
         shiftList.clearSelection();
         shiftList.setEnabled(true);
         editShift.setEnabled(false);
         selectedDoctorIdTextBox.setEditable(false);
         selectedDepartmentIdTextBox.setEditable(false);
-        selectedDatePicker.getComponentDateTextField().setEditable(false);
-        selectedDatePicker.getComponentToggleCalendarButton().setEnabled(false);
-        selectedStartTimePicker.getComponentTimeTextField().setEditable(false);
-        selectedStartTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
-        selectedEndTimePicker.getComponentTimeTextField().setEditable(false);
-        selectedEndTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
+        selectedDatePicker.setEnabled(false);
+        selectedStartTimePicker.setEnabled(false);
+        selectedEndTimePicker.setEnabled(false);
         deleteButton.setEnabled(false);
         updateButton.setEnabled(false);
     }
@@ -615,24 +595,18 @@ public class SwingShiftView extends JPanel implements ShiftView {
     private void restoreUpdateUI() {
         doctorIdTextBox.setEditable(true);
         departmentIdTextBox.setEditable(true);
-        datePicker.getComponentDateTextField().setEditable(true);
-        datePicker.getComponentToggleCalendarButton().setEnabled(true);
-        startTimePicker.getComponentTimeTextField().setEditable(true);
-        startTimePicker.getComponentToggleTimeMenuButton().setEnabled(true);
-        endTimePicker.getComponentTimeTextField().setEditable(true);
-        endTimePicker.getComponentToggleTimeMenuButton().setEnabled(true);
+        datePicker.setEnabled(true);
+        startTimePicker.setEnabled(true);
+        endTimePicker.setEnabled(true);
         addButton.setEnabled(false);
         shiftList.setEnabled(true);
         editShift.setEnabled(true);
         editShift.setSelected(false);
         selectedDoctorIdTextBox.setEditable(false);
         selectedDepartmentIdTextBox.setEditable(false);
-        selectedDatePicker.getComponentDateTextField().setEditable(false);
-        selectedDatePicker.getComponentToggleCalendarButton().setEnabled(false);
-        selectedStartTimePicker.getComponentTimeTextField().setEditable(false);
-        selectedStartTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
-        selectedEndTimePicker.getComponentTimeTextField().setEditable(false);
-        selectedEndTimePicker.getComponentToggleTimeMenuButton().setEnabled(false);
+        selectedDatePicker.setEnabled(false);
+        selectedStartTimePicker.setEnabled(false);
+        selectedEndTimePicker.setEnabled(false);
         deleteButton.setEnabled(true);
         updateButton.setEnabled(false);
     }
@@ -657,6 +631,8 @@ public class SwingShiftView extends JPanel implements ShiftView {
             shiftListModel.clear();
             shifts.forEach(this::addToList);
             enableUI();
+            clearInfoLabel();
+            clearErrorLabel();
         });
     }
     

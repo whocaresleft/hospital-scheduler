@@ -134,8 +134,6 @@
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
         <version>${picocli.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
       </dependency>
       
       <dependency>

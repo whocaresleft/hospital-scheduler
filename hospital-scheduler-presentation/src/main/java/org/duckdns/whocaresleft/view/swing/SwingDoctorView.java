@@ -457,6 +457,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             doctorListModel.clear();
             doctors.forEach(this::addToList);
             enableUI();
+            clearInfoLabel();
+            clearErrorLabel();
         });
     }
     
