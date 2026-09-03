@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import java.awt.event.KeyEvent;
+import java.awt.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
 
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.GenericTypeMatcher;
@@ -21,6 +22,7 @@ import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.Containers;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JButtonFixture;
+import org.assertj.swing.fixture.JListFixture;
 import org.assertj.swing.fixture.JTextComponentFixture;
 import org.duckdns.whocaresleft.core.Id;
 import org.duckdns.whocaresleft.model.Shift;
@@ -64,11 +66,17 @@ class SwingShiftViewTest {
             });
         }
         
-        private static void slideDownToHourInMenu(FrameFixture window, int hour) {
-            if (hour > 23) return;
-            for(int i = 0; i < hour + 1; i++) {
-                window.robot().pressAndReleaseKeys(KeyEvent.VK_DOWN);
-            }
+        private static JListFixture searchTimeList(FrameFixture window) {
+            Component listComponent = window.robot().finder().find(new GenericTypeMatcher<Component>(Component.class) {
+                @Override
+                protected boolean isMatching(Component component) {
+                    return component.getClass().equals(JList.class)
+                        && component.getName() == null
+                        && component.isShowing();
+                }
+            });
+            
+            return new JListFixture(window.robot(), (JList<?>) listComponent);
         }
     }
     
@@ -598,10 +606,11 @@ class SwingShiftViewTest {
                 window.textBox("endTimeTextBox").enterText("09:00");
                 
                 window.button("startTimeButton").click();
-                Helpers.slideDownToHourInMenu(window, 8);
-                window.robot().pressAndReleaseKeys(KeyEvent.VK_ENTER);
+                Helpers.searchTimeList(window)
+                    .clickItem("08:00");
                 
-                window.button("addButton").requireEnabled();
+                await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+                window.button("addButton").requireEnabled());
             }
             
             @Test @GUITest
@@ -613,10 +622,11 @@ class SwingShiftViewTest {
                 window.textBox("startTimeTextBox").enterText("08:00");
                 
                 window.button("endTimeButton").click();
-                Helpers.slideDownToHourInMenu(window, 9);
-                window.robot().pressAndReleaseKeys(KeyEvent.VK_ENTER);
+                Helpers.searchTimeList(window)
+                    .clickItem("09:00");
                 
-                window.button("addButton").requireEnabled();
+                await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
+                    window.button("addButton").requireEnabled());
             }
             
             @Test @GUITest

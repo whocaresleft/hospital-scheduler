@@ -326,20 +326,19 @@
             </dependency>
           </dependencies>
           <configuration>
+            <mutators>
+              <mutator>STRONGER</mutator>
+            </mutators>
             <failWhenNoMutations>false</failWhenNoMutations>
             <targetClasses>
               <param>org.duckdns.whocaresleft.core.Id</param>
               <param>org.duckdns.whocaresleft.model.Shift</param>
               <param>org.duckdns.whocaresleft.presenter.*</param>
-              <param>org.duckdns.whocaresleft.repository.mongodb.*</param>
-              <param>org.duckdns.whocaresleft.repository.mariadb.*</param>
             </targetClasses>
             <targetTests>
               <param>org.duckdns.whocaresleft.core.Id*</param>
               <param>org.duckdns.whocaresleft.model.Shift*</param>
               <param>org.duckdns.whocaresleft.presenter.*</param>
-              <param>org.duckdns.whocaresleft.repository.mongodb.*</param>
-              <param>org.duckdns.whocaresleft.repository.mariadb.*</param>
             </targetTests>
             <excludedClasses>
               <param>org.duckdns.whocaresleft.repository.mariadb.entity.*</param>
@@ -393,11 +392,6 @@
           <plugin>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
-            <configuration>
-              <mutators>
-                <mutator>DEFAULTS</mutator>
-              </mutators>
-            </configuration>
             <executions>
               <execution>
                 <goals>
@@ -419,9 +413,14 @@
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
             <configuration>
-              <mutators>
-                <mutator>STRONGER</mutator>
-              </mutators>
+              <targetClasses>
+                <param>org.duckdns.whocaresleft.repository.mongodb.*</param>
+                <param>org.duckdns.whocaresleft.repository.mariadb.*</param>
+              </targetClasses>
+              <targetTests>
+                <param>org.duckdns.whocaresleft.repository.mongodb.*</param>
+                <param>org.duckdns.whocaresleft.repository.mariadb.*</param>
+              </targetTests>
             </configuration>
             <executions>
               <execution>

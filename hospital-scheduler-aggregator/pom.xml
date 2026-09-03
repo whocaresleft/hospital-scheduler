@@ -88,5 +88,26 @@
         <module>../hospital-scheduler-report</module>
       </modules>
     </profile>
+    
+    <profile>
+      <id>mutation-testing</id>
+      <modules>
+        <module>../hospital-scheduler-report</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>mutation-testing-full</id>
+      <modules>
+        <module>../hospital-scheduler-report</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>include-report-in-execution-tree</id>
+      <modules>
+        <module>../hospital-scheduler-report</module>
+      </modules>
+    </profile>
   </profiles>
 </project>

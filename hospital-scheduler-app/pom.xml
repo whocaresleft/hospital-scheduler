@@ -16,6 +16,8 @@
     
     <maven.assembly.version>3.8.0</maven.assembly.version>
     <maven.exec.version>1.6.0</maven.exec.version>
+    
+    <main.class.path>org.duckdns.whocaresleft.app.swing.SwingHospitalApp</main.class.path>
   </properties>
   
   <dependencies>
@@ -80,7 +82,7 @@
               </descriptorRefs>
               <archive>
                 <manifest>
-                  <mainClass>org.duckdns.whocaresleft.app.swing.SwingHospitalApp</mainClass>
+                  <mainClass>${main.class.path}</mainClass>
                 </manifest>
               </archive>
             </configuration>

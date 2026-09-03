@@ -34,10 +34,11 @@ public class SwingHospitalApp implements Callable<Void>{
     private String databaseBackend = "mongodb";
     
     @Option(names = {"--mongo-connection-string"}, description = "MongoDB connection string")
-    private String mongoConnectionString;
+    private String mongoConnectionString = "mongodb://localhost:27017/?replicaSet=rs0";
     
     @Option(names = {"--maria-jdbc-url"}, description = "JDBC connection URL for MariaDB")
-    private String mariaJdbcUrl;
+    private String mariaJdbcUrl = DEFAULT_MARIA_JDBC_URL;
+    private static final String DEFAULT_MARIA_JDBC_URL = "jdbc:mariadb://localhost:3306/";
     
     @Option(names = {"--db-mongo-name"}, description = "MongoDB database name")
     private String databaseName = "hospital";
@@ -112,6 +113,10 @@ public class SwingHospitalApp implements Callable<Void>{
             break;
             
         case "mariadb":
+            
+            if (mariaJdbcUrl.equals(DEFAULT_MARIA_JDBC_URL)) {
+                mariaJdbcUrl = mariaJdbcUrl + databaseName;
+            }
             
             String additionalArgs = "createDatabaseIfNotExist=true&connectTimeout=" + timeout;
             String finalUrl = mariaJdbcUrl.contains("?")
