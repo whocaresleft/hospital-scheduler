@@ -1,0 +1,35 @@
+services:
+  mariadb:
+    image: mariadb:10.3.39
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: hospital_docker_maria
+      MARIADB_USER: testuserdocker
+      MARIADB_PASSWORD: testpassworddocker
+    restart: unless-stopped
+    networks:
+      - hospital_java_network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    
+  hospital-java-app:
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    command:
+        [
+          "java",
+          "-jar",
+          "/app/app.jar",
+          "--db-backend=mariadb",
+          "--maria-jdbc-url=jdbc:mariadb://mariadb:3306/hospital_docker_maria",
+          "--maria-user=testuserdocker",
+          "--maria-password=testpassworddocker",
+          "--maria-ddl=update"
+        ]
