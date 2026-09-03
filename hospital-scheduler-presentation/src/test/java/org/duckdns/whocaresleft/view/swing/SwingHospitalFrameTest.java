@@ -65,7 +65,7 @@ class SwingHospitalFrameTest {
     }
     
     @AfterEach
-    void teardown() throws Exception {
+    void teardown() {
         if (window != null)
             window.cleanUp();
     }

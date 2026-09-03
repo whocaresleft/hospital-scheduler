@@ -84,20 +84,17 @@ public class SwingHospitalFrame extends JFrame {
         
         this.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowOpened(WindowEvent e) {
-                if (tabbedPane.getSelectedIndex() == 0 && doctorPresenter != null)
-                    new Thread(() -> doctorPresenter.allDoctors()).start();
-            }
+            public void windowOpened(WindowEvent e) { new Thread(() -> doctorPresenter.allDoctors()).start(); }
         });
         
         tabbedPane.addChangeListener(e -> {
             int index = tabbedPane.getSelectedIndex();
             
-            if (index == 0 && doctorPresenter != null)
+            if (index == 0)
                 new Thread(() -> doctorPresenter.allDoctors()).start();
-            else if (index == 1 && departmentPresenter != null)
+            else if (index == 1)
                 new Thread(() -> departmentPresenter.allDepartments()).start();
-            else if (index == 2 && shiftPresenter != null)
+            else if (index == 2)
                 new Thread(() -> shiftPresenter.allShifts()).start();
         });
     }
