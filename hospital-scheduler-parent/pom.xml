@@ -13,7 +13,7 @@
     <maven.compiler.release>17</maven.compiler.release>
     <argLine></argLine>
     
-    <maven.compiler.version>3.15.0</maven.compiler.version>
+    <maven.compiler.version>3.16.0</maven.compiler.version>
     <maven.surefire.version>3.5.6</maven.surefire.version>
     <maven.surefire.report.version>3.5.6</maven.surefire.report.version>
     <maven.site.version>3.22.0</maven.site.version>
