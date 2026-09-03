@@ -31,7 +31,7 @@ public class MariaTransactionManager implements TransactionManager {
             t.commit();
             em.close();
         } catch (Exception e) { 
-          t.rollback();
+            t.rollback();
             em.close();
             throw e;
         }

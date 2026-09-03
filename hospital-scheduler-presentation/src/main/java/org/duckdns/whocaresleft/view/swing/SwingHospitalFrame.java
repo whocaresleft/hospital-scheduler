@@ -41,7 +41,7 @@ public class SwingHospitalFrame extends JFrame {
     
     private final transient Map<Integer, Runnable> tabSwitchAction = Map.of(
         0, () -> new Thread(() -> doctorPresenter.allDoctors()).start(),
-        1, () ->new Thread(() -> departmentPresenter.allDepartments()).start(),
+        1, () -> new Thread(() -> departmentPresenter.allDepartments()).start(),
         2, () -> new Thread(() -> shiftPresenter.allShifts()).start());
     
     public SwingHospitalFrame() {
@@ -95,7 +95,7 @@ public class SwingHospitalFrame extends JFrame {
         
         tabbedPane.addChangeListener(e -> {
             int index = tabbedPane.getSelectedIndex();
-            tabSwitchAction.getOrDefault(index, () -> {}).run();
+            tabSwitchAction.get(index).run();
         });
     }
     
