@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Map;
 
 public class SwingHospitalFrame extends JFrame {
     
@@ -37,6 +38,11 @@ public class SwingHospitalFrame extends JFrame {
     private SwingDepartmentView departmentView;
     private SwingShiftView shiftView;
     private JLabel hospitalLabel;
+    
+    private final Map<Integer, Runnable> tabSwitchAction = Map.of(
+        0, () -> new Thread(() -> doctorPresenter.allDoctors()).start(),
+        1, () ->new Thread(() -> departmentPresenter.allDepartments()).start(),
+        2, () -> new Thread(() -> shiftPresenter.allShifts()).start());
     
     public SwingHospitalFrame() {
         setTitle("Hospital Scheduler X");
@@ -89,13 +95,7 @@ public class SwingHospitalFrame extends JFrame {
         
         tabbedPane.addChangeListener(e -> {
             int index = tabbedPane.getSelectedIndex();
-            
-            if (index == 0)
-                new Thread(() -> doctorPresenter.allDoctors()).start();
-            else if (index == 1)
-                new Thread(() -> departmentPresenter.allDepartments()).start();
-            else if (index == 2)
-                new Thread(() -> shiftPresenter.allShifts()).start();
+            tabSwitchAction.getOrDefault(index, () -> {}).run();
         });
     }
     
