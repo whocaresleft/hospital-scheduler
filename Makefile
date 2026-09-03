@@ -1,5 +1,31 @@
 MVNW := ./mvnw
 POM_PATH = hospital-scheduler-aggregator/pom.xml
+JAVA_REQUIRED := 17
+
+dependencies-check:
+	@echo "Checking dependencies:"
+	@if command -v java >/dev/null 2>&1; then \
+		JAVA_VER=$$(java -version 2>&1 | awk -F '"' '/version/ {print $$2}' | cut -d'.' -f1); \
+		if [ "$$JAVA_VER" = "$(JAVA_REQUIRED)" ]; then \
+			echo "Java $(REQUIRED_JAVA):          found"; \
+		else \
+			echo >&2 "Java $(REQUIRED_JAVA): NOT found, but $$JAVA_VER was"; \
+			exit 1; \
+		fi; \
+	else \
+		echo >&2 "Java $(REQUIRED_JAVA):  NOT found"; \
+		exit 1; \
+	fi
+	@if command -v docker >/dev/null 2>&1; then echo "Docker:         found"; else echo >&2 "Docker: not found"; exit 1; fi
+	@if docker compose version >/dev/null 2>&1; then \
+		echo "Docker compose: found"; \
+	else \
+		echo "Docker compose: NOT found"; \
+		exit 1; \
+	fi
+	@if command -v xhost >/dev/null 2>&1; then echo "Xhost:          found"; else echo >&2 "Xhost: not found"; exit 1; fi
+	@echo "All set!"
+.PHONY: dependencies-check
 
 clean-all:
 	$(MVNW) clean -Pinclude-report-in-execution-tree -f $(POM_PATH)
