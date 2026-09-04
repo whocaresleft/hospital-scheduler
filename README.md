@@ -163,6 +163,7 @@ make native-clean
 ### Run within Docker
 > [!NOTE]
 > Running within Docker is available for Linux only (with either X11 or Wayland with xorg installed)
+
 If both **Docker compose** and **xhost** are installed, the application can be run within a Docker container using **make**. While typing the command, we can also specify the database to be used. As for now the only valid options are `mongo` and `maria`:
 ```
 make docker-build-and-run DB=mongo
