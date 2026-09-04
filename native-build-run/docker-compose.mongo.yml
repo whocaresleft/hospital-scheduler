@@ -2,14 +2,12 @@ services:
   mongodb:
     image: mongo:5
     container_name: mongodb
-    restart: always
+    restart: "no"
     ports:
       - "27017:27017"
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
     volumes:
       - mongo-data:/data/db
-    networks:
-      - hospital_java_network
     healthcheck:
       test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
@@ -23,8 +21,6 @@ services:
       mongodb:
         condition: service_healthy
     restart: "no"
-    networks:
-     - hospital_java_network
     entrypoint:
       - bash
       - -c
@@ -43,22 +39,13 @@ services:
             print("Replica Set rs0 initialized");
           }
         '
-
-  hospital-java-app:
-    depends_on:
-      mongo-init-replica:
-        condition: service_completed_successfully
-    command:
-        [
-          "java",
-          "-jar",
-          "/app/app.jar",
-          "--mongo-connection-string=mongodb://mongodb:27017/?replicaSet=rs0",
-          "--db-mongo-name=hospital_docker_mongo",
-          "--db-mongo-doctor-collection=doctor_docker_mongo",
-          "--db-mongo-department-collection=department-docker_mongo",
-          "--db-mongo-shift-collection=shift-docker_mongo"
-        ]
+        touch /tmp/init_ready
+        tail -f /dev/null
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/init_ready"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
 
 volumes:
   mongo-data:

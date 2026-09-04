@@ -1,8 +1,8 @@
 services:
   hospital-java-app:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker-build-run/Dockerfile
       args:
         DISPLAY: ${DISPLAY}
     environment:
@@ -10,6 +10,7 @@ services:
       - _JAVA_AWT_WM_NONREPARENTING=1
       - SUN_AWT_DISABLE_OPENGL=true
     container_name: hospital_java_app
+    restart: "no"
     networks:
      - hospital_java_network
     volumes:

@@ -9,7 +9,7 @@ services:
       MARIADB_DATABASE: hospital_docker_maria
       MARIADB_USER: testuserdocker
       MARIADB_PASSWORD: testpassworddocker
-    restart: unless-stopped
+    restart: "no"
     networks:
       - hospital_java_network
     healthcheck:
