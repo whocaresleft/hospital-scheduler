@@ -134,7 +134,7 @@ The application can be run in two different ways, those being on your local mach
 suggest using **make**!!
 
 ### Run native
-> [!INFO]
+> [!NOTE]
 > To run the application natevely, the [Build dependencies](#build-dependencies) need to be installed!
 
 While typing the **make**, we can also specify the database to be used. As for now the only valid options are `mongo` and `maria`:
@@ -161,6 +161,8 @@ make native-clean
 ```
 
 ### Run within Docker
+> [!NOTE]
+> Running within Docker is available for Linux only (with either X11 or Wayland with xorg installed)
 If both **Docker compose** and **xhost** are installed, the application can be run within a Docker container using **make**. While typing the command, we can also specify the database to be used. As for now the only valid options are `mongo` and `maria`:
 ```
 make docker-build-and-run DB=mongo
