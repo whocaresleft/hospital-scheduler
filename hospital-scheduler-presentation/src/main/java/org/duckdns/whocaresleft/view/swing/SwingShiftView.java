@@ -205,9 +205,8 @@ public class SwingShiftView extends JPanel implements ShiftView {
             JLabel label = new JLabel();
             label.setHorizontalAlignment(SwingConstants.CENTER);
             
-            if (shift != null) {
-                label.setText(shift.toString());
-            }
+            label.setText(shift.toString());
+            
             if (isSelected) {
                 label.setBackground(list.getSelectionBackground());
                 label.setForeground(list.getSelectionForeground());

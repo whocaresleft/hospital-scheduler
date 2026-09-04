@@ -155,9 +155,8 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             JLabel label = new JLabel();
             label.setHorizontalAlignment(SwingConstants.CENTER);
             
-            if (doctor != null) {
-                label.setText(displayDoctor(doctor));
-            }
+            label.setText(displayDoctor(doctor));
+            
             if (isSelected) {
                 label.setBackground(list.getSelectionBackground());
                 label.setForeground(list.getSelectionForeground());

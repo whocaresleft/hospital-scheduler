@@ -132,9 +132,8 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
             JLabel label = new JLabel();
             label.setHorizontalAlignment(SwingConstants.CENTER);
             
-            if (department != null) {
-                label.setText(displayDepartment(department));
-            }
+            label.setText(displayDepartment(department));
+            
             if (isSelected) {
                 label.setBackground(list.getSelectionBackground());
                 label.setForeground(list.getSelectionForeground());
