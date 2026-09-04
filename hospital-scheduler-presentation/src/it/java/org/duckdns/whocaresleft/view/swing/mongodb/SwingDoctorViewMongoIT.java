@@ -101,7 +101,7 @@ class SwingDoctorViewMongoIT {
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(window.list("doctorList").contents())
-                .containsExactlyInAnyOrder(d1.toString(), d2.toString()));
+                .containsExactlyInAnyOrder(SwingDoctorView.displayDoctor(d1), SwingDoctorView.displayDoctor(d2)));
     }
     
     @Test @GUITest
@@ -114,7 +114,8 @@ class SwingDoctorViewMongoIT {
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("doctorList").contents())
-                .containsExactly(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor").toString());
+                .containsExactly(
+                    SwingDoctorView.displayDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "doc", "tor")));
             
             window.label("infoLabel").requireText("Doctor added!");
         });
@@ -134,7 +135,8 @@ class SwingDoctorViewMongoIT {
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("doctorList").contents())
-                .containsExactly(Doctor.createDoctor(Id.createId("doctor_id"), "ORIGINAL", "DOCTOR").toString());
+                .containsExactly(
+                    SwingDoctorView.displayDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "ORIGINAL", "DOCTOR")));
             
             window.label("infoLabel").requireText(" ");
             window.label("errorLabel").requireText("A Doctor with id doctor_id already exists");
@@ -185,7 +187,7 @@ class SwingDoctorViewMongoIT {
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("doctorList").contents())
                 .containsExactly(
-                    Doctor.createDoctor(Id.createId("doctor_id"), "docextension", "torextension").toString());
+                    SwingDoctorView.displayDoctor(Doctor.createDoctor(Id.createId("doctor_id"), "docextension", "torextension")));
             
             window.label("infoLabel").requireText("Doctor updated!");
         });

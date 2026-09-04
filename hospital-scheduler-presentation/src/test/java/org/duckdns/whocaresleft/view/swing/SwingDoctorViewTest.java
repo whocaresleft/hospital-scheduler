@@ -689,7 +689,7 @@ class SwingDoctorViewTest {
                 
                 String[] listContents = window.list("doctorList").contents();
                 assertThat(listContents)
-                    .containsExactlyInAnyOrder(d1.toString(), d2.toString());
+                    .containsExactlyInAnyOrder(SwingDoctorView.displayDoctor(d1), SwingDoctorView.displayDoctor(d2));
             }
             
             @Test @GUITest
@@ -702,12 +702,14 @@ class SwingDoctorViewTest {
                     view.getDoctorListModel().addElement(old));
                 
                 assertThat(window.list("doctorList").contents())
-                    .containsExactly(old.toString());
+                    .containsExactly(SwingDoctorView.displayDoctor(old));
                 
                 view.showAllDoctors(Arrays.asList(new1, new2));
                 
                 assertThat(window.list("doctorList").contents())
-                    .containsExactlyInAnyOrder(new1.toString(), new2.toString());
+                    .containsExactlyInAnyOrder(
+                        SwingDoctorView.displayDoctor(new1),
+                        SwingDoctorView.displayDoctor(new2));
             }
             
             @Test @GUITest
@@ -735,7 +737,7 @@ class SwingDoctorViewTest {
                 view.doctorAdded(Doctor.createDoctor(Id.createId("doctor_id"), "Doc", "Tor"));
                 
                 assertThat(window.list("doctorList").contents())
-                    .containsExactly(doctor.toString());
+                    .containsExactly(SwingDoctorView.displayDoctor(doctor));
                 window.label("infoLabel").requireText("Doctor added!");
                 window.label("errorLabel").requireText(" ");
             }
@@ -754,7 +756,7 @@ class SwingDoctorViewTest {
                 view.doctorRemoved(Doctor.createDoctor(Id.createId("doctor_2"), "Dok", "Ter"));
                 
                 assertThat(window.list("doctorList").contents())
-                    .containsExactly(doctor1.toString());
+                    .containsExactly(SwingDoctorView.displayDoctor(doctor1));
                 window.label("infoLabel").requireText("Doctor removed!");
                 window.label("errorLabel").requireText(" ");
             }
@@ -772,7 +774,7 @@ class SwingDoctorViewTest {
                         Doctor.createDoctor(Id.createId("doctor_id"), "New", "Doktor"));
                 
                 assertThat(window.list("doctorList").contents())
-                    .containsExactly(newDoctor.toString());
+                    .containsExactly(SwingDoctorView.displayDoctor(newDoctor));
                 window.label("infoLabel").requireText("Doctor updated!");
                 window.label("errorLabel").requireText(" ");
             }
