@@ -161,7 +161,9 @@ public class SwingDoctorView extends JPanel implements DoctorView {
             if (isSelected) {
                 label.setBackground(list.getSelectionBackground());
                 label.setForeground(list.getSelectionForeground());
-                label.setOpaque(true);
+            } else {
+                label.setBackground(list.getBackground());
+                label.setForeground(list.getForeground());
             }
             return label;
         });

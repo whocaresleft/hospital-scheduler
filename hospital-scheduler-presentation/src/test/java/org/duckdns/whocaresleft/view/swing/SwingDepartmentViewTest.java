@@ -629,7 +629,7 @@ class SwingDepartmentViewTest {
                 
                 String[] listContents = window.list("departmentList").contents();
                 assertThat(listContents)
-                    .containsExactlyInAnyOrder(d1.toString(), d2.toString());
+                    .containsExactlyInAnyOrder(SwingDepartmentView.displayDepartment(d1), SwingDepartmentView.displayDepartment(d2));
             }
             
             @Test @GUITest
@@ -642,12 +642,12 @@ class SwingDepartmentViewTest {
                     view.getDepartmentListModel().addElement(old));
                 
                 assertThat(window.list("departmentList").contents())
-                    .containsExactly(old.toString());
+                    .containsExactly(SwingDepartmentView.displayDepartment(old));
                 
                 view.showAllDepartments(Arrays.asList(new1, new2));
                 
                 assertThat(window.list("departmentList").contents())
-                    .containsExactlyInAnyOrder(new1.toString(), new2.toString());
+                    .containsExactlyInAnyOrder(SwingDepartmentView.displayDepartment(new1), SwingDepartmentView.displayDepartment(new2));
             }
             
             @Test @GUITest
@@ -675,7 +675,7 @@ class SwingDepartmentViewTest {
                 view.departmentAdded(department);
                 
                 assertThat(window.list("departmentList").contents())
-                    .containsExactly(department.toString());
+                    .containsExactly(SwingDepartmentView.displayDepartment(department));
                 window.label("infoLabel").requireText("Department added!");
                 window.label("errorLabel").requireText(" ");
             }
@@ -694,7 +694,7 @@ class SwingDepartmentViewTest {
                 view.departmentRemoved(Department.createDepartment(Id.createId("sr"), "Surgery room"));
                 
                 assertThat(window.list("departmentList").contents())
-                    .containsExactly(d1.toString());
+                    .containsExactly(SwingDepartmentView.displayDepartment(d1));
                 window.label("infoLabel").requireText("Department removed!");
                 window.label("errorLabel").requireText(" ");
             }
@@ -713,7 +713,7 @@ class SwingDepartmentViewTest {
                     Department.createDepartment(Id.createId("er"), "New Emergency room"));
                 
                 assertThat(window.list("departmentList").contents())
-                    .containsExactly(newDepartment.toString());
+                    .containsExactly(SwingDepartmentView.displayDepartment(newDepartment));
                 window.label("infoLabel").requireText("Department updated!");
                 window.label("errorLabel").requireText(" ");
             }
