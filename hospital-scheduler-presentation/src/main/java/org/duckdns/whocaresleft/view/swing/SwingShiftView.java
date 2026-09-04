@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.JCheckBox;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 public class SwingShiftView extends JPanel implements ShiftView {
@@ -200,6 +201,21 @@ public class SwingShiftView extends JPanel implements ShiftView {
         shiftList = new JList<>(shiftListModel);
         shiftList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         shiftList.setEnabled(false);
+        shiftList.setCellRenderer((list, shift, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel();
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            label.setText(shift.toString());
+            
+            if (isSelected) {
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            } else {
+                label.setBackground(list.getBackground());
+                label.setForeground(list.getForeground());
+            }
+            return label;
+        });
         scrollPane.setViewportView(shiftList);
         shiftList.setName("shiftList");
         

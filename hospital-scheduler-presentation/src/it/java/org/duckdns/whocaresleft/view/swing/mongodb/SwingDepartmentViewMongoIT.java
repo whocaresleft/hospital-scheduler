@@ -101,7 +101,7 @@ class SwingDepartmentViewMongoIT {
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(window.list("departmentList").contents())
-                .containsExactlyInAnyOrder(d1.toString(), d2.toString()));
+                .containsExactlyInAnyOrder(SwingDepartmentView.displayDepartment(d1), SwingDepartmentView.displayDepartment(d2)));
     }
     
     @Test @GUITest
@@ -113,7 +113,8 @@ class SwingDepartmentViewMongoIT {
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("departmentList").contents())
-                .containsExactly(Department.createDepartment(Id.createId("er"), "Emergency Room").toString());
+                .containsExactly(
+                    SwingDepartmentView.displayDepartment(Department.createDepartment(Id.createId("er"), "Emergency Room")));
             
             window.label("infoLabel").requireText("Department added!");
         });
@@ -133,7 +134,8 @@ class SwingDepartmentViewMongoIT {
         
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("departmentList").contents())
-                .containsExactly(Department.createDepartment(Id.createId("er"), "Original Emergency Room").toString());
+                .containsExactly(
+                    SwingDepartmentView.displayDepartment(Department.createDepartment(Id.createId("er"), "Original Emergency Room")));
             
             window.label("infoLabel").requireText(" ");
             window.label("errorLabel").requireText("A Department with id er already exists");
@@ -183,7 +185,7 @@ class SwingDepartmentViewMongoIT {
         await().atMost(TIMEOUT, TimeUnit.SECONDS).untilAsserted(() -> {
             assertThat(window.list("departmentList").contents())
                 .containsExactly(
-                    Department.createDepartment(Id.createId("er"), "Emergency Room-new").toString());
+                    SwingDepartmentView.displayDepartment(Department.createDepartment(Id.createId("er"), "Emergency Room-new")));
             
             window.label("infoLabel").requireText("Department updated!");
         });

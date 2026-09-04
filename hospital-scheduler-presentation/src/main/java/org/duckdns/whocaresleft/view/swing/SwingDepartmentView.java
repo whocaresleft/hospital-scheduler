@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import java.awt.Insets;
@@ -127,6 +128,21 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         departmentList = new JList<>(departmentListModel);
         departmentList.setEnabled(false);
         departmentList.setName("departmentList");
+        departmentList.setCellRenderer((list, department, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel();
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            label.setText(displayDepartment(department));
+            
+            if (isSelected) {
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            } else {
+                label.setBackground(list.getBackground());
+                label.setForeground(list.getForeground());
+            }
+            return label;
+        });
         scrollPane.setViewportView(departmentList);
         
         JLabel selectedDepartmentLabel = new JLabel("Selected Department");
@@ -271,6 +287,10 @@ public class SwingDepartmentView extends JPanel implements DepartmentView {
         deleteButton.addActionListener(e -> delete());
         
         updateButton.addActionListener(e -> update());
+    }
+    
+    public static String displayDepartment(Department department) {
+        return "(ID " + department.getId() + ") " + department.getName();
     }
     
     public void setPresenter(DepartmentPresenter presenter) { this.presenter = presenter; }

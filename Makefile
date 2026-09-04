@@ -1,6 +1,11 @@
-MVNW := ./mvnw
 POM_PATH = hospital-scheduler-aggregator/pom.xml
 JAVA_REQUIRED := 17
+
+ifeq ($(OS),Windows_NT)
+	MVNW := mvnw.cmd
+else
+	MVNW := ./mvnw
+endif
 
 dependencies-check-dev:
 	@echo "Checking building dependencies:"
@@ -64,6 +69,8 @@ dependencies-check-all:
 
 clean-all:
 	$(MVNW) clean -Pinclude-report-in-execution-tree -f $(POM_PATH)
+	@ rm -rf logs
+	@ rm -rf target/logs
 .PHONY: clean-all
 
 XVFB := $(shell [ -z "$$DISPLAY" ] || [ "$$XDG_SESSION_TYPE" = "wayland" ] || [ -n "$$WAYLAND_DISPLAY" ] && echo "env -u WAYLAND_DISPLAY -u XDG_SESSION_TYPE NO_AT_BRIDGE=1 xvfb-run -a -s '-screen 0 1920x1080x24' bash -c")

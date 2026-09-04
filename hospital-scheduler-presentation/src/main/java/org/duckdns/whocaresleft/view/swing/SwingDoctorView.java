@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import java.awt.Insets;
@@ -23,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JCheckBox;
 import java.awt.Color;
+
 import javax.swing.JScrollPane;
 
 public class SwingDoctorView extends JPanel implements DoctorView {
@@ -149,6 +151,21 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         doctorListModel = new DefaultListModel<>();
         doctorList = new JList<>(doctorListModel);
         doctorList.setEnabled(false);
+        doctorList.setCellRenderer((list, doctor, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel();
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            label.setText(displayDoctor(doctor));
+            
+            if (isSelected) {
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            } else {
+                label.setBackground(list.getBackground());
+                label.setForeground(list.getForeground());
+            }
+            return label;
+        });
         scrollPane.setViewportView(doctorList);
         doctorList.setName("doctorList");
         
@@ -323,6 +340,10 @@ public class SwingDoctorView extends JPanel implements DoctorView {
         selectedLastNameTextBox.addKeyListener(updateButtonEnabler);
         
         updateButton.addActionListener(e -> update());
+    }
+    
+    public static String displayDoctor(Doctor doctor) {
+        return "(ID " + doctor.getId() + ") Dr. " + doctor.getFirstName() + " " + doctor.getLastName();
     }
     
     public void setPresenter(DoctorPresenter presenter) { this.presenter = presenter; }
