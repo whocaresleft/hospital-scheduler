@@ -4,15 +4,15 @@
     <Console name="ConsoleAppender" target="SYSTEM_OUT">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </Console>
-    <File name="DoctorFileAppender" fileName="logs/DoctorPresenter.log" append="true">
+    <File name="DoctorFileAppender" fileName="target/logs/DoctorPresenter.log" append="true">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </File>
     
-    <File name="DepartmentFileAppender" fileName="logs/DepartmentPresenter.log" append="true">
+    <File name="DepartmentFileAppender" fileName="target/logs/DepartmentPresenter.log" append="true">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </File>
     
-    <File name="ShiftFileAppender" fileName="logs/ShiftPresenter.log" append="true">
+    <File name="ShiftFileAppender" fileName="target/logs/ShiftPresenter.log" append="true">
       <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
     </File>
   </Appenders>

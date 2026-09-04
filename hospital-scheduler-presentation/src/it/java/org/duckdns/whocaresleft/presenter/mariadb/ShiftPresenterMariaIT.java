@@ -42,7 +42,7 @@ class ShiftPresenterMariaIT {
     private static final LocalTime TIME_09_00 = LocalTime.of(9, 0);
     
     @Container
-    private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.3.39");
+    private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.11");
     private static EntityManagerFactory emf;
     
     @Mock

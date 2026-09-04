@@ -30,7 +30,7 @@ public class SwingHospitalApp implements Callable<Void>{
     
     private static final Logger LOGGER = LogManager.getLogger(SwingHospitalApp.class);
     
-    @Option(names = {"-d", "--db-backend"}, description = "Database backend: ${COMPLETITION-CANDIDATES}")
+    @Option(names = {"-d", "--db-backend"}, description = "Database backend (mongodb and mariadb)")
     private String databaseBackend = "mongodb";
     
     @Option(names = {"--mongo-connection-string"}, description = "MongoDB connection string")

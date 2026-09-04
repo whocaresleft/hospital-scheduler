@@ -29,7 +29,7 @@ import jakarta.persistence.Persistence;
 class MariaTransactionManagerTestcontainersIT {
     
     @Container
-    private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.3.39");
+    private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.11");
     private static EntityManagerFactory emf;
     
     private MariaTransactionManager transactionManager;
