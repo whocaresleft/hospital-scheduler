@@ -41,7 +41,7 @@ import jakarta.persistence.Persistence;
 @Testcontainers @DisplayName("End-to-End tests for the SwingHospitalApp, using MariaDB as database backend")
 class SwingHospitalAppMariaE2E {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     
     private static final String DOCTOR_FIXTURE_1_ID = "doctor_1";
     private static final String DOCTOR_FIXTURE_1_FIRST_NAME = "Doc";

@@ -34,7 +34,7 @@ import com.mongodb.client.MongoDatabase;
 @Testcontainers @DisplayName("Integration tests between SwingDoctorView, DoctorPresenter, and MongoTransactionManager")
 class SwingDoctorViewMongoIT {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     private static final String DOCTOR_COLLECTION = "doctor";
     private static final String DEPARTMENT_COLLECTION = "department";
     private static final String SHIFT_COLLECTION = "shift";

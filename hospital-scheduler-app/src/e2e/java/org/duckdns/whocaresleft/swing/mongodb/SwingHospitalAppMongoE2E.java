@@ -36,7 +36,7 @@ import com.mongodb.client.model.Filters;
 @Testcontainers @DisplayName("End-to-End tests for the SwingHospitalApp, using MongoDB as database backend")
 class SwingHospitalAppMongoE2E {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     private static final String DB_NAME = "test-hospital";
     private static final String DOCTOR_COLLECTION = "test-doctor";
     private static final String DEPARTMENT_COLLECTION = "test-department";

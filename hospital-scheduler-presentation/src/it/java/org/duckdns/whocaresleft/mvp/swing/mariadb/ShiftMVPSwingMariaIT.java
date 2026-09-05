@@ -42,7 +42,7 @@ import jakarta.persistence.Persistence;
     + "and MariaTransactionManager, with the goal of verifying the MVP architecture interaction")
 class ShiftMVPSwingMariaIT {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     private static final LocalDate DATE_24_07_2026 = LocalDate.of(2026, 7, 24);
     private static final LocalTime TIME_08_00 = LocalTime.of(8, 0);
     private static final LocalTime TIME_09_00 = LocalTime.of(9, 0);

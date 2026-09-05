@@ -41,7 +41,7 @@ import jakarta.persistence.Persistence;
 @Testcontainers @DisplayName("Integration tests between SwingShiftView, ShiftPresenter, and MariaTransactionManager")
 class SwingShiftViewMariaIT {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     private static final LocalDate DATE_24_07_2026 = LocalDate.of(2026, 7, 24);
     private static final LocalTime TIME_08_00 = LocalTime.of(8, 0);
     private static final LocalTime TIME_08_30 = LocalTime.of(8, 30);

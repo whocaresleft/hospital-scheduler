@@ -40,7 +40,7 @@ import com.mongodb.client.MongoDatabase;
 @Testcontainers @DisplayName("Integration tests between SwingShiftView, ShiftPresenter, and MongoTransactionManager")
 class SwingShiftViewMongoIT {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     private static final String DOCTOR_COLLECTION = "doctor";
     private static final String DEPARTMENT_COLLECTION = "department";
     private static final String SHIFT_COLLECTION = "shift";

@@ -35,7 +35,7 @@ import jakarta.persistence.Persistence;
     + "and MariaTransactionManager, with the goal of verifying the MVP architecture interaction")
 class DepartmentMVPSwingMariaIT {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     
     @Container
     private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.11");

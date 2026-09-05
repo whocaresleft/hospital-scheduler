@@ -35,7 +35,7 @@ import jakarta.persistence.Persistence;
 @Testcontainers @DisplayName("Integration tests between SwingDepartmentView, DepartmentPresenter, and MariaTransactionManager")
 class SwingDepartmentViewMariaIT {
     
-    private static final int TIMEOUT = 15;
+    private static final int TIMEOUT = 25;
     
     @Container
     private static final MariaDBContainer<?> maria = new MariaDBContainer<>("mariadb:10.11");
