@@ -43,13 +43,13 @@ public class SwingHospitalApp implements Callable<Void>{
     @Option(names = {"--db-mongo-name"}, description = "MongoDB database name")
     private String databaseName = "hospital";
     
-    @Option(names = {"--db-mongo-doctor-collection"}, description = "Doctor collectio name")
+    @Option(names = {"--db-mongo-doctor-collection"}, description = "Doctor collection name")
     private String doctorCollection = "doctor";
     
-    @Option(names = {"--db-mongo-department-collection"}, description = "Department collectio name")
+    @Option(names = {"--db-mongo-department-collection"}, description = "Department collection name")
     private String departmentCollection = "department";
     
-    @Option(names = {"--db-mongo-shift-collection"}, description = "Shift collectio name")
+    @Option(names = {"--db-mongo-shift-collection"}, description = "Shift collection name")
     private String shiftCollection = "shift";
     
     @Option(names = {"--maria-user"}, description = "MariaDB username")

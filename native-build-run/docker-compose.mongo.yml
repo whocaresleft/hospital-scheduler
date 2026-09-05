@@ -29,7 +29,6 @@ services:
         mongo --host mongodb:27017 --eval '
           var status = rs.status()
           if (status.ok === 1) {
-            rs.status();
             print("Replica Set already configured");
           } else {
             rs.initiate({
