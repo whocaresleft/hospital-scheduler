@@ -1,6 +1,6 @@
 # Hospital Scheduler
 Project for the AST exam at University of Florence, master's deegre in Software: Science and Technology. The application is a manager for doctor-department schedule.<br>
-`N.B.` the file [Report.pdf](https://github.com/whocaresleft-hospital-scheduler/Report.pdf) is the same report that was submitted on Moodle, just under a different name.
+`N.B.` the file [Report.pdf](https://github.com/whocaresleft/hospital-scheduler/blob/main/Report.pdf) is the same report that was submitted on Moodle, just under a different name.
 
 ## Cool Badges
 [![Java CI with Maven in Linux](https://github.com/whocaresleft/hospital-scheduler/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/whocaresleft/hospital-scheduler/actions/workflows/ci-linux.yml)
@@ -47,7 +47,7 @@ This project is a multi-module Maven project, consisting of seven following sub-
 * `report`: Module used to aggregate the generated JaCoCo and Pitest reports, into a single html file (I mean one for JaCoCo and one for Pitest, if they are enabled);
 * `app`: Contains the Main class (used to start the Swing application), as well as the **e2e** tests.
 
-For a better explaination of the contents of the modules **model**, **presentation**, and **app** it would be best to consult the [Report.pdf](https://github.com/whocaresleft-hospital-scheduler/Report.pdf) present in the repository.
+For a better explaination of the contents of the modules **model**, **presentation**, and **app** it would be best to consult the [Report.pdf](https://github.com/whocaresleft/hospital-scheduler/blob/main/Report.pdf) present in the repository.
 
 ## Dependencies
 I highly suggest having **make** installed in order to use the given **Makefile**. In case **make** is already installed, it can be used to check the presence of the other dependencies.
